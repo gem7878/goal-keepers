@@ -1,95 +1,138 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import { CreateButton, Modal, MyGoals } from "@/components";
+import { useEffect, useState } from "react";
+import Image1 from "../../public/assets/images/aurora.jpg";
+import Image2 from "../../public/assets/images/gem.png";
+import { createPortal } from "react-dom";
+import { StaticImageData } from "next/image";
+
 export default function Home() {
+  const [isMyGoals, setIsMyGoals] = useState(true);
+  const [isOpen, setOpen] = useState(false);
+  const [portalElement, setPortalElement] = useState<Element | null>(null);
+  const [selectGoalNum, setSelectGoalNum] = useState<number | null>(null);
+  const [selectData, setSelectData] = useState<{
+    image: any;
+    goalTitle: string;
+    goalContent: string;
+    startDate: string;
+    endDate: string;
+    goalComment: string[];
+  } | null>(null);
+
+  const myGoalList = [
+    {
+      image: Image1,
+      goalTitle: "오로라보기1",
+      goalContent:
+        "상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용",
+      startDate: "2023-12-17",
+      endDate: "2024-03-17",
+      goalComment: ["예약했음"],
+    },
+    {
+      image: Image2,
+      goalTitle: "오로라보기2",
+      goalContent: "상세내용",
+      startDate: "2023-12-17",
+      endDate: "2024-03-17",
+      goalComment: ["예약했음"],
+    },
+    {
+      image: Image1,
+      goalTitle: "오로라보기3",
+      goalContent: "상세내용",
+      startDate: "2023-12-17",
+      endDate: "2024-03-17",
+      goalComment: ["예약했음"],
+    },
+    {
+      image: Image1,
+      goalTitle: "오로라보기4",
+      goalContent: "상세내용",
+      startDate: "2023-12-17",
+      endDate: "2024-03-17",
+      goalComment: ["예약했음"],
+    },
+    {
+      image: Image2,
+      goalTitle: "오로라보기5",
+      goalContent: "상세내용",
+      startDate: "2023-12-17",
+      endDate: "2024-03-17",
+      goalComment: ["예약했음"],
+    },
+  ];
+
+  useEffect(() => {
+    selectGoalNum !== null ? setOpen(true) : setOpen(false);
+    if (selectGoalNum !== null) {
+      setOpen(true);
+      setSelectData(myGoalList[selectGoalNum]);
+    } else {
+      setOpen(false);
+      setSelectData(null);
+    }
+  }, [selectGoalNum]);
+
+  useEffect(() => {
+    setPortalElement(document.getElementById("portal"));
+  }, [isOpen]);
+
+  const handleTab = (boolean: boolean) => {
+    setIsMyGoals(boolean);
+  };
   return (
-    <main className={styles.main}>
-      <h1>골키퍼스</h1>
-      {/* <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div> */}
-    </main>
-  )
+    <div className="flex flex-col	w-full h-full items-center justify-center">
+      <header className="fixed top-3 right-5">
+        <button>alarm</button>
+      </header>
+      <section className="w-11/12 h-[calc(100%-60px)]  text-white">
+        <nav className="w-full h-10">
+          <ul className="flex h-full">
+            <li
+              className={`w-24 ${
+                isMyGoals ? `bg-orange-300` : `bg-amber-500`
+              } rounded-se-full`}
+            >
+              <button
+                className="w-full h-full pr-3"
+                onClick={() => handleTab(true)}
+              >
+                나의 목표
+              </button>
+            </li>
+            <li
+              className={`w-24 ${
+                !isMyGoals ? `bg-orange-300` : `bg-amber-500`
+              } rounded-se-full`}
+            >
+              <button
+                className="w-full h-full pr-3"
+                onClick={() => handleTab(false)}
+              >
+                팀 목표
+              </button>
+            </li>
+          </ul>
+        </nav>
+        <MyGoals
+          myGoalList={myGoalList}
+          setSelectGoalNum={setSelectGoalNum}
+        ></MyGoals>
+      </section>
+      <CreateButton></CreateButton>
+      {isOpen && portalElement
+        ? createPortal(
+            <Modal
+              setOpen={setOpen}
+              selectData={selectData}
+              setSelectGoalNum={setSelectGoalNum}
+            />,
+            portalElement
+          )
+        : null}
+    </div>
+  );
 }
