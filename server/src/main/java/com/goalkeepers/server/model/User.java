@@ -1,26 +1,24 @@
 package com.goalkeepers.server.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Builder
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name= "USER_INFO_TB")
 public class User {
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String loginId;
-    private String password;
-    private String nickname;
+    @Column(unique = true)
+    private String email;
 
-    private UserRole role;
+    private String password;
+
+    @Column(unique = true)
+    private String nickname;
 }
