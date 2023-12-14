@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.goalkeepers.server.model.Tutorial;
+import com.goalkeepers.server.entity.Tutorial;
 
 public interface TutorialRepository extends JpaRepository<Tutorial, Long>{
     

@@ -1,4 +1,4 @@
-package com.goalkeepers.server.service;
+/*package com.goalkeepers.server.service;
 
 import java.util.Optional;
 import java.util.HashMap;
@@ -68,4 +68,4 @@ public class UserService {
         return result;
     }
     
-}
+}*/
