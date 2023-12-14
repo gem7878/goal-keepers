@@ -1,4 +1,4 @@
-package com.goalkeepers.server.controller;
+/*package com.goalkeepers.server.controller;
 
 import java.util.List;
 import java.util.Map;
@@ -63,4 +63,4 @@ public class UserController {
         
         return ResponseEntity.ok(userService.loginUser(user));
     }
-}
+}*/
