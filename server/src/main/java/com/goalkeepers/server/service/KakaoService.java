@@ -2,6 +2,8 @@ package com.goalkeepers.server.service;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -54,7 +56,12 @@ public class KakaoService {
 	public String loginCallback(String code) {	
 		String param = "grant_type=authorization_code&client_id="+CLIENT_ID+"&redirect_uri="+REDIRECT_URI+"&client_secret="+CLIENT_SECRET+"&code="+code;
 		String rtn = httpCallService.Call("POST", TOKEN_URI, "", param);
-        httpSession.setAttribute("token", Trans.token(rtn));     		
+        try {
+			httpSession.setAttribute("token", Trans.token(rtn));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}     		
 		return "";
 	}
 			
