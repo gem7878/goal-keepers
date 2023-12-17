@@ -38,9 +38,13 @@ public class AuthService {
     }
 
     public TokenDto login(MemberRequestDto requestDto) {
-        UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
-        Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
-        return tokenProvider.createJwt(authentication,3);
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
+            Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
+            return tokenProvider.createJwt(authentication,3);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     // 이메일 중복확인
