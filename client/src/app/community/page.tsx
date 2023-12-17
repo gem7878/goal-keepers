@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateButton, PostBox } from "@/components";
+import { CreateButton, PostBox } from "@/components/index.js";
 import React, { useRef, useState } from "react";
 import Image1 from "../../../public/assets/images/aurora.jpg";
 import Image2 from "../../../public/assets/images/gem.png";
