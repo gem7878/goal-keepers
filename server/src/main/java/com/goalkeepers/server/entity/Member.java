@@ -1,8 +1,6 @@
 package com.goalkeepers.server.entity;
 
-import java.time.LocalDateTime;
-
-import org.springframework.data.annotation.CreatedDate;
+import java.util.List;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -22,7 +20,7 @@ import lombok.Setter;
 public class Member {
     
     @Id 
-    @Column(name = "MEMBER_ID")
+    @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -35,9 +33,9 @@ public class Member {
     @Column(unique = true, length = 15)
     private String nickname;
 
-    @CreatedDate
-    private LocalDateTime createDate;
-
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Goal> goals;
 }

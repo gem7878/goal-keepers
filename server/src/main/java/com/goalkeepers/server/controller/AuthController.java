@@ -33,8 +33,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody MemberRequestDto requestDto) {
-        return ResponseEntity.ok(authService.login(requestDto));
+    public ResponseEntity<?> login(@RequestBody MemberRequestDto requestDto) {
+        TokenDto response = authService.login(requestDto);
+        if (response == null) {
+            return ResponseEntity.badRequest().body("로그인에 실패하였습니다.");
+        }
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/email")
