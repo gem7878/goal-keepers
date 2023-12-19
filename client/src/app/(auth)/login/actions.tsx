@@ -2,15 +2,15 @@
 
 import { POST } from "@/app/api/(users)/auth/login/route";
 
-export const handleSubmit = async (formData: any) => {
-  const email = formData.get("email");
-  const password = formData.get("password");
-
-  const postData = {
-    email: formData.get("email"),
-    password: formData.get("password"),
-  };
+export const handleLogin = async (postData: {
+  email: string;
+  password: string;
+}) => {
   return POST(postData)
-    .then((response) => console.log("Response Success"))
+    .then((response) => {
+      if (response.statusCode == 200) {
+        return JSON.parse(response.body);
+      }
+    })
     .catch((error) => console.log(error));
 };

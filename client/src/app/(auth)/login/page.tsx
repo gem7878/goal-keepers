@@ -3,7 +3,10 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import axios from "axios";
-import { handleSubmit } from "./actions";
+import { handleLogin } from "./actions";
+import Image from "next/image";
+import kakaoButton from "../../../../public/kakao_login_buttons/kakao_login_medium_wide.png";
+import { useRouter } from "next/navigation";
 
 interface LoginTypes {
   email: string;
@@ -11,50 +14,74 @@ interface LoginTypes {
 }
 
 const Login = () => {
-  const [post, setPost] = useState<LoginTypes | null>(null);
-
-  // const getPostByLogin = async (email: string, password: string) => {
-  //   try {
-  //     const response = await axios.post("/auth/login", {
-  //       email: email,
-  //       password: password,
-  //     });
-  //     console.log("서버 응답", response.data);
-  //   } catch (error) {
-  //     console.log("오류 발생");
-  //   }
-  // };
-
-  // const handleSubmit = async (formData: any) => {
-  //   console.log(formData.get("email"));
-  //   console.log(formData.get("password"));
-  // };
-  console.log("hello");
+  const router = useRouter();
+  const handleSubmit = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const postData = {
+      email: form.email?.value,
+      password: form.password?.value,
+    };
+    await handleLogin(postData)
+      .then((response) => {
+        localStorage.setItem("accessToken", response.accessToken);
+        router.push("/");
+      })
+      .catch((error) => console.log(error));
+  };
 
   return (
-    <div>
-      <h2>login page</h2>
-      <button onClick={() => console.log("hello world")}>확인</button>
-      <form action={handleSubmit}>
+    <>
+      <h2 className="w-full text-center text-3xl font-extrabold mt-20 h-24 font-['MoiraiOne'] text-orange-400">
+        골키퍼스
+      </h2>
+      <form onSubmit={handleSubmit} className="flex flex-col w-full gap-2">
         <input
-          type="text"
-          placeholder="이메일을 입력하세요"
+          type="email"
+          placeholder="example@example.com"
           name="email"
+          className="w-full h-11 border rounded-md p-3"
         ></input>
         <input
-          type="text"
-          placeholder="비밀번호를 입력하세요"
+          type="password"
+          placeholder="password"
           name="password"
+          className="w-full h-11 border rounded-md p-3 mb-5"
         ></input>
-        <input type="submit" value={"로그인"}></input>
+        <input
+          className="gk-primary-login-button"
+          type="submit"
+          value={"로그인"}
+        ></input>
       </form>
-      <Link href={"/register"}>회원가입</Link>
-      <Link href={"/forgot-password"}>비밀번호 찾기</Link>
-      <section>
-        <h4>소셜로그인</h4>
-        <Link href="/social-register">kakao</Link>
-      </section>
-    </div>
+      <hr className="border-dashed"></hr>
+      <div className="flex flex-col w-full gap-1">
+        <button className="w-full h-9 border rounded-md" type="button">
+          <Image
+            src={kakaoButton}
+            alt=""
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderRadius: "0.375rem",
+            }}
+          ></Image>
+        </button>
+        <Link
+          href={"/forgot-password"}
+          className="w-full text-center h-9 border rounded-md leading-9 text-sm text-gray-600"
+        >
+          아이디 / 비밀번호 찾기
+        </Link>
+        <Link
+          href={"/register"}
+          className="w-full text-center h-9 border rounded-md leading-9 text-sm text-gray-600"
+        >
+          회원가입
+        </Link>
+      </div>
+    </>
   );
 };
 
