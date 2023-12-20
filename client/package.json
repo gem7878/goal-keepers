@@ -9,9 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/cookie": "^0.6.0",
+    "@types/js-cookie": "^3.0.6",
     "@types/shortid": "^0.0.32",
     "axios": "^1.6.2",
+    "cookie": "^0.6.0",
     "http-proxy-middleware": "^2.0.6",
+    "js-cookie": "^3.0.5",
     "next": "14.0.3",
     "react": "^18",
     "react-dom": "^18",

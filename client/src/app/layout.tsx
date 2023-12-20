@@ -4,7 +4,9 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/index.js";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { handleConfirmToken } from "./actions";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const loginPath = [
     "/login",
     "/register",
@@ -26,6 +29,16 @@ export default function RootLayout({
     "/find",
     "social-register",
   ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const tokenData = await handleConfirmToken();
+      if (!tokenData && !loginPath.includes(pathname)) {
+        router.push("/login");
+      }
+    };
+    fetchData();
+  }, [pathname]);
 
   return (
     <html lang="en">
