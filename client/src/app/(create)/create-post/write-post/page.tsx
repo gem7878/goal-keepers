@@ -1,7 +1,7 @@
 import React from "react";
 
-import Image1 from "../../../../public/assets/images/aurora.jpg";
-import Image2 from "../../../../public/assets/images/gem.png";
+import Image1 from "../../../../../public/assets/images/aurora.jpg";
+import Image2 from "../../../../../public/assets/images/gem.png";
 import Image from "next/image";
 const WritePost = () => {
   const goalData = {
@@ -43,6 +43,7 @@ const WritePost = () => {
           <textarea
             placeholder="포스트 내용을 작성하세요."
             className="text-sm w-full border h-[calc(100%-40px)] mt-2 p-2"
+            value={""}
           ></textarea>
         </article>
       </div>
