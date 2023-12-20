@@ -6,7 +6,7 @@ interface POSTTypes {
   password: string;
 }
 
-export const POST = async (request: POSTTypes) => {
+export const POST = async (request: POSTTypes,) => {
   console.log("연동됐니?");
 
   try {
@@ -21,7 +21,7 @@ export const POST = async (request: POSTTypes) => {
         withCredentials: true,
       }
     );
-
+    
     return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error: any) {
     console.error("Error during request setup:", error.message);

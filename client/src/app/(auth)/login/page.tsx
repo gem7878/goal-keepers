@@ -7,6 +7,7 @@ import { handleLogin } from "./actions";
 import Image from "next/image";
 import kakaoButton from "../../../../public/kakao_login_buttons/kakao_login_medium_wide.png";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 interface LoginTypes {
   email: string;
@@ -24,9 +25,13 @@ const Login = () => {
     };
     await handleLogin(postData)
       .then((response) => {
-        localStorage.setItem("accessToken", response.accessToken);
-        router.push("/");
+        if (response?.ok) {
+          router.push("/");
+        } else {
+          alert("이메일 또는 비밀번호가 일치하지 않습니다.");
+        }
       })
+
       .catch((error) => console.log(error));
   };
 
