@@ -17,7 +17,7 @@ export default function AuthLayout({
 }) {
   const pathname = usePathname();
   return (
-    <div>
+    <section className="h-5/6 w-10/12 flex flex-col justify-between">
       {/* {navLink.map((link) => {
         const isActive = pathname.startsWith(link.href);
         return (
@@ -31,6 +31,6 @@ export default function AuthLayout({
         );
       })} */}
       {children}
-    </div>
+    </section>
   );
 }

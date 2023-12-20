@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateButton, Modal, MyGoals } from "@/components";
+import { CreateButton, Modal, MyGoals } from "@/components/index.js";
 import { useEffect, useState } from "react";
 import Image1 from "../../public/assets/images/aurora.jpg";
 import Image2 from "../../public/assets/images/gem.png";
