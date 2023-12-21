@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Image1 from "../../../../public/assets/images/aurora.jpg";
-import Image2 from "../../../../public/assets/images/gem.png";
+import Image1 from "../../../../../public/assets/images/aurora.jpg";
+import Image2 from "../../../../../public/assets/images/gem.png";
 import Image from "next/image";
 
 const SelectGoal = () => {
@@ -86,7 +86,8 @@ const SelectGoal = () => {
                 onMouseLeave={() => handleMouseEnter(null)}
                 onClick={() => handleImageClick(index)}
                 className={`relative w-[calc(33%-8px)] aspect-square	${
-                  selectNumber === index && "outline outline-4 outline-orange-300"
+                  selectNumber === index &&
+                  "outline outline-4 outline-orange-300"
                 }`}
               >
                 <Image
