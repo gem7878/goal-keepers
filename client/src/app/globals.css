@@ -41,3 +41,13 @@ body {
 .gk-primary-create-section {
   @apply flex w-4/5 flex-col	items-center justify-between	h-4/5;
 }
+.gk-primary-login-button {
+  @apply w-full bg-orange-300 text-white h-11 font-bold text-lg rounded-md;
+}
+.gk-primary-login-button:disabled {
+  background-color: rgb(190, 190, 190); /* 흐린 색상의 배경 적용 */
+}
+@font-face {
+  font-family: "MoiraiOne";
+  src: url("../../public/assets/font/MoiraiOne-Regular.ttf");
+}
