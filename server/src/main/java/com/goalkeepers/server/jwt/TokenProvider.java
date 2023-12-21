@@ -46,38 +46,34 @@ public class TokenProvider {
 
     // 토큰 생성
     public TokenDto createJwt(Authentication authentication, long expirationHs) {
+
+        String authorities = authentication.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .collect(Collectors.joining(","));
+
+        // 토큰 만료 시간 설정
+        Date tokenExpiresIn = new Date(System.currentTimeMillis() + 1000*60*60*expirationHs);
+
+        // 토큰 생성
+        String jws = Jwts.builder()
+                        .subject(authentication.getName())
+                        .claim(AUTHORITIES_KEY, authorities)
+                        .expiration(tokenExpiresIn)
+                        .issuedAt(new Date())
+                        .signWith(key)
+                        .compact();
         try {
-            
-            String authorities = authentication.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.joining(","));
-
-            // 토큰 만료 시간 설정
-            Date tokenExpiresIn = new Date(System.currentTimeMillis() + 1000*60*60*expirationHs);
-
-            // 토큰 생성
-            String jws = Jwts.builder()
-                            .subject(authentication.getName())
-                            .claim(AUTHORITIES_KEY, authorities)
-                            .expiration(tokenExpiresIn)
-                            .issuedAt(new Date())
-                            .signWith(key)
-                            .compact();
-            
             // 토큰 확인
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(jws).getPayload().getSubject().equals(authentication.getName());                                                                                         
-            
-            return TokenDto.builder()
-                    .grantType(BEARER_TYPE)
-                    .accessToken(jws)
-                    .tokenExpiresIn(tokenExpiresIn.getTime())
-                    .build();
-
-        } catch (JwtException  e) {
-            log.info("토큰 생성 중 오류가 있습니다.");
-        }
-
-        return null;
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(jws).getPayload().getSubject().equals(authentication.getName());      
+        } catch (Exception e) {
+            throw new JwtException("토큰 생성 중 오류가 있습니다.");
+        }                                                                                   
+        
+        return TokenDto.builder()
+                .grantType(BEARER_TYPE)
+                .accessToken(jws)
+                .tokenExpiresIn(tokenExpiresIn.getTime())
+                .build();
     }
 
     // 토큰 검증
