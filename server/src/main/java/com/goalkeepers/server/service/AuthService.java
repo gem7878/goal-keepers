@@ -1,5 +1,7 @@
 package com.goalkeepers.server.service;
 
+import java.util.Optional;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -15,9 +17,6 @@ import com.goalkeepers.server.repository.MemberRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -43,37 +42,27 @@ public class AuthService {
         return tokenProvider.createJwt(authentication,3);
     }
 
+    // 멤버 정보 가져오기
+    public Optional<Member> loadMemberByEmail(String email) {
+        return memberRepository.findByEmail(email);
+    }
+
     // 이메일 중복확인
-    public Map<String, Object> confirmDuplicateEmail(String email) {
+    public Boolean confirmDuplicateEmail(String email) {
         Boolean isExistsEmail = memberRepository.existsByEmail(email);
-        Map<String, Object> response = new HashMap<>();
-        
         if (isExistsEmail) {
-            response.put("success", false);
-            response.put("message", "이미 가입된 이메일입니다.");
+            throw new RuntimeException("이미 가입되어 있는 이메일입니다.");
         } else {
-            response.put("success", true);
-            response.put("message", "사용 가능한 이메일입니다.");
-            response.put("email", email);
+            return true;
         }
-        //System.out.println(response);
-        return response;
     }
 
     // 닉네임 중복확인
-    public Map<String, Object> confirmDuplicateNickname(String nickname) {
-        Boolean isExistsNickname = memberRepository.existsByNickname(nickname);
-        Map<String, Object> response = new HashMap<>();
-        
-        if (isExistsNickname) {
-            response.put("success", false);
-            response.put("message", "사용중인 닉네임입니다.");
+    public Boolean confirmDuplicateNickname(String nickname) {       
+        if (memberRepository.existsByNickname(nickname)) {
+            throw new RuntimeException("사용중인 닉네임입니다.");
         } else {
-            response.put("success", true);
-            response.put("message", "사용 가능한 닉네임입니다.");
-            response.put("nickname", nickname);
+            return true;
         }
-        //System.out.println(response);
-        return response;
     }
 }

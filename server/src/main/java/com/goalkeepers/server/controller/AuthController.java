@@ -12,9 +12,9 @@ import com.goalkeepers.server.service.AuthService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,23 +28,49 @@ public class AuthController {
     private final AuthService authService;
     
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto> signup(@RequestBody MemberRequestDto requestDto) {
-        return ResponseEntity.ok(authService.signup(requestDto));
+    public ResponseEntity<?> signup(@RequestBody MemberRequestDto requestDto) {
+        try {
+            MemberResponseDto responseDto = authService.signup(requestDto);
+            return ResponseEntity.ok(responseDto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e ) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody MemberRequestDto requestDto) {
-        return ResponseEntity.ok(authService.login(requestDto));
+    public ResponseEntity<?> login(@RequestBody MemberRequestDto requestDto) {
+        try {
+            TokenDto response = authService.login(requestDto);
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e ) {
+            return ResponseEntity.badRequest().body("아이디 또는 비밀번호가 일치하지 않습니다.");
+        }
     }
 
     @PostMapping("/email")
-    public ResponseEntity<Map<String, Object>> emailConfirm(@RequestBody ConfirmEmailRequestDto requestDto) {
-        return ResponseEntity.ok(authService.confirmDuplicateEmail(requestDto.getEmail()));
+    public ResponseEntity<String> emailConfirm(@RequestBody ConfirmEmailRequestDto requestDto) {
+        try {
+            authService.confirmDuplicateEmail(requestDto.getEmail());
+            return ResponseEntity.ok("사용가능한 이메일입니다.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e ) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/nickname")
-    public ResponseEntity<Map<String, Object>> nicknameConfirm(@RequestBody ConfirmNicknameRequestDto requestDto) {
-        return ResponseEntity.ok(authService.confirmDuplicateNickname(requestDto.getNickname()));
+    public ResponseEntity<String> nicknameConfirm(@RequestBody ConfirmNicknameRequestDto requestDto) {
+        try {
+            authService.confirmDuplicateNickname(requestDto.getNickname());
+            return ResponseEntity.ok("사용가능한 닉네임입니다.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e ) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     
 }
