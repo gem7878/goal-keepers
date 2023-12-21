@@ -40,6 +40,7 @@ public class LikeShareService {
             // 좋아요 취소
             post.setLikeCnt(post.getLikeCnt()-1);
             likeRepository.deleteByMemberAndPost(member, post);
+            throw new RuntimeException("좋아요 취소");
         } else {
             // 좋아요
             post.setLikeCnt(post.getLikeCnt()+1);
@@ -58,6 +59,7 @@ public class LikeShareService {
             // 공유 취소
             goal.setShareCnt(goal.getShareCnt()-1);
             shareRepository.deleteByMemberAndGoal(member, goal);
+            throw new RuntimeException("공유 취소");
         } else {
             // 공유
             goal.setShareCnt(goal.getShareCnt()+1);
