@@ -3,6 +3,10 @@ package com.goalkeepers.server.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
+
+import com.goalkeepers.server.dto.GoalRequestDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,16 +22,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name= "GOAL_TB")
 public class Goal {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "goal_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,9 +59,21 @@ public class Goal {
     @NotNull
     private LocalDate endDate;
 
-    @Column(unique = true)
+    @Column
     private String imageUrl;
+
+    @ColumnDefault("0")
+    private int shareCnt;
 
     @OneToMany(mappedBy = "goal")
     private List<Post> posts;
+
+    public static Goal goalUpdate(Goal goal, GoalRequestDto requestDto) {
+        goal.title = requestDto.getTitle();
+        goal.description = requestDto.getDescription();
+        goal.startDate = requestDto.getStartDate();
+        goal.endDate = requestDto.getEndDate();
+        goal.imageUrl = requestDto.getImageUrl();
+        return goal;
+    }
 }

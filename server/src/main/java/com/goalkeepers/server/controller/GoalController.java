@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
+import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.service.GoalService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,36 +28,71 @@ public class GoalController {
      *  나의 전체 버킷리스트 보기
         버킷 상세 보기
         버킷 생성
-        버킷 삭제
         버킷 수정
+        버킷 삭제
      */
 
     private final GoalService goalService;
 
-    @GetMapping("/me")
-    public ResponseEntity<List<GoalResponseDto>> getMyGoalLists() {
-        return ResponseEntity.ok(goalService.getMyGoalList());
+    @GetMapping("/all")
+    public ResponseEntity<?> getMyGoalLists() {
+        try {
+            List<GoalResponseDto> response = goalService.getMyGoalList();
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("나의 Goal 정보를 불러오는데 실패했습니다.");
+        }
+        
     }
-    /* 버킷 상세 보기 추가해야됨 */
-    /*@GetMapping("/me")
+
+    @GetMapping("/goal")
     public ResponseEntity<?> getMyGoal(@RequestParam(name = "id") Long id) {
-        return ResponseEntity.ok("");
-    }*/
+        try {
+            List<PostResponseDto> response = goalService.getSelectedGoal(id);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("나의 Goal 정보를 불러오는데 실패했습니다.");
+        }
+    }
 
     @PostMapping("/goal")
-    public ResponseEntity<GoalResponseDto> createMyGoal(@RequestBody GoalRequestDto requestDto) {
-        return ResponseEntity.ok(goalService.createMyGoal(requestDto));
+    public ResponseEntity<?> createMyGoal(@RequestBody GoalRequestDto requestDto) {
+        try {
+            GoalResponseDto response = goalService.createMyGoal(requestDto);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("나의 Goal 생성에 실패하였습니다.");
+        }
     }
 
     @PutMapping("/goal")
-    public ResponseEntity<GoalResponseDto> updateMyGoal(@RequestParam(name = "id") Long id, @RequestBody GoalRequestDto requestDto) {
-        return ResponseEntity.ok(goalService.updateMyGoal(requestDto, id));
+    public ResponseEntity<?> updateMyGoal(@RequestParam(name = "id") Long id, @RequestBody GoalRequestDto requestDto) {
+        try {
+            GoalResponseDto response = goalService.updateMyGoal(requestDto, id);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("나의 Goal 수정에 실패하였습니다.");
+        }
     }
 
     @DeleteMapping("/goal")
     public ResponseEntity<String> deleteMyGoal(@RequestParam(name = "id") Long id) {
-        goalService.deleteMyGoal(id);
-        return ResponseEntity.ok(id + " Goal을 삭제하였습니다.");
+        try {
+            goalService.deleteMyGoal(id);
+            return ResponseEntity.ok(id + " Goal을 삭제하였습니다.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("나의 Goal 삭제에 실패하였습니다.");
+        }
     }
     
 }

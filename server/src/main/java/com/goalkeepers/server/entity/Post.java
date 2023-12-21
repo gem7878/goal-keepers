@@ -1,9 +1,12 @@
 package com.goalkeepers.server.entity;
 
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import com.goalkeepers.server.dto.PostRequestDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,16 +15,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "POST_TB")
 public class Post {
     
@@ -38,15 +46,9 @@ public class Post {
     private String content;
 
     @ColumnDefault("0")
-    @NotNull
     private int likeCnt;
 
-    @ColumnDefault("0")
-    @NotNull
-    private int shareCnt;
-
-    @NotNull
-    @CreationTimestamp
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,7 +58,15 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
-    @NotNull
     private Goal goal;
+
+    @OneToMany(mappedBy = "post")
+    private List<PostComment> comments;
+
+    public static Post postUpdate(Post post, PostRequestDto requestDto) {
+        post.title = requestDto.getTitle();
+        post.content = requestDto.getContent();
+        return post;
+    }
    
 }
