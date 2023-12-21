@@ -30,7 +30,7 @@ public class MemberController {
 
     @PostMapping("/nickname")
     public ResponseEntity<MemberResponseDto> setMemberNickname(@RequestBody MemberRequestDto requestDto) {
-        return ResponseEntity.ok(memberService.changeMemberNickname(requestDto.getEmail(), requestDto.getNickname()));
+        return ResponseEntity.ok(memberService.changeMemberNickname(requestDto.getNickname()));
     }
     
     @PostMapping("/password")

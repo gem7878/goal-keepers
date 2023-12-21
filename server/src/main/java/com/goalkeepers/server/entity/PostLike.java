@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "SHARE_TB")
-public class PostShare {
+@Table(name = "LIKE_TB")
+public class PostLike {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "share_id")
+    @Column(name = "like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,4 +33,9 @@ public class PostShare {
     @JoinColumn(name = "post_id")
     @NotNull
     private Post post;
+
+    public PostLike(Member member, Post post) {
+        this.member = member;
+        this.post = post;
+    }
 }
