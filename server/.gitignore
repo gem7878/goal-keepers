@@ -46,3 +46,6 @@ HELP.md
 settings.gradle
 application.properties
 Dockerfile
+flyway.user.toml
+report.html
+report.json

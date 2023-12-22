@@ -1,15 +1,8 @@
 package com.goalkeepers.server.dto;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
-import com.goalkeepers.server.entity.Role;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

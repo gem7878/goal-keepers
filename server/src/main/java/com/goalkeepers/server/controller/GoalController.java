@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalkeepers.server.dto.GoalPostResponseDto;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
-import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.service.GoalService;
 
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class GoalController {
     @GetMapping("/goal")
     public ResponseEntity<?> getMyGoal(@RequestParam(name = "id") Long id) {
         try {
-            List<PostResponseDto> response = goalService.getSelectedGoal(id);
+            List<GoalPostResponseDto> response = goalService.getSelectedGoal(id);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

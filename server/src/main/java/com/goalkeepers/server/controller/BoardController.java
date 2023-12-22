@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
+import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalShareRequestDto;
 import com.goalkeepers.server.dto.PostLikeRequestDto;
+import com.goalkeepers.server.dto.PostListPageResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.service.BoardService;
 import com.goalkeepers.server.service.CommentService;
+import com.goalkeepers.server.service.GoalService;
 import com.goalkeepers.server.service.LikeShareService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,16 +35,24 @@ public class BoardController {
     private final BoardService boardService;
     private final CommentService commentService;
     private final LikeShareService likeShareService;
+    private final GoalService goalService;
 
     /*
      *  여러 유저의 포스트 보기
-        담기
         좋아요
+        담기
      */
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllPost() {
-        return ResponseEntity.ok(boardService.getAllPostList());
+        try {
+            List<PostListPageResponseDto> response = boardService.getAllPostList();
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("게시판 불러오기 실패했습니다.");
+        }
     }
 
     @PostMapping("/post/like")
@@ -56,6 +67,20 @@ public class BoardController {
         }
     }
 
+    // 연결된 골 찾기
+    @GetMapping("/goal/share")
+    public ResponseEntity<?> findMyGoalWithShare(@RequestBody GoalShareRequestDto requestDto) {
+        try {
+            GoalResponseDto response = likeShareService.findGoal(requestDto);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("연결된 골 찾기 실패하였습니다.");
+        }
+    }
+
+    // 공유하기 -> 골 만들기
     @PostMapping("/goal/share")
     public ResponseEntity<?> postShare(@RequestBody GoalShareRequestDto requestDto) {
         try {
@@ -65,6 +90,19 @@ public class BoardController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("담기 실패하였습니다.");
+        }
+    }
+
+    // 공유 취소하기 -> 골 삭제하기
+    @DeleteMapping("/goal/share")
+    public ResponseEntity<?> deleteShare(@RequestBody GoalShareRequestDto requestDto) {
+        try {
+            goalService.deleteMyGoal(requestDto.getGoalId());
+            return ResponseEntity.ok("Goal " + requestDto.getGoalId() + " 삭제 성공");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("삭제 실패하였습니다.");
         }
     }
 

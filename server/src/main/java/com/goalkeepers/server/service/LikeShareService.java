@@ -1,9 +1,12 @@
 package com.goalkeepers.server.service;
 
+import java.time.LocalDate;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.goalkeepers.server.config.SecurityUtil;
+import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalShareRequestDto;
 import com.goalkeepers.server.dto.PostLikeRequestDto;
 import com.goalkeepers.server.entity.Goal;
@@ -29,7 +32,6 @@ public class LikeShareService {
     private final GoalRepository goalRepository;
     private final PostRepository postRepository;
 
-
     // 좋아요
     public void addLike(PostLikeRequestDto requestDto) {
         Member member = isMemberCurrent();
@@ -47,23 +49,57 @@ public class LikeShareService {
             likeRepository.save(new PostLike(member, post));
         }
     }
-    
 
-    // 공유하기
-    public void addShare(GoalShareRequestDto requestDto) {
+    // 연결된 골 찾기
+    public GoalResponseDto findGoal(GoalShareRequestDto requestDto) {
+        Member member = isMemberCurrent();
+        Goal goal = goalRepository.findById(requestDto.getGoalId())
+                    .orElseThrow(() -> new RuntimeException("Goal Id를 확인해주세요."));
+        GoalShare share = shareRepository.findByMemberAndGoal(member, goal)
+                                        .orElseThrow(() -> new RuntimeException("이 Goal과 연결된 나의 Goal이 없습니다."));
+        
+        Goal shareGoal = goalRepository.findByShare(share)
+                                        .orElseThrow(() -> new RuntimeException("나의 Goal이 없습니다."));
+        return GoalResponseDto.of(shareGoal);
+    }
+
+    // 공유하기 -> 골 만들기
+    public GoalResponseDto addShare(GoalShareRequestDto requestDto) {
         Member member = isMemberCurrent();
         Goal goal = goalRepository.findById(requestDto.getGoalId())
                     .orElseThrow(() -> new RuntimeException("Goal Id를 확인해주세요."));
 
-        if(shareRepository.existsByMemberAndGoal(member, goal)) {
-            // 공유 취소
-            goal.setShareCnt(goal.getShareCnt()-1);
-            shareRepository.deleteByMemberAndGoal(member, goal);
-            throw new RuntimeException("공유 취소");
+        // 공유한 적이 없는지 -> 내 골이 아닌지
+        if (shareRepository.existsByMemberAndGoal(member, goal)) {
+            throw new RuntimeException("공유된 Goal입니다.");
+        } else if (goal.getMember().equals(member)) {
+            throw new RuntimeException("내 Goal입니다.");
         } else {
-            // 공유
+            GoalShare share = shareRepository.save(new GoalShare(member, goal));
             goal.setShareCnt(goal.getShareCnt()+1);
-            shareRepository.save(new GoalShare(member, goal));
+            
+            // 새로운 골 만들기
+            LocalDate startDate = LocalDate.now();
+            Goal newGoal = goalRepository.save(new Goal(
+                                share,
+                                goal.getTitle(),
+                                goal.getDescription(),
+                                goal.getImageUrl(),
+                                startDate,
+                                startDate.plusYears(1),
+                                member));
+            return GoalResponseDto.of(newGoal);
+        }
+    }
+
+    // Share 데이터 삭제
+    public void deleteShare(Goal goal) {
+        GoalShare share = goal.getShare();
+        if (share != null) {
+            Goal sharedGoal = share.getGoal();
+            sharedGoal.setShareCnt(sharedGoal.getShareCnt()-1);
+            goal.setShare(null);
+            shareRepository.delete(share);
         }
     }
 
