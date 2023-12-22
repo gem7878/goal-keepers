@@ -1,0 +1,1 @@
+ALTER TABLE public.post_tb ALTER COLUMN goal_id DROP NOT NULL;

@@ -8,15 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.goalkeepers.server.config.SecurityUtil;
+import com.goalkeepers.server.dto.GoalPostResponseDto;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
-import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
-import com.goalkeepers.server.repository.PostRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,7 +25,7 @@ public class GoalService {
     
     private final GoalRepository goalRepository;
     private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
+    private final LikeShareService shareService;
 
     /*
      *  나의 전체 버킷리스트 보기
@@ -44,14 +43,14 @@ public class GoalService {
                                 .collect(Collectors.toList());
     }
 
-    public List<PostResponseDto> getSelectedGoal(Long goalId) {
-        Member member = isMemberCurrent();
+    public List<GoalPostResponseDto> getSelectedGoal(Long goalId) {
+        isMemberCurrent();
         Optional<Goal> goal = goalRepository.findById(goalId);
 
         if (goal.isPresent()) {
-            return postRepository.findAllByGoal(goal)
+            return goal.get().getPosts()
                     .stream()
-                    .map(PostResponseDto::listOf)
+                    .map(GoalPostResponseDto::of) // listof
                     .collect(Collectors.toList());
         } else {
             throw new RuntimeException("GoalId를 확인해주세요.");
@@ -80,9 +79,19 @@ public class GoalService {
         Goal goal = goalRepository.findById(goalId)
                     .orElseThrow(() -> new RuntimeException("Goal Id를 확인해주세요."));
         if (goal.getMember().equals(member)) {
+            disconnectedPost(goal);
+            shareService.deleteShare(goal);
             goalRepository.delete(goal);
         } else {
             throw new RuntimeException("로그인한 유저와 작성 유저가 같지 않습니다.");
+        }
+    }
+
+    private void disconnectedPost(Goal goal) {
+        for (Post post : goal.getPosts()) {
+            if(post.getGoal() != null) {
+                post.setGoal(null);
+            }
         }
     }
 

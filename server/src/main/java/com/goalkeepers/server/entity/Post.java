@@ -57,7 +57,7 @@ public class Post {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_id")
+    @JoinColumn(name = "goal_id", nullable = true)
     private Goal goal;
 
     @OneToMany(mappedBy = "post")
