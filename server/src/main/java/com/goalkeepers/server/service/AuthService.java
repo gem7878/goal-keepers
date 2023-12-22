@@ -39,7 +39,7 @@ public class AuthService {
     public TokenDto login(MemberRequestDto requestDto) {
         UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
         Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
-        return tokenProvider.createJwt(authentication,3);
+        return tokenProvider.createJwt(authentication,12);
     }
 
     // 멤버 정보 가져오기
