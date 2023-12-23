@@ -9,7 +9,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.goalkeepers.server.dto.SecurityErrorResponseDto;
+import com.goalkeepers.server.exception.ErrorResponseDto;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +33,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter()
-                .write(objectMapper.writeValueAsString(SecurityErrorResponseDto.of("인증에 실패하였습니다 (UnAuthorized)",HttpStatus.UNAUTHORIZED.value())));
+                .write(objectMapper.writeValueAsString(new ErrorResponseDto("인증에 실패하였습니다 (UnAuthorized)",HttpStatus.UNAUTHORIZED.value())));
     }
 }
