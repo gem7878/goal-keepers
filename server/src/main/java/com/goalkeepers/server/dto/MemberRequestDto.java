@@ -1,16 +1,12 @@
 package com.goalkeepers.server.dto;
 
-import javax.swing.Spring;
-
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.goalkeepers.server.entity.Role;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import com.goalkeepers.server.entity.Member;
 
@@ -32,8 +28,8 @@ public class MemberRequestDto {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
 
-    @Max(value = 15, message = "닉네임은 3 ~ 15자 입니다.")
-    @Min(value = 3, message = "닉네임은 3 ~ 15자 입니다.")
+    @NotBlank(message = "닉네임을 입력해주세요.")
+    @Size(min = 3, max = 15, message = "닉네임은 3 ~ 15자 입니다.")
     private String nickname;
 
     public Member toMember(PasswordEncoder passwordEncoder) {
@@ -43,9 +39,5 @@ public class MemberRequestDto {
                 .nickname(nickname)
                 .role(Role.ROLE_USER)
                 .build();     
-    }
-
-    public UsernamePasswordAuthenticationToken toAuthentication() {
-        return new UsernamePasswordAuthenticationToken(email, password);
     }
 }
