@@ -9,6 +9,7 @@ import com.goalkeepers.server.dto.MemberResponseDto;
 import com.goalkeepers.server.dto.TokenDto;
 import com.goalkeepers.server.service.AuthService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,15 +29,9 @@ public class AuthController {
     private final AuthService authService;
     
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody MemberRequestDto requestDto) {
-        try {
-            MemberResponseDto responseDto = authService.signup(requestDto);
-            return ResponseEntity.ok(responseDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e ) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<?> signup(@Valid @RequestBody MemberRequestDto requestDto) {
+        MemberResponseDto responseDto = authService.signup(requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/login")

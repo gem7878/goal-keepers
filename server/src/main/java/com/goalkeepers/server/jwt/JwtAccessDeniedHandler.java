@@ -9,7 +9,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.goalkeepers.server.dto.SecurityErrorResponseDto;
+import com.goalkeepers.server.exception.ErrorResponseDto;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler{
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter()
-                .write(objectMapper.writeValueAsString(SecurityErrorResponseDto.of("권한이 없습니다 (Forbidden)",HttpStatus.FORBIDDEN.value())));
+                .write(objectMapper.writeValueAsString(new ErrorResponseDto("권한이 없습니다 (Forbidden)",HttpStatus.FORBIDDEN.value())));
     }
     
 }
