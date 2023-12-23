@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,11 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice(basePackages = "com.goalkeepers.server")
 public class GlobalExceptionHandler {
     
-    /**
-	 * javax.validation.Valid or @Validated 으로 binding error 발생시 발생한다.
-	 * HttpMessageConverter 에서 등록한 HttpMessageConverter binding 못할경우 발생
-	 * 주로 @RequestBody, @RequestPart 어노테이션에서 발생
-	 */
+    // @Valid Error
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	protected ResponseEntity<ErrorResponseDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		List<ErrorResponseDto.FieldError> errors = new ArrayList<>();
@@ -73,7 +70,7 @@ public class GlobalExceptionHandler {
 	}
 
 	/**
-	 * Authentication 객체가 필요한 권한을 보유하지 않은 경우 발생합
+	 * Authentication 객체가 필요한 권한을 보유하지 않은 경우 발생
 	 */
 	@ExceptionHandler(AccessDeniedException.class)
 	protected ResponseEntity<ErrorResponseDto> handleAccessDeniedException(AccessDeniedException e) {
@@ -82,11 +79,20 @@ public class GlobalExceptionHandler {
 	}
 
 	/**
+	 * 로그인 중 email 또는 password가 다른 경우
+	 */
+	@ExceptionHandler(BadCredentialsException.class)
+	protected ResponseEntity<ErrorResponseDto> handleBadCredentialException(BadCredentialsException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_CREDENTIALS);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/**
 	 * Business Logic 수행 중 발생시킬 커스텀 에러
 	 */
 	@ExceptionHandler(value = { CustomException.class })
 	protected ResponseEntity<ErrorResponseDto> handleCustomException(CustomException e) {
-		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST); // CustomException에 ErrorCode Enum 반환
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST, e.getMessage());
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 	

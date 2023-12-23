@@ -8,10 +8,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.goalkeepers.server.dto.LoginRequestDto;
 import com.goalkeepers.server.dto.MemberRequestDto;
 import com.goalkeepers.server.dto.MemberResponseDto;
 import com.goalkeepers.server.dto.TokenDto;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.jwt.TokenProvider;
 import com.goalkeepers.server.repository.MemberRepository;
 
@@ -29,14 +31,16 @@ public class AuthService {
 
     public MemberResponseDto signup(MemberRequestDto requestDto) {
         if(memberRepository.existsByEmail(requestDto.getEmail())) {
-            throw new RuntimeException("이미 가입된 이메일입니다.");
+            throw new CustomException("이미 가입된 이메일입니다.");
+        } if (memberRepository.existsByNickname(requestDto.getNickname())) {
+            throw new CustomException("사용중인 닉네임입니다.");
         }
 
         Member member = requestDto.toMember(passwordEncoder);
         return MemberResponseDto.of(memberRepository.save(member));
     }
 
-    public TokenDto login(MemberRequestDto requestDto) {
+    public TokenDto login(LoginRequestDto requestDto) {
         UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
         Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
         return tokenProvider.createJwt(authentication,12);
@@ -51,7 +55,7 @@ public class AuthService {
     public Boolean confirmDuplicateEmail(String email) {
         Boolean isExistsEmail = memberRepository.existsByEmail(email);
         if (isExistsEmail) {
-            throw new RuntimeException("이미 가입되어 있는 이메일입니다.");
+            throw new CustomException("이미 가입된 이메일입니다.");
         } else {
             return true;
         }
@@ -60,7 +64,7 @@ public class AuthService {
     // 닉네임 중복확인
     public Boolean confirmDuplicateNickname(String nickname) {       
         if (memberRepository.existsByNickname(nickname)) {
-            throw new RuntimeException("사용중인 닉네임입니다.");
+            throw new CustomException("사용중인 닉네임입니다.");
         } else {
             return true;
         }
