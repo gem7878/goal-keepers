@@ -28,6 +28,12 @@ public class ErrorResponseDto {
         this.code = errorCode.getCode();
     }
 
+    public ErrorResponseDto(ErrorCode errorCode, String message) {
+        this.message = message;
+        this.status = errorCode.getStatus();
+        this.code = errorCode.getCode();
+    }
+
     public ErrorResponseDto(ErrorCode errorCode, List<FieldError> errors) {
         this.message = errorCode.getMessage();
         this.status = errorCode.getStatus();
