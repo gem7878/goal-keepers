@@ -14,6 +14,7 @@ import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
+import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,10 +51,10 @@ public class GoalService {
         if (goal.isPresent()) {
             return goal.get().getPosts()
                     .stream()
-                    .map(GoalPostResponseDto::of) // listof
+                    .map(GoalPostResponseDto::of)
                     .collect(Collectors.toList());
         } else {
-            throw new RuntimeException("GoalId를 확인해주세요.");
+            throw new CustomException("Goal Id를 확인해주세요.");
         }
     }
 
@@ -65,26 +66,18 @@ public class GoalService {
 
     public GoalResponseDto updateMyGoal(GoalRequestDto requestDto, Long goalId) {
         Member member = isMemberCurrent();
-        Goal goal = goalRepository.findById(goalId)
-                    .orElseThrow(() -> new RuntimeException("Goal Id를 확인해주세요."));
-        if (goal.getMember().equals(member)) {
-            return GoalResponseDto.of(Goal.goalUpdate(goal, requestDto));
-        } else {
-            throw new RuntimeException("로그인한 유저와 작성 유저가 같지 않습니다.");
-        }
+        Goal goal = goalRepository.findByIdAndMember(goalId, member)
+                    .orElseThrow(() -> new CustomException("나의 Goal Id가 아닙니다."));
+        return GoalResponseDto.of(Goal.goalUpdate(goal, requestDto));
     }
 
     public void deleteMyGoal(Long goalId) {
         Member member = isMemberCurrent();
-        Goal goal = goalRepository.findById(goalId)
-                    .orElseThrow(() -> new RuntimeException("Goal Id를 확인해주세요."));
-        if (goal.getMember().equals(member)) {
-            disconnectedPost(goal);
-            shareService.deleteShare(goal);
-            goalRepository.delete(goal);
-        } else {
-            throw new RuntimeException("로그인한 유저와 작성 유저가 같지 않습니다.");
-        }
+        Goal goal = goalRepository.findByIdAndMember(goalId, member)
+                    .orElseThrow(() -> new CustomException("나의 Goal Id가 아닙니다."));
+        disconnectedPost(goal);
+        shareService.deleteShare(goal);
+        goalRepository.delete(goal);
     }
 
     private void disconnectedPost(Goal goal) {
@@ -98,6 +91,6 @@ public class GoalService {
     // 로그인 했는지 확인
     public Member isMemberCurrent() {
         return memberRepository.findById(SecurityUtil.getCurrentMemberId())
-                .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
+                .orElseThrow(() -> new CustomException("로그인 유저 정보가 없습니다"));
     }
 }
