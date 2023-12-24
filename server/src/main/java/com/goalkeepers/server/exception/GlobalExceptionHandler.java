@@ -10,6 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -84,6 +85,15 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(BadCredentialsException.class)
 	protected ResponseEntity<ErrorResponseDto> handleBadCredentialException(BadCredentialsException e) {
 		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_CREDENTIALS);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/**
+	 * @RequestParmas null error
+	 */
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	protected ResponseEntity<ErrorResponseDto> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST, "RequestParams가 비어있습니다.");
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 

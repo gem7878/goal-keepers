@@ -15,4 +15,5 @@ public interface GoalRepository extends JpaRepository<Goal, Long>{
     List<Goal> findAllByMember(Member member);
     Optional<Goal> findById(Long id);
     Optional<Goal> findByShare(GoalShare share);
+    Optional<Goal> findByIdAndMember(Long id, Member member);
 }
