@@ -7,6 +7,8 @@ import com.goalkeepers.server.dto.PostRequestDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -60,7 +62,7 @@ public class Post {
     @JoinColumn(name = "goal_id", nullable = true)
     private Goal goal;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostComment> comments;
 
     public static Post postUpdate(Post post, PostRequestDto requestDto) {

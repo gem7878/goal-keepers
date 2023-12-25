@@ -17,16 +17,18 @@ import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class GoalService {
+public class GoalService extends CommonService{
     
     private final GoalRepository goalRepository;
     private final MemberRepository memberRepository;
     private final LikeShareService shareService;
+    
 
     /*
      *  나의 전체 버킷리스트 보기
@@ -37,44 +39,37 @@ public class GoalService {
      */
 
     public List<GoalResponseDto> getMyGoalList() {
-        Member member = isMemberCurrent();
+        Member member = isMemberCurrent(memberRepository);
         return goalRepository.findAllByMember(member)
                                 .stream()
                                 .map(GoalResponseDto::of)
                                 .collect(Collectors.toList());
     }
 
+    // 모든 유저가 접근 가능
     public List<GoalPostResponseDto> getSelectedGoal(Long goalId) {
-        isMemberCurrent();
-        Optional<Goal> goal = goalRepository.findById(goalId);
+        isMemberCurrent(memberRepository);
+        Goal goal = goalRepository.findById(goalId)
+                                    .orElseThrow(() -> new CustomException("Goal Id를 확인해주세요."));
 
-        if (goal.isPresent()) {
-            return goal.get().getPosts()
-                    .stream()
-                    .map(GoalPostResponseDto::of)
-                    .collect(Collectors.toList());
-        } else {
-            throw new CustomException("Goal Id를 확인해주세요.");
-        }
+        return goal.getPosts()
+                .stream()
+                .map(GoalPostResponseDto::of)
+                .collect(Collectors.toList());
     }
 
     public GoalResponseDto createMyGoal(GoalRequestDto requestDto) {
-        Member member = isMemberCurrent();
-        Goal goal = requestDto.toGoal(member);     
-        return GoalResponseDto.of(goalRepository.save(goal));
+        Member member = isMemberCurrent(memberRepository);    
+        return GoalResponseDto.of(goalRepository.save(requestDto.toGoal(member)));
     }
 
     public GoalResponseDto updateMyGoal(GoalRequestDto requestDto, Long goalId) {
-        Member member = isMemberCurrent();
-        Goal goal = goalRepository.findByIdAndMember(goalId, member)
-                    .orElseThrow(() -> new CustomException("나의 Goal Id가 아닙니다."));
-        return GoalResponseDto.of(Goal.goalUpdate(goal, requestDto));
+        return GoalResponseDto.of(Goal.goalUpdate(isMyGoal(memberRepository, goalRepository, goalId), requestDto));
     }
 
     public void deleteMyGoal(Long goalId) {
-        Member member = isMemberCurrent();
-        Goal goal = goalRepository.findByIdAndMember(goalId, member)
-                    .orElseThrow(() -> new CustomException("나의 Goal Id가 아닙니다."));
+        Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
+
         disconnectedPost(goal);
         shareService.deleteShare(goal);
         goalRepository.delete(goal);
@@ -86,11 +81,5 @@ public class GoalService {
                 post.setGoal(null);
             }
         }
-    }
-
-    // 로그인 했는지 확인
-    public Member isMemberCurrent() {
-        return memberRepository.findById(SecurityUtil.getCurrentMemberId())
-                .orElseThrow(() -> new CustomException("로그인 유저 정보가 없습니다"));
     }
 }
