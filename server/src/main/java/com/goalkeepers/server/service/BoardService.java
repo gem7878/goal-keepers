@@ -13,6 +13,7 @@ import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
+import com.goalkeepers.server.entity.PostLike;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
@@ -23,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class BoardService {
+public class BoardService extends CommonService {
     
     private final PostRepository postRepository;
     private final GoalRepository goalRepository;
@@ -59,45 +60,24 @@ public class BoardService {
      */
 
     public PostResponseDto createMyPost(PostRequestDto requestDto) {
-        Member member = isMemberCurrent();
-        Goal goal = goalRepository.findById(requestDto.getGoalId())
-                        .orElseThrow(() -> new RuntimeException("Goal Id를 확인해주세요."));
-        if(goal.getMember().equals(member)) {
-            Post post = requestDto.toPost(member, goal);
-            return PostResponseDto.of(postRepository.save(post));
-        } else {
-            throw new RuntimeException("Goal을 만든 유저와 Post를 만든 유저가 다릅니다.");
-        }        
+        Member member = isMemberCurrent(memberRepository);
+        Goal goal = isMyGoal(memberRepository, goalRepository, requestDto.getGoalId());
+        Post post = requestDto.toPost(member, goal);
+        return PostResponseDto.of(postRepository.save(post));     
     }
 
-    public PostResponseDto updateMyPost(PostRequestDto requestDto, Long postId) {
-        Member member = isMemberCurrent();
-        Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new RuntimeException("Post Id를 확인해주세요."));
-    
-        if(post.getMember().equals(member)) {
-            return PostResponseDto.of(Post.postUpdate(post, requestDto));
-        } else {
-            throw new RuntimeException("로그인한 유저와 작성 유저가 같지 않습니다.");
-        }
+    public PostResponseDto updateMyPost(PostRequestDto requestDto, Long postId) {  
+        return PostResponseDto.of(Post.postUpdate(isMyPost(memberRepository, postRepository, postId), requestDto));
     }
 
     public void deleteMyPost(Long postId) {
-        Member member = isMemberCurrent();
-        Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new RuntimeException("Post Id를 확인해주세요."));
+        Post post = isMyPost(memberRepository, postRepository, postId);
         
-        if(post.getMember().equals(member)) {
-            postRepository.delete(post);
-        } else {
-            throw new RuntimeException("로그인한 유저와 작성 유저가 같지 않습니다.");
+        List<PostLike> likeList = likeRepository.findAllByPost(post);
+        for (PostLike like : likeList) {
+            likeRepository.delete(like);
         }
-    }
-
-    // 로그인 했는지 확인
-    public Member isMemberCurrent() {
-        return memberRepository.findById(SecurityUtil.getCurrentMemberId())
-                .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
+        postRepository.delete(isMyPost(memberRepository, postRepository, postId));
     }
 }
 
