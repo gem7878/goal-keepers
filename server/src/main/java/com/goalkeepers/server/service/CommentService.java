@@ -1,6 +1,7 @@
 package com.goalkeepers.server.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -9,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
+import com.goalkeepers.server.dto.PostListPageResponseDto;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostComment;
+import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.CommentRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostRepository;
@@ -21,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CommentService {
+public class CommentService extends CommonService {
     
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -35,51 +38,36 @@ public class CommentService {
      */
 
     public List<CommentResponseDto> getSelectedPost(Long postId) {
-        Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new RuntimeException("Post Id를 확인해주세요."));
-        
-        return commentRepository.findAllByPost(post)
-                                .stream()
-                                .map(CommentResponseDto::of)
-                                .collect(Collectors.toList());
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberId != null ?
+                memberRepository.findById(memberId).orElseThrow(() -> new CustomException("member id 오류")) :
+                null;
+    
+        List<PostComment> comments = commentRepository.findAllByPost(isPost(postRepository, postId));
+        return comments.stream()
+                .map(comment -> CommentResponseDto.of(comment, writeCommentMember(comment, member)))
+                .collect(Collectors.toList());
+    }
+    
+    private boolean writeCommentMember(PostComment comment, Member member) {
+        return member != null && comment.getMember().equals(member);
     }
 
     public CommentResponseDto createMyComment(CommentRequestDto requestDto, Long postId) {
-        Member member = isMemberCurrent();
-        Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new RuntimeException("Post Id를 확인해주세요."));
+        Member member = isMemberCurrent(memberRepository);
+        Post post = isPost(postRepository, postId);
         
         PostComment comment = requestDto.toComment(member, post);
-        return CommentResponseDto.of(commentRepository.save(comment)); 
+        return CommentResponseDto.of(commentRepository.save(comment), true); 
     }
 
     public CommentResponseDto updateMyComment(CommentRequestDto requestDto, Long commentId) {
-        Member member = isMemberCurrent();
-        PostComment comment = commentRepository.findById(commentId)
-                    .orElseThrow(() -> new RuntimeException("Post Id를 확인해주세요."));
-        
-        if(comment.getMember().equals(member)) {
-            return CommentResponseDto.of(PostComment.commentUpdate(comment, requestDto));
-        } else {
-            throw new RuntimeException("로그인한 유저와 작성 유저가 같지 않습니다.");
-        }
+        PostComment comment = isMyComment(memberRepository, commentRepository, commentId);
+        return CommentResponseDto.of(PostComment.commentUpdate(comment, requestDto), true);
     }
 
     public void deleteMyComment(Long commentId) {
-        Member member = isMemberCurrent();
-        PostComment comment = commentRepository.findById(commentId)
-                    .orElseThrow(() -> new RuntimeException("Post Id를 확인해주세요."));
-        
-        if(comment.getMember().equals(member)) {
-            commentRepository.delete(comment);
-        } else {
-            throw new RuntimeException("로그인한 유저와 작성 유저가 같지 않습니다.");
-        }
-    }
-
-    // 로그인 했는지 확인
-    public Member isMemberCurrent() {
-        return memberRepository.findById(SecurityUtil.getCurrentMemberId())
-                .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
+        PostComment comment = isMyComment(memberRepository, commentRepository, commentId);
+        commentRepository.delete(comment);
     }
 }
