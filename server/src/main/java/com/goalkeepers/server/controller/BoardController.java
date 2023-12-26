@@ -1,7 +1,6 @@
 package com.goalkeepers.server.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,8 +45,8 @@ public class BoardController {
      */
 
     @GetMapping("/all")
-    public ResponseEntity<CommonResponseDto> getAllPost() {
-        List<PostListPageResponseDto> response = boardService.getAllPostList();
+    public ResponseEntity<CommonResponseDto> getAllPost(@RequestParam(name = "page") int pageNumber) {
+        Page<PostListPageResponseDto> response = boardService.getAllPostList(pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
@@ -110,8 +109,8 @@ public class BoardController {
      */
 
     @GetMapping("/all-comment")
-    public ResponseEntity<CommonResponseDto> getAllComment(@RequestParam(name = "post-id") Long postId) {
-        List<CommentResponseDto> response = commentService.getSelectedPost(postId);
+    public ResponseEntity<CommonResponseDto> getAllComment(@RequestParam(name = "page") int pageNumber, @RequestParam(name = "post-id") Long postId) {
+        Page<CommentResponseDto> response = commentService.getSelectedPost(postId, pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 

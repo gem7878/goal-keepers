@@ -11,7 +11,7 @@ import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostComment;
 
 @Repository
-public interface CommentRepository extends JpaRepository<PostComment, Long>{
+public interface CommentRepository extends JpaRepository<PostComment, Long>, CommentRepositoryCustom{
     List<PostComment> findAllByPost(Post post);
     Optional<PostComment> findByIdAndMember(Long id, Member member);
 }
