@@ -65,4 +65,34 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         return new PageImpl<>(page, pageable, totalSize);
     }
+
+    @Override
+    public Page<PostListPageResponseDto> searchMyAllPost(Pageable pageable, Member member) {
+        
+        List<Post> posts = queryFactory
+                            .selectFrom(post)
+                            .where(post.member.eq(member))
+                            .orderBy(post.id.desc())
+                            .offset(pageable.getOffset())
+                            .limit(pageable.getPageSize())
+                            .fetch();
+        
+        List<PostListPageResponseDto> page = posts
+                    .stream()
+                    .map(post -> {
+                        boolean isLike = likeRepository.existsByMemberAndPost(member, post);
+                        boolean isShare = post.getGoal() != null ? shareRepository.existsByMemberAndGoal(member, post.getGoal()) : false;
+                        return PostListPageResponseDto.of(post, isLike, isShare);
+                    })
+                    .collect(Collectors.toList());
+        
+        
+        int totalSize = queryFactory
+                        .selectFrom(post)
+                        .where(post.member.eq(member))
+                        .fetch()
+                        .size();
+
+        return new PageImpl<>(page, pageable, totalSize);
+    }
 }

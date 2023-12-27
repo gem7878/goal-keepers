@@ -34,6 +34,12 @@ public class BoardService extends CommonService {
         return postRepository.searchAll(PageRequest.of(pageNumber - 1, 10));
     }
 
+    // 나의 모든 게시글 보기
+    public Page<PostListPageResponseDto> getMyAllPostList(int pageNumber) {
+        Member member = isMemberCurrent(memberRepository);
+        return postRepository.searchMyAllPost(PageRequest.of(pageNumber - 1, 10), member);
+    }
+
     /*
      *  게시글 쓰기
         게시글 수정하기
