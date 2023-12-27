@@ -22,11 +22,12 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const loginPath = [
-    '/login',
-    '/register',
-    '/forgot-password',
-    '/find',
-    'social-register',
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/find",
+    "social-register",
+    "/redirection"
   ];
 
   useEffect(() => {
