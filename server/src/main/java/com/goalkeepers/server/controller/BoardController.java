@@ -58,8 +58,8 @@ public class BoardController {
 
     // 연결된 골 찾기
     @GetMapping("/goal/share")
-    public ResponseEntity<CommonResponseDto> findMyGoalWithShare(@Valid @RequestBody GoalShareRequestDto requestDto) {
-        GoalResponseDto response = likeShareService.findGoal(requestDto);
+    public ResponseEntity<CommonResponseDto> findMyGoalWithShare(@RequestParam(name = "goal-id") Long goalId) {
+        GoalResponseDto response = likeShareService.findGoal(goalId);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 

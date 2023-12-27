@@ -51,9 +51,9 @@ public class LikeShareService extends CommonService {
     }
 
     // 연결된 골 찾기
-    public GoalResponseDto findGoal(GoalShareRequestDto requestDto) {
+    public GoalResponseDto findGoal(Long goalId) {
         Member member = isMemberCurrent(memberRepository);
-        Goal goal = isGoal(goalRepository, requestDto.getGoalId());
+        Goal goal = isGoal(goalRepository, goalId);
 
         GoalShare share = shareRepository.findByMemberAndGoal(member, goal)
                                         .orElseThrow(() -> new CustomException("이 Goal과 연결된 나의 Goal이 없습니다."));
