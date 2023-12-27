@@ -28,6 +28,7 @@ export default function RootLayout({
     "/forgot-password",
     "/find",
     "social-register",
+    "/redirection"
   ];
 
   useEffect(() => {

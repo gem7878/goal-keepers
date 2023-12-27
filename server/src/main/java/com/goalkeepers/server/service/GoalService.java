@@ -1,13 +1,11 @@
 package com.goalkeepers.server.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.dto.GoalPostResponseDto;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
