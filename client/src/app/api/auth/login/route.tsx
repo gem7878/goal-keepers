@@ -7,8 +7,6 @@ interface POSTTypes {
 }
 
 export const POST = async (request: POSTTypes,) => {
-  console.log("연동됐니?");
-
   try {
     const response = await axios.post(
       "http://localhost:8080/auth/login",
