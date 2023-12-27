@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import Link from 'next/link';
+import { notFound, useParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 export default function CreateGoalLayout({
   children,
@@ -17,7 +17,7 @@ export default function CreateGoalLayout({
     setCreateGoalId(parseInt(params.createGoalId));
   }, [params.createGoalId]);
 
-  const createGoalList = ["이름", "이미지", "기간", "상세내용"];
+  const createGoalList = ['이름', '이미지', '기간', '상세내용'];
 
   if (createGoalId > createGoalList.length) {
     notFound();
@@ -44,12 +44,6 @@ export default function CreateGoalLayout({
         </ul>
       </nav>
       {children}
-      <Link
-        className="gk-primary-next-a"
-        href={createGoalId >= 4 ? "/" : `${createGoalId + 1}`}
-      >
-        <button className="w-full h-full">다음</button>
-      </Link>
     </section>
   );
 }

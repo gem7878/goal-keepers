@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { CreateButton, Modal, MyGoals } from "@/components/index.js";
-import { useEffect, useState } from "react";
-import Image1 from "../../public/assets/images/aurora.jpg";
-import Image2 from "../../public/assets/images/gem.png";
-import { createPortal } from "react-dom";
-import { StaticImageData } from "next/image";
+import { CreateButton, Modal, MyGoals } from '@/components/index.js';
+import { useEffect, useState } from 'react';
+import Image1 from '../../public/assets/images/aurora.jpg';
+import Image2 from '../../public/assets/images/gem.png';
+import { createPortal } from 'react-dom';
+import { StaticImageData } from 'next/image';
+import { handleConfirmToken, handleGetGoalListAll } from './actions';
 
 export default function Home() {
   const [isMyGoals, setIsMyGoals] = useState(true);
@@ -24,46 +25,58 @@ export default function Home() {
   const myGoalList = [
     {
       image: Image1,
-      goalTitle: "오로라보기1",
+      goalTitle: '오로라보기1',
       goalContent:
-        "상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
+        '상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용',
+      startDate: '2023-12-17',
+      endDate: '2024-03-17',
+      goalComment: ['예약했음'],
     },
     {
       image: Image2,
-      goalTitle: "오로라보기2",
-      goalContent: "상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
+      goalTitle: '오로라보기2',
+      goalContent: '상세내용',
+      startDate: '2023-12-17',
+      endDate: '2024-03-17',
+      goalComment: ['예약했음'],
     },
     {
       image: Image1,
-      goalTitle: "오로라보기3",
-      goalContent: "상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
+      goalTitle: '오로라보기3',
+      goalContent: '상세내용',
+      startDate: '2023-12-17',
+      endDate: '2024-03-17',
+      goalComment: ['예약했음'],
     },
     {
       image: Image1,
-      goalTitle: "오로라보기4",
-      goalContent: "상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
+      goalTitle: '오로라보기4',
+      goalContent: '상세내용',
+      startDate: '2023-12-17',
+      endDate: '2024-03-17',
+      goalComment: ['예약했음'],
     },
     {
       image: Image2,
-      goalTitle: "오로라보기5",
-      goalContent: "상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
+      goalTitle: '오로라보기5',
+      goalContent: '상세내용',
+      startDate: '2023-12-17',
+      endDate: '2024-03-17',
+      goalComment: ['예약했음'],
     },
   ];
+
+  const test = async () => {
+    await handleGetGoalListAll()
+      .then((response) => {
+        // console.log(response);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  useEffect(() => {
+    test();
+  }, []);
 
   useEffect(() => {
     selectGoalNum !== null ? setOpen(true) : setOpen(false);
@@ -77,7 +90,7 @@ export default function Home() {
   }, [selectGoalNum]);
 
   useEffect(() => {
-    setPortalElement(document.getElementById("portal"));
+    setPortalElement(document.getElementById('portal'));
   }, [isOpen]);
 
   const handleTab = (boolean: boolean) => {
@@ -130,7 +143,7 @@ export default function Home() {
               selectData={selectData}
               setSelectGoalNum={setSelectGoalNum}
             />,
-            portalElement
+            portalElement,
           )
         : null}
     </div>
