@@ -1,15 +1,17 @@
-"use client";
+'use client';
 
-import Image, { StaticImageData } from "next/image";
-import React, { SetStateAction, useRef, useState } from "react";
+import Image, { StaticImageData } from 'next/image';
+import React, { SetStateAction, useRef, useState } from 'react';
+import Image1 from '../../public/assets/images/aurora.jpg';
 
 interface selectDataTypes {
-  image: any;
-  goalTitle: string;
-  goalContent: string;
+  imageUrl: any;
+  title: string;
+  description: string;
   startDate: string;
   endDate: string;
-  goalComment: string[];
+  shareCnt: number;
+  goalId: number;
 }
 
 const Modal: React.FC<{
@@ -42,13 +44,14 @@ const Modal: React.FC<{
       <main className="w-3/4 h-3/5 bg-white opacity-100 " ref={containerRef}>
         <section className="w-full h-1/5 relative">
           <Image
-            src={selectData?.image}
+            // src={selectData?.imageUrl}
+            src={Image1}
             alt=""
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           ></Image>
           <div className="absolute top-0 w-full h-full bg-opacity-50 bg-black flex items-center">
             <h2 className="text-white ml-8 text-base font-bold">
-              {selectData?.goalTitle}
+              {selectData?.title}
             </h2>
           </div>
           {!isEdit && (
@@ -63,7 +66,7 @@ const Modal: React.FC<{
         <section className="h-3/5 w-full pt-8 px-8 flex flex-col justify-between">
           <div className="w-full">
             <textarea
-              value={selectData?.goalContent}
+              value={selectData?.description}
               readOnly={isEdit ? false : true}
             ></textarea>
           </div>
@@ -76,7 +79,7 @@ const Modal: React.FC<{
             className="w-1/4 bg-orange-300 rounded-lg h-1/3 text-white"
             onClick={() => handleConfirmButton()}
           >
-            {isEdit ? "수정" : "확인"}
+            {isEdit ? '수정' : '확인'}
           </button>
         </section>
       </main>

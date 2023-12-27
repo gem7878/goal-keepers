@@ -62,7 +62,7 @@ export const POST = async (request: POSTTypes) => {
       },
     );
 
-    return { statusCode: 200, body: JSON.stringify(response.data) };
+    return { statusCode: 200, body: JSON.stringify(response.data.data) };
   } catch (error: any) {
     console.error('Error during request setup:', error.message);
     return {
