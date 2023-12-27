@@ -58,8 +58,7 @@ export const POST = async (request: POSTTypes) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMjU1OTI2MiwiaWF0IjoxNzAyNTQ4NDYyfQ.XhEGH5blxSOfpAJymR0pCpTQ0JGyacTd4c4bfSQLu-A',
+          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       },
