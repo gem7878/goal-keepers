@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { cookies } from 'next/headers';
 
 interface POSTTypes {
   title: string;
@@ -16,6 +17,9 @@ interface PUTTypes {
   imageUrl: string;
 }
 
+const cookieStore = cookies();
+const token: string | undefined = cookieStore.get('accessToken')?.value;
+
 export const GET = async (request: Request) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -24,8 +28,7 @@ export const GET = async (request: Request) => {
       `http://localhost:8080/goal-list/goal?id=${id}`,
       {
         headers: {
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMjg4Nzk1MCwiaWF0IjoxNzAyODc3MTUwfQ.g0SkCtaEIAzynkxCPq_tBT233oG1eV-Oz-8pmi7bMqc',
+          Authorization: `Bearer ${token}`,
         },
       },
     );
@@ -55,14 +58,13 @@ export const POST = async (request: POSTTypes) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMjU1OTI2MiwiaWF0IjoxNzAyNTQ4NDYyfQ.XhEGH5blxSOfpAJymR0pCpTQ0JGyacTd4c4bfSQLu-A',
+          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       },
     );
 
-    return { statusCode: 200, body: JSON.stringify(response.data) };
+    return { statusCode: 200, body: JSON.stringify(response.data.data) };
   } catch (error: any) {
     console.error('Error during request setup:', error.message);
     return {

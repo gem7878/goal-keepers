@@ -14,68 +14,90 @@ export default function Home() {
   const [portalElement, setPortalElement] = useState<Element | null>(null);
   const [selectGoalNum, setSelectGoalNum] = useState<number | null>(null);
   const [selectData, setSelectData] = useState<{
-    image: any;
-    goalTitle: string;
-    goalContent: string;
+    imageUrl: any;
+    title: string;
+    description: string;
     startDate: string;
     endDate: string;
-    goalComment: string[];
+    shareCnt: number;
+    goalId: number;
   } | null>(null);
+  const [myGoalList, setMyGoalList] = useState([
+    {
+      description: '',
+      endDate: '',
+      goalId: 0,
+      imageUrl: '',
+      shareCnt: 0,
+      startDate: '',
+      title: '',
+    },
+    {
+      description: '',
+      endDate: '',
+      goalId: 0,
+      imageUrl: '',
+      shareCnt: 0,
+      startDate: '',
+      title: '',
+    },
+  ]);
 
-  const myGoalList = [
-    {
-      image: Image1,
-      goalTitle: '오로라보기1',
-      goalContent:
-        '상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용',
-      startDate: '2023-12-17',
-      endDate: '2024-03-17',
-      goalComment: ['예약했음'],
-    },
-    {
-      image: Image2,
-      goalTitle: '오로라보기2',
-      goalContent: '상세내용',
-      startDate: '2023-12-17',
-      endDate: '2024-03-17',
-      goalComment: ['예약했음'],
-    },
-    {
-      image: Image1,
-      goalTitle: '오로라보기3',
-      goalContent: '상세내용',
-      startDate: '2023-12-17',
-      endDate: '2024-03-17',
-      goalComment: ['예약했음'],
-    },
-    {
-      image: Image1,
-      goalTitle: '오로라보기4',
-      goalContent: '상세내용',
-      startDate: '2023-12-17',
-      endDate: '2024-03-17',
-      goalComment: ['예약했음'],
-    },
-    {
-      image: Image2,
-      goalTitle: '오로라보기5',
-      goalContent: '상세내용',
-      startDate: '2023-12-17',
-      endDate: '2024-03-17',
-      goalComment: ['예약했음'],
-    },
-  ];
+  // const myGoalList = [
+  //   {
+  //     image: Image1,
+  //     goalTitle: '오로라보기1',
+  //     goalContent:
+  //       '상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용',
+  //     startDate: '2023-12-17',
+  //     endDate: '2024-03-17',
+  //     goalComment: ['예약했음'],
+  //   },
+  //   {
+  //     image: Image2,
+  //     goalTitle: '오로라보기2',
+  //     goalContent: '상세내용',
+  //     startDate: '2023-12-17',
+  //     endDate: '2024-03-17',
+  //     goalComment: ['예약했음'],
+  //   },
+  //   {
+  //     image: Image1,
+  //     goalTitle: '오로라보기3',
+  //     goalContent: '상세내용',
+  //     startDate: '2023-12-17',
+  //     endDate: '2024-03-17',
+  //     goalComment: ['예약했음'],
+  //   },
+  //   {
+  //     image: Image1,
+  //     goalTitle: '오로라보기4',
+  //     goalContent: '상세내용',
+  //     startDate: '2023-12-17',
+  //     endDate: '2024-03-17',
+  //     goalComment: ['예약했음'],
+  //   },
+  //   {
+  //     image: Image2,
+  //     goalTitle: '오로라보기5',
+  //     goalContent: '상세내용',
+  //     startDate: '2023-12-17',
+  //     endDate: '2024-03-17',
+  //     goalComment: ['예약했음'],
+  //   },
+  // ];
 
-  const test = async () => {
+  const handleFetchGoalListAll = async () => {
     await handleGetGoalListAll()
       .then((response) => {
-        // console.log(response);
+        console.log(response.data);
+        setMyGoalList(response.data);
       })
       .catch((error) => console.log(error));
   };
 
   useEffect(() => {
-    test();
+    handleFetchGoalListAll();
   }, []);
 
   useEffect(() => {
