@@ -35,6 +35,15 @@ const Login = () => {
       .catch((error) => console.log(error));
   };
 
+  const API_KEY = ''; // 추가
+  const REDIRECT_URI = ''; // 추가
+  const KakaoLoginAPI = `https://kauth.kakao.com/oauth/authorize?client_id=${API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+  
+  const openKakaoLogin = () => {
+    console.log("clicked");
+    window.open(KakaoLoginAPI, "_self");
+  };
+
   return (
     <>
       <h2 className="w-full text-center text-3xl font-extrabold mt-20 h-24 font-['MoiraiOne'] text-orange-400">
@@ -61,7 +70,7 @@ const Login = () => {
       </form>
       <hr className="border-dashed"></hr>
       <div className="flex flex-col w-full gap-1">
-        <button className="w-full h-9 border rounded-md" type="button">
+        <button className="w-full h-9 border rounded-md" type="button" onClick={openKakaoLogin}>
           <Image
             src={kakaoButton}
             alt=""
