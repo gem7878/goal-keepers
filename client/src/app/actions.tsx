@@ -3,6 +3,12 @@
 import { cookies } from 'next/headers';
 import { GET as AllGET } from '@/app/api/goal-list/all/route';
 
+export const handleGetAccessToken = () => {
+  const cookieStore = cookies();
+  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  return token;
+};
+
 export const handleConfirmToken = async () => {
   const cookieStore = cookies();
   const hasCookie = cookieStore.has('accessToken');
@@ -26,16 +32,14 @@ export const handleConfirmToken = async () => {
   if (!hasCookie || isTokenExpired(accessToken)) {
     return false;
   } else {
-    console.log(accessToken);
-
     return true;
   }
 };
 
 export const handleGetGoalListAll = async () => {
   return AllGET()
-    .then((response) => {
-      console.log(response);
+    .then((response: any) => {
+      return JSON.parse(response.body);
     })
     .catch((error) => console.log(error));
 };

@@ -1,13 +1,16 @@
-import Image from "next/image";
-import React, { SetStateAction } from "react";
+import Image from 'next/image';
+import React, { SetStateAction } from 'react';
+import Image1 from '../../public/assets/images/aurora.jpg';
+import Image2 from '@/public/assets/images/gem.png';
 
 interface myGoalListTypes {
-  goalTitle: string;
-  goalContent: string;
-  image: any;
+  goalId: number;
+  title: string;
+  description: string;
+  imageUrl: any;
   startDate: string;
   endDate: string;
-  goalComment: string[];
+  shareCnt: number;
 }
 
 const MyGoals: React.FC<{
@@ -29,17 +32,18 @@ const MyGoals: React.FC<{
               onClick={() => handleSelectGoalClick(index)}
             >
               <Image
-                src={list.image}
+                // src={list.imageUrl}
+                src={Image1}
                 alt=""
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  position: "absolute",
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  position: 'absolute',
                 }}
               ></Image>
               <div className="w-full h-full bg-black opacity-50 absolute"></div>
-              <h3 className="text-white absolute">{list.goalTitle}</h3>
+              <h3 className="text-white absolute">{list.title}</h3>
             </li>
           );
         })}

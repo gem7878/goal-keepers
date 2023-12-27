@@ -5,7 +5,6 @@ export const GET = async () => {
   const cookieStore = cookies();
   const token: string | undefined = cookieStore.get('accessToken')?.value;
 
-
   try {
     const response = await axios.get('http://localhost:8080/goal-list/all', {
       headers: {
@@ -13,14 +12,8 @@ export const GET = async () => {
       },
     });
 
-    const data = response.data;
-
-    console.log('helllllllo', data);
-
-    return new Response(JSON.stringify({ data }));
+    return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error) {
-    console.log('errrrrrrr');
-
     console.log('error', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
