@@ -40,8 +40,7 @@ public class BoardController {
 
     /*
      *  여러 유저의 포스트 보기
-        좋아요
-        담기
+     *  나의 포스트 보기
      */
 
     @GetMapping("/all")
@@ -49,6 +48,17 @@ public class BoardController {
         Page<PostListPageResponseDto> response = boardService.getAllPostList(pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
+
+    @GetMapping("/all/me")
+    public ResponseEntity<CommonResponseDto> getMyAllPost(@RequestParam(name = "page") int pageNumber) {
+        Page<PostListPageResponseDto> response = boardService.getMyAllPostList(pageNumber);
+        return ResponseEntity.ok(new CommonResponseDto(true, response));
+    }
+
+    /*
+     * 좋아요
+     * 공유
+     */
 
     @PostMapping("/post/like")
     public ResponseEntity<CommonResponseDto> postlike(@Valid @RequestBody PostLikeRequestDto requestDto) {
