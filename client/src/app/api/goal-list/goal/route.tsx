@@ -9,12 +9,12 @@ interface POSTTypes {
   imageUrl: string;
 }
 interface PUTTypes {
-  goalId: number;
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  imageUrl: string;
+  goalId: number | undefined;
+  title: string | undefined;
+  description: string | undefined;
+  startDate: string | undefined;
+  endDate: string | undefined;
+  imageUrl: any;
 }
 
 const cookieStore = cookies();

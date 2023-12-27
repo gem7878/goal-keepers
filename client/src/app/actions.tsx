@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { GET as AllGET } from '@/app/api/goal-list/all/route';
+// import { PUT } from '@/app/api/goal-list/goal/route';
 
 export const handleGetAccessToken = () => {
   const cookieStore = cookies();
@@ -13,6 +14,8 @@ export const handleConfirmToken = async () => {
   const cookieStore = cookies();
   const hasCookie = cookieStore.has('accessToken');
   const accessToken: string | undefined = cookieStore.get('accessToken')?.value;
+
+  console.log(accessToken);
 
   function isTokenExpired(token: any) {
     const decodedToken = decodeToken(token);
@@ -30,8 +33,11 @@ export const handleConfirmToken = async () => {
 
   // 사용 예시
   if (!hasCookie || isTokenExpired(accessToken)) {
+    console.log('토큰이 만료되었습니다');
+
     return false;
   } else {
+    console.log('토큰이 유효합니다');
     return true;
   }
 };
@@ -43,3 +49,15 @@ export const handleGetGoalListAll = async () => {
     })
     .catch((error) => console.log(error));
 };
+// export const handleUpdateGoal = async (putData: {
+//   goalId: number | undefined;
+//   title: string | undefined;
+//   description: string | undefined;
+//   startDate: string | undefined;
+//   endDate: string | undefined;
+//   imageUrl: any;
+// }) => {
+//   return PUT(putData)
+//     .then((response) => console.log(response))
+//     .catch((error) => console.log(error));
+// };

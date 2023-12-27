@@ -43,58 +43,14 @@ export default function Home() {
     },
   ]);
 
-  // const myGoalList = [
-  //   {
-  //     image: Image1,
-  //     goalTitle: '오로라보기1',
-  //     goalContent:
-  //       '상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용',
-  //     startDate: '2023-12-17',
-  //     endDate: '2024-03-17',
-  //     goalComment: ['예약했음'],
-  //   },
-  //   {
-  //     image: Image2,
-  //     goalTitle: '오로라보기2',
-  //     goalContent: '상세내용',
-  //     startDate: '2023-12-17',
-  //     endDate: '2024-03-17',
-  //     goalComment: ['예약했음'],
-  //   },
-  //   {
-  //     image: Image1,
-  //     goalTitle: '오로라보기3',
-  //     goalContent: '상세내용',
-  //     startDate: '2023-12-17',
-  //     endDate: '2024-03-17',
-  //     goalComment: ['예약했음'],
-  //   },
-  //   {
-  //     image: Image1,
-  //     goalTitle: '오로라보기4',
-  //     goalContent: '상세내용',
-  //     startDate: '2023-12-17',
-  //     endDate: '2024-03-17',
-  //     goalComment: ['예약했음'],
-  //   },
-  //   {
-  //     image: Image2,
-  //     goalTitle: '오로라보기5',
-  //     goalContent: '상세내용',
-  //     startDate: '2023-12-17',
-  //     endDate: '2024-03-17',
-  //     goalComment: ['예약했음'],
-  //   },
-  // ];
-
   const handleFetchGoalListAll = async () => {
     await handleGetGoalListAll()
       .then((response) => {
-        console.log(response.data);
         setMyGoalList(response.data);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.log('에러!', error));
   };
+  const handleFetchSelectGoal = async () => {};
 
   useEffect(() => {
     handleFetchGoalListAll();
