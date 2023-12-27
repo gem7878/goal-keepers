@@ -36,6 +36,11 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    private SNS sns;
+
+    private Long snsId;
+
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Goal> goals;
 }
