@@ -32,6 +32,8 @@ public class QPost extends EntityPathBase<Post> {
 
     public final NumberPath<Integer> likeCnt = createNumber("likeCnt", Integer.class);
 
+    public final SetPath<PostLike, QPostLike> likes = this.<PostLike, QPostLike>createSet("likes", PostLike.class, QPostLike.class, PathInits.DIRECT2);
+
     public final QMember member;
 
     public final StringPath title = createString("title");
