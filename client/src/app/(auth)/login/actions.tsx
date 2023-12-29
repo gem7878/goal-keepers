@@ -29,7 +29,7 @@ export const handleLogin = async (postData: {
   return POST(postData)
     .then((response) => {
       if (response.statusCode == 200) {
-        setAccessTokenCookie(JSON.parse(response.body).accessToken);
+        setAccessTokenCookie(JSON.parse(response.body).data.accessToken);
         return { ok: true };
       } else {
         return { ok: false };

@@ -101,7 +101,7 @@ const Register = () => {
         nickname: NICK_NAME,
       })
         .then((response) => {
-          alert(`${response.nickname}님! 회원가입이 완료되었습니다.`);
+          alert(`${response.data.nickname}님! 회원가입이 완료되었습니다.`);
           return router.push('/login');
         })
         .catch((error) => console.log(error));
