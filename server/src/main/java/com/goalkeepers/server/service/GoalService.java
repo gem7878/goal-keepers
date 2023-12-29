@@ -1,6 +1,9 @@
 package com.goalkeepers.server.service;
 
+import static com.goalkeepers.server.entity.QMember.member;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -13,10 +16,12 @@ import com.goalkeepers.server.dto.GoalPostResponseDto;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.entity.Goal;
+import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
+import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +34,7 @@ public class GoalService extends CommonService{
     private final GoalRepository goalRepository;
     private final MemberRepository memberRepository;
     private final LikeShareService shareService;
+    private final GoalShareRepository shareRepository;
     
 
     /*
@@ -45,15 +51,16 @@ public class GoalService extends CommonService{
     }
 
     // 모든 유저가 접근 가능
-    public List<GoalPostResponseDto> getSelectedGoal(Long goalId) {
-        isMemberCurrent(memberRepository);
+    public GoalResponseDto getSelectedGoal(Long goalId) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberId != null ? memberRepository.findById(memberId).get() : null;
         Goal goal = goalRepository.findById(goalId)
                                     .orElseThrow(() -> new CustomException("Goal Id를 확인해주세요."));
-
-        return goal.getPosts()
-                .stream()
-                .map(GoalPostResponseDto::of)
-                .collect(Collectors.toList());
+        if(member == null) {
+            return GoalResponseDto.of(goal);
+        }
+        Boolean isShare = shareRepository.existsByMemberAndGoal(member, goal);
+        return GoalResponseDto.of(goal, isShare);
     }
 
     public GoalResponseDto createMyGoal(GoalRequestDto requestDto) {

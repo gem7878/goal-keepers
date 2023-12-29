@@ -1,7 +1,5 @@
 package com.goalkeepers.server.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.goalkeepers.server.dto.CommonResponseDto;
-import com.goalkeepers.server.dto.GoalPostResponseDto;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.service.GoalService;
@@ -40,12 +37,6 @@ public class GoalController {
     @GetMapping("/all")
     public ResponseEntity<CommonResponseDto> getMyGoalLists(@RequestParam(name = "page") int pageNumber) {
         Page<GoalResponseDto> response = goalService.getMyGoalList(pageNumber);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
-    }
-
-    @GetMapping("/goal")
-    public ResponseEntity<CommonResponseDto> getMyGoal(@RequestParam(name = "id", required = true) Long id) {
-        List<GoalPostResponseDto> response = goalService.getSelectedGoal(id);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 

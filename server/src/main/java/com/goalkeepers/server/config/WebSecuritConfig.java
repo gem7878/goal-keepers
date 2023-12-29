@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,7 +36,7 @@ public class WebSecuritConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/auth/**", "/board/all/**", "/board/all-comment","/api/kakao/login").permitAll()
+                .requestMatchers("/auth/**", "/board/all/**", "/board/all-comment","/api/kakao/login", "/public/**").permitAll()
                 .requestMatchers("/member/**", "/goal-list/**", "/board/post/**", "/board/comment", "/board/goal/share").hasAuthority("ROLE_USER")
                 .anyRequest().authenticated()
             )
