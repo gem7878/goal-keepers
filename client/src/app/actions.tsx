@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { GET as AllGET } from '@/app/api/goal-list/all/route';
+import { GET as UserGET } from '@/app/api/member/me/route';
 import { DELETE, PUT } from '@/app/api/goal-list/goal/route';
 
 export const handleGetAccessToken = () => {
@@ -34,7 +35,15 @@ export const handleConfirmToken = async () => {
     return true;
   }
 };
-
+export const handleGetUserInfo = async () => {
+  return UserGET()
+    .then((response: any) => {
+      if (response.statusCode === 200) {
+        return JSON.parse(response.body).data;
+      }
+    })
+    .catch((error) => console.log(error));
+};
 export const handleGetGoalListAll = async () => {
   return AllGET()
     .then((response: any) => {

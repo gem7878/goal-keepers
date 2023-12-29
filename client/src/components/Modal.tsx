@@ -9,7 +9,7 @@ import {
   handleUpdateGoal,
 } from '@/app/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setState } from '@/redux/renderSlice';
+import { selectRender, setStateGoal } from '@/redux/renderSlice';
 
 interface selectDataTypes {
   imageUrl: any;
@@ -36,6 +36,7 @@ const Modal: React.FC<{
   const containerRef = useRef<HTMLElement>(null);
 
   const reduxGoalData = useSelector(selectRender);
+  const dispatch = useDispatch();
 
   const handleOutsideClick = (e: any) => {
     if (!containerRef.current?.contains(e.target)) {
@@ -55,7 +56,7 @@ const Modal: React.FC<{
     await handleUpdateGoal(updateData)
       .then((response) => {
         if (response.success) {
-          dispatch(setState(!reduxGoalData.boolean));
+          dispatch(setStateGoal(!reduxGoalData.goalBoolean));
           setOpen(false);
           setSelectGoalNum(null);
         }
@@ -73,7 +74,7 @@ const Modal: React.FC<{
       await handleDeleteGoal(deleteData)
         .then((response) => {
           if (response.success === true) {
-            dispatch(setState(!reduxGoalData.boolean));
+            dispatch(setStateGoal(!reduxGoalData.goalBoolean));
             setOpen(false);
             setSelectGoalNum(null);
           }
@@ -84,7 +85,6 @@ const Modal: React.FC<{
     }
   };
 
-  const dispatch = useDispatch();
   useEffect(() => {}, []);
   const handleConfirmButton = () => {
     if (isEdit) {

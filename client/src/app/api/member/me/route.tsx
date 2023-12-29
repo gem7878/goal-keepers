@@ -1,22 +1,21 @@
-import axios from "axios";
+import axios from 'axios';
+import { cookies } from 'next/headers';
 
-export const GET = async (request: Request) => {
+const cookieStore = cookies();
+const token: string | undefined = cookieStore.get('accessToken')?.value;
+
+export const GET = async () => {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const response = await axios.get("http://localhost:8080/member/me", {
+    const response = await axios.get('http://localhost:8080/member/me', {
       headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMjU2MjgyMiwiaWF0IjoxNzAyNTUyMDIyfQ.3CxoWqXwGIOIM7MfzGedlE-NISMPAkeppUpC_OYxfds",
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    const data = response.data;
-
-    return new Response(JSON.stringify({ data }));
+    return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error) {
-    console.log("error", error);
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
     });
   }

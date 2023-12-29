@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import { StaticImageData } from 'next/image';
 import { handleConfirmToken, handleGetGoalListAll } from './actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { setState, selectRender } from '@/redux/renderSlice';
+import { selectRender } from '@/redux/renderSlice';
 
 export default function Home() {
   const [isMyGoals, setIsMyGoals] = useState(true);
@@ -38,7 +38,7 @@ export default function Home() {
 
   useEffect(() => {
     handleFetchGoalListAll();
-  }, [reduxGoalData.boolean]);
+  }, [reduxGoalData.goalBoolean]);
 
   useEffect(() => {
     selectGoalNum !== null ? setOpen(true) : setOpen(false);
