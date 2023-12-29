@@ -1,96 +1,70 @@
-"use client";
+'use client';
 
-import { CreateButton, PostBox } from "@/components/index.js";
-import React, { useRef, useState } from "react";
-import Image1 from "../../../public/assets/images/aurora.jpg";
-import Image2 from "../../../public/assets/images/gem.png";
+import { CreateButton, PostBox, PostBoxDetail } from '@/components/index.js';
+import React, { useEffect, useRef, useState } from 'react';
+import { handleGetPostAll, handleLikePost } from './actions';
+import { handleGetUserInfo } from '../actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectRender, setStatePost } from '@/redux/renderSlice';
+
+interface postTypes {
+  postId: number;
+  nickname: string;
+  title: string;
+  content: string;
+  updatedAt: string;
+  likeCnt: number;
+  goalId: number;
+  goalTitle: string;
+  goalDescription: string;
+  goalImageUrl: string;
+  shareCnt: number;
+  like: boolean;
+  share: false;
+}
 
 const Community = () => {
   const [focusNum, setFocusNum] = useState<number | null>(null);
-  const postData = [
-    {
-      goalTitle: "오로라보기1",
-      goalContent:
-        "상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용",
-      image: Image1,
-      likeCount: 11,
-      saveCount: 8,
-      postTitle: "포스트1",
-      postContent: "포스트 상세내용",
-      postDate: "2023-12-01",
-      comments: [
-        {
-          userId: "밍밍밍밍밍",
-          content:
-            "밍밍의댓글밍밍의댓글밍밍의댓글밍밍의댓글밍밍의댓글밍밍의댓글밍밍의댓글밍밍의댓글밍밍의댓글밍밍의댓글밍밍의댓글밍밍의댓글",
-        },
-      ],
-    },
-    {
-      goalTitle: "오로라보기2",
-      goalContent: "상세내용",
-      image: Image2,
-      likeCount: 11,
-      saveCount: 8,
-      postTitle: "포스트1",
-      postContent: "포스트 상세내용",
-      postDate: "2023-12-01",
-      comments: [
-        {
-          userId: "밍밍",
-          content: "밍밍의 댓글",
-        },
-      ],
-    },
-    {
-      goalTitle: "오로라보기3",
-      goalContent: "상세내용",
-      image: Image1,
-      likeCount: 11,
-      saveCount: 8,
-      postTitle: "포스트1",
-      postContent: "포스트 상세내용",
-      postDate: "2023-12-01",
-      comments: [
-        {
-          userId: "밍밍",
-          content: "밍밍의 댓글",
-        },
-      ],
-    },
-    {
-      goalTitle: "오로라보기4",
-      goalContent: "상세내용",
-      image: Image1,
-      likeCount: 11,
-      saveCount: 8,
-      postTitle: "포스트1",
-      postContent: "포스트 상세내용",
-      postDate: "2023-12-01",
-      comments: [
-        {
-          userId: "밍밍",
-          content: "밍밍의 댓글",
-        },
-      ],
-    },
-    {
-      goalTitle: "오로라보기5",
-      goalContent: "상세내용",
-      image: Image1,
-      likeCount: 11,
-      saveCount: 8,
-      postTitle: "포스트1",
-      postContent: "포스트 상세내용",
-      postDate: "2023-12-01",
-      comments: [
-        {
-          userId: "밍밍",
-          content: "밍밍의 댓글",
-        },
-      ],
-    },
-  ];
+  const [postData, setPostData] = useState<postTypes[]>([]);
+  const [nicnname, setNickname] = useState('');
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    onGetUserInfo();
+  }, []);
+  const reduxPostData = useSelector(selectRender);
+
+  useEffect(() => {
+    handleAllPost();
+  }, [reduxPostData.postBoolean]);
+
+  const handleAllPost = async () => {
+    const form = { pageNum: 1 };
+    await handleGetPostAll(form)
+      .then((response) => {
+        setPostData(response.content);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const onGetUserInfo = async () => {
+    await handleGetUserInfo()
+      .then((response) => {
+        setNickname(response.nickname);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const onLikePost = async (index: number) => {
+    await handleLikePost(postData[index].postId)
+      .then((response) => {
+        if (response.success) {
+            dispatch(setStatePost(!reduxPostData.postBoolean));
+        }
+      })
+      .catch((error) => console.log(error));
+  };
 
   return (
     <div className="w-full	h-full pt-[80px]">
@@ -100,15 +74,29 @@ const Community = () => {
       </header>
       <section className="z-0 h-full overflow-y-scroll w-full">
         {postData.map((data, index) => {
-          return (
-            <PostBox
-              data={data}
-              key={index}
-              index={index}
-              focusNum={focusNum}
-              setFocusNum={setFocusNum}
-            ></PostBox>
-          );
+          if (focusNum === index) {
+            return (
+              <PostBoxDetail
+                data={data}
+                key={index}
+                myPost={nicnname === data.nickname}
+                setFocusNum={setFocusNum}
+                index={index}
+                onLikePost={onLikePost}
+              ></PostBoxDetail>
+            );
+          } else {
+            return (
+              <PostBox
+                data={data}
+                key={index}
+                index={index}
+                focusNum={focusNum}
+                setFocusNum={setFocusNum}
+                onLikePost={onLikePost}
+              ></PostBox>
+            );
+          }
         })}
       </section>
       <CreateButton></CreateButton>

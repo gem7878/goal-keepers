@@ -55,10 +55,13 @@ body {
   font-size: 13px !important;
 }
 .gk-primary-h1 {
-  @apply text-2xl font-extrabold mb-6 text-center;
+  @apply text-2xl font-extrabold  text-center;
 }
 .gk-primary-next-a {
-  @apply w-full bg-orange-300 text-white h-8 mb-10;
+  @apply w-full bg-orange-300 text-white h-10 rounded-md font-bold mt-4;
+}
+.gk-primary-next-a-block {
+  @apply w-full bg-gray-300 text-white h-10 rounded-md font-bold mt-4;
 }
 .gk-primary-create-section {
   @apply flex w-4/5 flex-col	items-center justify-between	h-4/5;
