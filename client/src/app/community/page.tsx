@@ -26,7 +26,7 @@ interface postTypes {
 const Community = () => {
   const [focusNum, setFocusNum] = useState<number | null>(null);
   const [postData, setPostData] = useState<postTypes[]>([]);
-  const [nicnname, setNickname] = useState('');
+  const [nickname, setNickname] = useState('');
 
   const dispatch = useDispatch();
 
@@ -79,7 +79,7 @@ const Community = () => {
               <PostBoxDetail
                 data={data}
                 key={index}
-                myPost={nicnname === data.nickname}
+                myNickname={nickname}
                 setFocusNum={setFocusNum}
                 index={index}
                 onLikePost={onLikePost}

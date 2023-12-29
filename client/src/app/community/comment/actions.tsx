@@ -1,26 +1,26 @@
 'use server';
 
-import { GET } from '../api/board/all/route';
-import { PUT, DELETE } from '@/app/api/board/post/route';
-import { POST } from '@/app/api/board/post/like/route';
+import { GET } from '@/app/api/board/all-comment/route';
+import { POST, PUT, DELETE } from '@/app/api/board/comment/route';
 
-export const handleGetPostAll = async (getData: { pageNum: number }) => {
+export const handleGetComment = async (getData: {
+  postId: number;
+  page: number;
+}) => {
   return GET(getData)
     .then((response: any) => {
       if (response.statusCode === 200) {
-        return JSON.parse(response.body).data;
+        return JSON.parse(response.body);
       }
     })
     .catch((error) => console.log(error));
 };
 
-export const handlePutPost = async (postData: {
-  title: string;
-  content: string;
-  goalId: number;
+export const handleCreateComment = async (formData: {
   postId: number;
+  content: string;
 }) => {
-  return PUT(postData)
+  return POST(formData)
     .then((response: any) => {
       if (response.statusCode === 200) {
         return JSON.parse(response.body);
@@ -29,8 +29,11 @@ export const handlePutPost = async (postData: {
     .catch((error) => console.log(error));
 };
 
-export const handleDeletePost = async (postData: { postId: number }) => {
-  return DELETE(postData)
+export const handleUpdateComment = async (formData: {
+  commentId: number;
+  content: string;
+}) => {
+  return PUT(formData)
     .then((response: any) => {
       if (response.statusCode === 200) {
         return JSON.parse(response.body);
@@ -39,8 +42,8 @@ export const handleDeletePost = async (postData: { postId: number }) => {
     .catch((error) => console.log(error));
 };
 
-export const handleLikePost = async (postId: number) => {
-  return POST(postId)
+export const handleDeleteComment = async (formData: { commentId: number }) => {
+  return DELETE(formData)
     .then((response: any) => {
       if (response.statusCode === 200) {
         return JSON.parse(response.body);
