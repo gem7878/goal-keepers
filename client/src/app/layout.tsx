@@ -32,6 +32,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const fetchData = async () => {
+      await handleConfirmToken();
       const tokenData = await handleConfirmToken();
       if (!tokenData && !loginPath.includes(pathname)) {
         router.push('/login');

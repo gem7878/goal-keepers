@@ -8,9 +8,12 @@ export const GET = async () => {
   try {
     const response = await axios.get('http://localhost:8080/goal-list/all', {
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     });
+
+    // console.log(response.data);
 
     return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { GET as AllGET } from '@/app/api/goal-list/all/route';
+import { DELETE, PUT } from '@/app/api/goal-list/goal/route';
 
 export const handleGetAccessToken = () => {
   const cookieStore = cookies();
@@ -16,7 +17,6 @@ export const handleConfirmToken = async () => {
 
   function isTokenExpired(token: any) {
     const decodedToken = decodeToken(token);
-
     // 만료 시간이 없거나 현재 시간이 만료 시간 이후이면 토큰이 만료되지 않았음
     return !decodedToken.exp || Date.now() >= decodedToken.exp * 1000;
   }
@@ -28,7 +28,6 @@ export const handleConfirmToken = async () => {
     return JSON.parse(decodedPayload);
   }
 
-  // 사용 예시
   if (!hasCookie || isTokenExpired(accessToken)) {
     return false;
   } else {
@@ -39,7 +38,38 @@ export const handleConfirmToken = async () => {
 export const handleGetGoalListAll = async () => {
   return AllGET()
     .then((response: any) => {
+      // console.log('나오나요', response);
+
       return JSON.parse(response.body);
+    })
+    .catch((error) => console.log(error));
+};
+
+export const handleUpdateGoal = async (putData: {
+  goalId: number | undefined;
+  title: string | undefined;
+  description: string | undefined;
+  startDate: string | undefined;
+  endDate: string | undefined;
+  imageUrl: any;
+}) => {
+  return PUT(putData)
+    .then((reponse) => {
+      return JSON.parse(reponse.body);
+    })
+    .catch((error) => console.log(error));
+};
+
+export const handleDeleteGoal = async (deleteData: {
+  goalId: number | undefined;
+}) => {
+  return DELETE(deleteData)
+    .then((reponse) => {
+      if (typeof reponse.body === 'string') {
+        return JSON.parse(reponse.body);
+      } else {
+        return reponse.body;
+      }
     })
     .catch((error) => console.log(error));
 };

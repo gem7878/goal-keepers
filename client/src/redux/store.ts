@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from './counterSlice';
 import goalDataSlice from './goalDataSlice';
+import renderSlice from './renderSlice';
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
     goalData: goalDataSlice,
+    render: renderSlice,
   },
 });
