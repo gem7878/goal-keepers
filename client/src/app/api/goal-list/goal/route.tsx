@@ -9,12 +9,15 @@ interface POSTTypes {
   imageUrl: string;
 }
 interface PUTTypes {
-  goalId: number;
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  imageUrl: string;
+  goalId: number | undefined;
+  title: string | undefined;
+  description: string | undefined;
+  startDate: string | undefined;
+  endDate: string | undefined;
+  imageUrl: any;
+}
+interface DELETETypes {
+  goalId: number | undefined;
 }
 
 const cookieStore = cookies();
@@ -28,6 +31,7 @@ export const GET = async (request: Request) => {
       `http://localhost:8080/goal-list/goal?id=${id}`,
       {
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       },
@@ -76,8 +80,6 @@ export const POST = async (request: POSTTypes) => {
 
 export const PUT = async (request: PUTTypes) => {
   try {
-    // const { searchParams } = new URL(request.url);
-    // const id = searchParams.get('id');
     const id = request.goalId;
     const response = await axios.put(
       `http://localhost:8080/goal-list/goal?id=${id}`,
@@ -91,8 +93,7 @@ export const PUT = async (request: PUTTypes) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMjg4Nzk1MCwiaWF0IjoxNzAyODc3MTUwfQ.g0SkCtaEIAzynkxCPq_tBT233oG1eV-Oz-8pmi7bMqc',
+          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       },
@@ -107,23 +108,21 @@ export const PUT = async (request: PUTTypes) => {
     };
   }
 };
-export const DELETE = async (request: Request) => {
+export const DELETE = async (request: DELETETypes) => {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+    console.log(request.goalId);
+
     const response = await axios.delete(
-      `http://localhost:8080/goal-list/goal?id=${id}`,
+      `http://localhost:8080/goal-list/goal?id=${request.goalId}`,
       {
         headers: {
-          Authorization:
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMjg4Nzk1MCwiaWF0IjoxNzAyODc3MTUwfQ.g0SkCtaEIAzynkxCPq_tBT233oG1eV-Oz-8pmi7bMqc',
+          Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
       },
     );
 
-    const data = response.data;
-
-    return new Response(JSON.stringify({ data }));
+    return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error) {
     console.log('error', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {

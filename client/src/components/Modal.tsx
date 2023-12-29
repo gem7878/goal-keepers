@@ -1,8 +1,15 @@
 'use client';
 
 import Image, { StaticImageData } from 'next/image';
-import React, { SetStateAction, useRef, useState } from 'react';
+import React, { SetStateAction, useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/aurora.jpg';
+import {
+  handleDeleteGoal,
+  handleGetGoalListAll,
+  handleUpdateGoal,
+} from '@/app/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectRender, setState } from '@/redux/renderSlice';
 
 interface selectDataTypes {
   imageUrl: any;
@@ -20,16 +27,72 @@ const Modal: React.FC<{
   setSelectGoalNum: React.Dispatch<SetStateAction<number | null>>;
 }> = ({ setOpen, selectData, setSelectGoalNum }) => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [editTitle, setEditTitle] = useState(selectData?.title);
+  const [editDescription, setEditDescription] = useState(
+    selectData?.description,
+  );
+  const [editStartDate, setEditStartDate] = useState(selectData?.startDate);
+  const [editEndDate, setEditEndDate] = useState(selectData?.endDate);
   const containerRef = useRef<HTMLElement>(null);
+
+  const reduxGoalData = useSelector(selectRender);
+
   const handleOutsideClick = (e: any) => {
     if (!containerRef.current?.contains(e.target)) {
       setOpen(false);
       setSelectGoalNum(null);
     }
   };
+  const handleEditGoal = async () => {
+    const updateData = {
+      goalId: selectData?.goalId,
+      title: editTitle,
+      description: editDescription,
+      startDate: editStartDate,
+      endDate: editEndDate,
+      imageUrl: selectData?.imageUrl,
+    };
+    await handleUpdateGoal(updateData)
+      .then((response) => {
+        if (response.success) {
+          dispatch(setState(!reduxGoalData.boolean));
+          setOpen(false);
+          setSelectGoalNum(null);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const handleRemoveGoal = async () => {
+    const deleteData = {
+      goalId: selectData?.goalId,
+    };
+    const confirm = window.confirm('목표를 삭제하시겠습니까?');
+    if (confirm) {
+      await handleDeleteGoal(deleteData)
+        .then((response) => {
+          if (response.success === true) {
+            dispatch(setState(!reduxGoalData.boolean));
+            setOpen(false);
+            setSelectGoalNum(null);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
+  const dispatch = useDispatch();
+  useEffect(() => {}, []);
   const handleConfirmButton = () => {
     if (isEdit) {
-      setIsEdit(false);
+      const confirm = window.confirm('수정을 완료하시겠습니까?');
+      if (confirm) {
+        setIsEdit(false);
+        return handleEditGoal();
+      }
     } else {
       setIsEdit(true);
       setOpen(false);
@@ -51,27 +114,62 @@ const Modal: React.FC<{
           ></Image>
           <div className="absolute top-0 w-full h-full bg-opacity-50 bg-black flex items-center">
             <h2 className="text-white ml-8 text-base font-bold">
-              {selectData?.title}
+              {isEdit ? (
+                <input
+                  className="bg-inherit"
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                ></input>
+              ) : (
+                selectData?.title
+              )}
             </h2>
           </div>
           {!isEdit && (
-            <button
-              className="absolute text-white text-xs bottom-1 right-2"
-              onClick={() => setIsEdit(true)}
-            >
-              edit
-            </button>
+            <>
+              <button
+                className="absolute text-white text-xs bottom-1 right-12"
+                onClick={() => setIsEdit(true)}
+              >
+                edit
+              </button>
+              <button
+                className="absolute text-white text-xs bottom-1 right-2"
+                onClick={() => handleRemoveGoal()}
+              >
+                delete
+              </button>
+            </>
           )}
         </section>
         <section className="h-3/5 w-full pt-8 px-8 flex flex-col justify-between">
-          <div className="w-full">
+          <div className="w-full h-2/3">
             <textarea
-              value={selectData?.description}
+              className="h-full"
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
               readOnly={isEdit ? false : true}
             ></textarea>
           </div>
           <span className="w-full text-xs">
-            {selectData?.startDate} ~ {selectData?.endDate}
+            {isEdit ? (
+              <div className="flex">
+                <input
+                  placeholder={selectData?.startDate}
+                  className="w-1/3"
+                  onChange={(e) => setEditStartDate(e.target.value)}
+                ></input>
+                <span>&nbsp;~&nbsp;</span>
+                <input
+                  placeholder={selectData?.endDate}
+                  className="w-1/3"
+                  onChange={(e) => setEditEndDate(e.target.value)}
+                ></input>
+              </div>
+            ) : (
+              `${selectData?.startDate} ~ ${selectData?.endDate}`
+            )}
           </span>
         </section>
         <section className="h-1/5 w-full flex items-center justify-center">
