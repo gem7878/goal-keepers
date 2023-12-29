@@ -21,8 +21,9 @@ public class GoalResponseDto {
     private LocalDate endDate;
     private String imageUrl;
     private int shareCnt;
+    private Boolean isShare;
 
-    public static GoalResponseDto of(Goal goal) {
+    public static GoalResponseDto of(Goal goal, Boolean isShare) {
         return GoalResponseDto.builder()
                 .goalId(goal.getId())
                 .title(goal.getTitle())
@@ -31,6 +32,11 @@ public class GoalResponseDto {
                 .endDate(goal.getEndDate())
                 .imageUrl(goal.getImageUrl())
                 .shareCnt(goal.getShareCnt())
+                .isShare(isShare)
                 .build();
+    }
+
+    public static GoalResponseDto of(Goal goal) {
+        return of(goal, false);
     }
 }
