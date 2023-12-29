@@ -3,9 +3,12 @@ package com.goalkeepers.server.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.dto.GoalPostResponseDto;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
@@ -36,12 +39,9 @@ public class GoalService extends CommonService{
         버킷 수정
      */
 
-    public List<GoalResponseDto> getMyGoalList() {
-        Member member = isMemberCurrent(memberRepository);
-        return goalRepository.findAllByMember(member)
-                                .stream()
-                                .map(GoalResponseDto::of)
-                                .collect(Collectors.toList());
+    public Page<GoalResponseDto> getMyGoalList(int pageNumber) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        return goalRepository.searchMyAllGoal(PageRequest.of(pageNumber - 1, 10), memberId);
     }
 
     // 모든 유저가 접근 가능

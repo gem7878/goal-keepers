@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface GoalRepository extends JpaRepository<Goal, Long>{
+public interface GoalRepository extends JpaRepository<Goal, Long>, GoalRepositoryCustom {
     List<Goal> findAllByMember(Member member);
     Optional<Goal> findById(Long id);
     Optional<Goal> findByShare(GoalShare share);
