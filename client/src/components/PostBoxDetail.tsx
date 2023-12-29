@@ -1,11 +1,15 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/aurora.jpg';
-import { handleDeletePost, handlePutPost } from '@/app/community/actions';
+import {
+  handleDeletePost,
+  handlePutPost,
+} from '@/app/community/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
+import { CommentBox } from './index';
 
 interface postDataTypes {
   content: string;
@@ -25,11 +29,11 @@ interface postDataTypes {
 
 const PostBoxDetail: React.FC<{
   data: postDataTypes;
-  myPost: boolean;
+  myNickname: string;
   index: number;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
   onLikePost: (index: number) => void;
-}> = ({ data, myPost, setFocusNum, index, onLikePost }) => {
+}> = ({ data, myNickname, setFocusNum, index, onLikePost }) => {
   const [isPostEdit, setIsPostEdit] = useState(false);
   const [postTitle, setPostTitle] = useState(data.title);
   const [postContent, setPostContent] = useState(data.content);
@@ -94,7 +98,7 @@ const PostBoxDetail: React.FC<{
           }}
         ></Image>
         <div className="w-full h-full bg-black absolute opacity-50"></div>
-        {myPost && (
+        {myNickname === data.nickname && (
           <div className="flex text-white absolute top-0 right-0 text-xs gap-2 m-2">
             {isPostEdit ? (
               <>
@@ -179,32 +183,7 @@ const PostBoxDetail: React.FC<{
           <p className="text-sm	">{postContent}</p>
         </div>
       )}
-
-      <div className="w-full h-[35%] flex-col text-sm">
-        <h3 className="h-4">댓글</h3>
-        <div className="w-full h-[calc(100%-20px)] mt-1 border rounded-lg p-2">
-          <ul className="w-full h-3/4 overflow-y-scroll">
-            {/* {data.comments.map((list, index) => {
-              return (
-                <li key={index} className="flex-col w-full">
-                  <h4 className="text-xs w-full font-bold">{list.userId}</h4>
-                  <p className="text-xs w-auto">{list.content}</p>
-                </li>
-              );
-            })} */}
-          </ul>
-          <div className="w-full flex justify-between h-1/4">
-            <input
-              type="text"
-              className="border rounded-lg w-5/6 pl-2 text-xs"
-              placeholder="댓글을 입력하세요."
-            />
-            <button className="w-[13%] bg-orange-300 rounded-lg text-xs text-white border border-white">
-              확인
-            </button>
-          </div>
-        </div>
-      </div>
+      <CommentBox postId={data.postId} myNickname={myNickname}></CommentBox>
     </article>
   );
 };
