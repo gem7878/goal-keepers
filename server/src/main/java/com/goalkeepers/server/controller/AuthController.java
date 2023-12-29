@@ -15,8 +15,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -41,16 +42,34 @@ public class AuthController {
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
+    @PostMapping("/nickname")
+    public ResponseEntity<CommonResponseDto> confirmNickname(@Valid @RequestBody ConfirmNicknameRequestDto requestDto) {
+        authService.confirmDuplicateNickname(requestDto.getNickname());
+        return ResponseEntity.ok(new CommonResponseDto(true, "사용가능한 닉네임입니다."));
+    }
+
     @PostMapping("/email")
-    public ResponseEntity<CommonResponseDto> emailConfirm(@Valid @RequestBody ConfirmEmailRequestDto requestDto) {
+    public ResponseEntity<CommonResponseDto> confirmEmail(@Valid @RequestBody ConfirmEmailRequestDto requestDto) {
         authService.confirmDuplicateEmail(requestDto.getEmail());
         return ResponseEntity.ok(new CommonResponseDto(true, "사용가능한 이메일입니다."));
     }
 
-    @PostMapping("/nickname")
-    public ResponseEntity<CommonResponseDto> nicknameConfirm(@Valid @RequestBody ConfirmNicknameRequestDto requestDto) {
-        authService.confirmDuplicateNickname(requestDto.getNickname());
-        return ResponseEntity.ok(new CommonResponseDto(true, "사용가능한 닉네임입니다."));
+    @PostMapping("/email/verification-request")
+    public ResponseEntity<CommonResponseDto> verificationEmail(@Valid @RequestBody ConfirmEmailRequestDto requestDto) {
+        authService.sendCodeToEmail(requestDto.getEmail());
+        return ResponseEntity.ok(new CommonResponseDto(true, "이메일을 전송하였습니다."));
     }
-    
+
+    @GetMapping("/email/verification")
+    public ResponseEntity<CommonResponseDto> verificationCode(@RequestParam(name = "email") String email, 
+                                                                @RequestParam(name = "code") String code) {
+        return ResponseEntity.ok(new CommonResponseDto(authService.verifiedCode(email, code), "인증되었습니다."));
+    }
+
+    // 비밀번호 찾기
+    @PostMapping("/email/password-request")
+    public ResponseEntity<CommonResponseDto> findPassword(@Valid @RequestBody ConfirmEmailRequestDto requestDto) {
+        authService.sendPasswordToEmail(requestDto.getEmail());
+        return ResponseEntity.ok(new CommonResponseDto(true, "이메일을 전송하였습니다."));
+    }
 }
