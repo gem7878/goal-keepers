@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { cookies } from 'next/headers';
 
+interface GETTypes {
+  goalId: number | undefined;
+}
 interface POSTTypes {
   title: string;
   description: string;
@@ -23,12 +26,10 @@ interface DELETETypes {
 const cookieStore = cookies();
 const token: string | undefined = cookieStore.get('accessToken')?.value;
 
-export const GET = async (request: Request) => {
+export const GET = async (request: GETTypes) => {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
     const response = await axios.get(
-      `http://localhost:8080/goal-list/goal?id=${id}`,
+      `http://localhost:8080/goal-list/goal?id=${request.goalId}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -37,9 +38,7 @@ export const GET = async (request: Request) => {
       },
     );
 
-    const data = response.data;
-
-    return new Response(JSON.stringify({ data }));
+    return { statusCode: 200, body: JSON.stringify(response.data.data) };
   } catch (error) {
     console.log('error', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
