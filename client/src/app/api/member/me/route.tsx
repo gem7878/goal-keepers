@@ -5,8 +5,6 @@ const cookieStore = cookies();
 const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const GET = async () => {
-  console.log(token);
-
   try {
     const response = await axios.get('http://localhost:8080/member/me', {
       headers: {

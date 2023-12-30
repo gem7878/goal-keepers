@@ -9,12 +9,9 @@ export const handleGetShare = async (goalId: number) => {
 
   return GET(formData)
     .then((response: any) => {
-      console.log(response);
-      // if (response.statusCode === 200) {
-      //   console.log(response);
-
-      //   // return JSON.parse(response.body);
-      // }
+      if (response.statusCode === 200) {
+        return JSON.parse(response.body);
+      }
     })
     .catch((error) => console.log(error));
 };
@@ -33,7 +30,10 @@ export const handleCreateShare = async (goalId: number) => {
     .catch((error) => console.log(error));
 };
 
-export const handleDeleteShare = async (formData: { goalId: number }) => {
+export const handleDeleteShare = async (goalId: number) => {
+  const formData = {
+    goalId: goalId,
+  };
   return DELETE(formData)
     .then((response: any) => {
       if (response.statusCode === 200) {
