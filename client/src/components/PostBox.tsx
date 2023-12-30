@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/aurora.jpg';
 
 interface postDataTypes {
@@ -26,7 +26,17 @@ const PostBox: React.FC<{
   focusNum: number | null;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
   onLikePost: (index: number) => void;
-}> = ({ data, index, focusNum, setFocusNum, onLikePost }) => {
+  onShareGoal: (index: number) => void;
+  onGetShareData: (index: number) => void;
+}> = ({
+  data,
+  index,
+  focusNum,
+  setFocusNum,
+  onLikePost,
+  onShareGoal,
+  onGetShareData,
+}) => {
   const likeRef = useRef<HTMLUListElement>(null);
 
   const handleFocus = (e: { target: any }) => {
@@ -88,7 +98,13 @@ const PostBox: React.FC<{
             </label>
           </li>
           <li className="flex items-center gap-1">
-            <button>➕</button>
+            <button
+              onClick={() => {
+                data.share ? onGetShareData(data.goalId) : onShareGoal(index);
+              }}
+            >
+              ➕
+            </button>
             <label
               className={`text-xs	${
                 data.share ? 'text-orange-400' : 'text-gray-500'

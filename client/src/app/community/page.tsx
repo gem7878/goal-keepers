@@ -6,6 +6,11 @@ import { handleGetPostAll, handleLikePost } from './actions';
 import { handleGetUserInfo } from '../actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
+import {
+  handleCreateShare,
+  handleDeleteShare,
+  handleGetShare,
+} from './share/actions';
 
 interface postTypes {
   postId: number;
@@ -60,12 +65,41 @@ const Community = () => {
     await handleLikePost(postData[index].postId)
       .then((response) => {
         if (response.success) {
-            dispatch(setStatePost(!reduxPostData.postBoolean));
+          dispatch(setStatePost(!reduxPostData.postBoolean));
         }
       })
       .catch((error) => console.log(error));
   };
 
+  const onShareGoal = async (index: number) => {
+    await handleCreateShare(postData[index].goalId)
+      .then((response) => {
+        if (response.success) {
+          dispatch(setStatePost(!reduxPostData.postBoolean));
+        }
+      })
+      .catch((error) => console.log(error));
+  };
+  const onGetShareData = async (goalId: number) => {
+    console.log('click');
+
+    await handleGetShare(goalId)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => console.log(error));
+  };
+  // const onShareDeleteGoal = async (index: number) => {
+  //   await handleDeleteShare(postData[index].goalId)
+  //     .then((response) => {
+  //       console.log(response);
+
+  //       if (response.success) {
+  //         dispatch(setStatePost(!reduxPostData.postBoolean));
+  //       }
+  //     })
+  //     .catch((error) => console.log(error));
+  // };
   return (
     <div className="w-full	h-full pt-[80px]">
       <header className="w-11/12 inset-x-0 mx-auto flex justify-between	border h-11	fixed top-7 bg-white ">
@@ -83,6 +117,8 @@ const Community = () => {
                 setFocusNum={setFocusNum}
                 index={index}
                 onLikePost={onLikePost}
+                onShareGoal={onShareGoal}
+                onGetShareData={onGetShareData}
               ></PostBoxDetail>
             );
           } else {
@@ -94,6 +130,8 @@ const Community = () => {
                 focusNum={focusNum}
                 setFocusNum={setFocusNum}
                 onLikePost={onLikePost}
+                onShareGoal={onShareGoal}
+                onGetShareData={onGetShareData}
               ></PostBox>
             );
           }
