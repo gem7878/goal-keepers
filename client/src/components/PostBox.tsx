@@ -82,13 +82,7 @@ const PostBox: React.FC<{
         </h3>
         <ul ref={likeRef} className="flex w-full justify-center	gap-2">
           <li className="flex items-center gap-1">
-            <button
-              onClick={() => {
-                data.like || onLikePost(index);
-              }}
-            >
-              🧡
-            </button>
+            <button onClick={() => onLikePost(index)}>🧡</button>
             <label
               className={`text-xs	${
                 data.like ? 'text-orange-400' : 'text-gray-500'

@@ -84,22 +84,22 @@ const Community = () => {
     console.log('click');
 
     await handleGetShare(goalId)
-      .then((response) => {
-        console.log(response);
+      .then(async (response) => {
+        if (response.success) {
+          await onDeleteShareGoal(response.data.goalId);
+        }
       })
       .catch((error) => console.log(error));
   };
-  // const onShareDeleteGoal = async (index: number) => {
-  //   await handleDeleteShare(postData[index].goalId)
-  //     .then((response) => {
-  //       console.log(response);
-
-  //       if (response.success) {
-  //         dispatch(setStatePost(!reduxPostData.postBoolean));
-  //       }
-  //     })
-  //     .catch((error) => console.log(error));
-  // };
+  const onDeleteShareGoal = async (goalId: number) => {
+    await handleDeleteShare(goalId)
+      .then((response) => {
+        if (response.success) {
+          dispatch(setStatePost(!reduxPostData.postBoolean));
+        }
+      })
+      .catch((error) => console.log(error));
+  };
   return (
     <div className="w-full	h-full pt-[80px]">
       <header className="w-11/12 inset-x-0 mx-auto flex justify-between	border h-11	fixed top-7 bg-white ">

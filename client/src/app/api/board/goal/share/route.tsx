@@ -14,8 +14,6 @@ interface DELETETypes {
 }
 
 export const GET = async (request: GETTypes) => {
-  console.log(token);
-
   const id = request.goalId;
   try {
     const response = await axios.get(
@@ -28,8 +26,6 @@ export const GET = async (request: GETTypes) => {
         withCredentials: true,
       },
     );
-
-    console.log('과연!', response);
 
     return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error) {
