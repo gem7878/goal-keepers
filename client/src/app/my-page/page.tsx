@@ -1,27 +1,44 @@
-"use client";
-import React, { useEffect, useMemo, useState } from "react";
+'use client';
+import React, { useEffect, useMemo, useState } from 'react';
+import { handleGetUserInfo } from '../actions';
+import Link from 'next/link';
 
 const MyPage = () => {
   const [adData, setAdData] = useState([
     {
-      title: "광고수신1",
+      title: '광고수신',
       isAgree: true,
     },
     {
-      title: "광고수신2",
+      title: '포스트 댓글 알림 수신',
       isAgree: true,
     },
     {
-      title: "광고수신3",
+      title: '포스트 좋아요 알림 수신',
       isAgree: false,
     },
     {
-      title: "광고수신4",
+      title: '목표 담기 알림 수신',
       isAgree: true,
     },
   ]);
+  const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
 
   useEffect(() => {}, [adData]);
+  useEffect(() => {
+    onGetUserInfo();
+  }, []);
+
+  const onGetUserInfo = async () => {
+    await handleGetUserInfo()
+      .then((response) => {
+        setNickname(response.nickname);
+        setEmail(response.emai);
+      })
+      .catch((error) => console.log(error));
+  };
+
   const handleClick = ({ index, bool }: { index: number; bool: boolean }) => {
     setAdData((prevAdData) => {
       return prevAdData.map((item, i) => {
@@ -37,21 +54,30 @@ const MyPage = () => {
     <div className="w-full py-14 px-5 h-full flex flex-col justify-between">
       <section className="border w-full rounded-md h-[17%] flex justify-between py-4 px-8 items-center">
         <div className="flex items-end">
-          <h2 className="text-2xl">&quot;밍밍&quot;</h2>
-          <label>lv.17</label>
+          <h2 className="text-2xl">&quot;{nickname}&quot;</h2>
+          <label>님</label>
         </div>
         <div className="flex flex-col items-center text-sm">
-          <button>닉네임 변경</button>
-          <p>레벨 정보</p>
+          <Link
+            href={{
+              pathname: '/my-page/account',
+              query: {
+                nickname: nickname,
+                email: email,
+              },
+            }}
+          >
+            <button>계정 관리</button>
+          </Link>
         </div>
       </section>
-      <section className="border w-full rounded-md h-[14%] py-4 px-8 flex items-center">
-        <h2 className="text-xl">건의함</h2>
+      <section className="border w-full rounded-md h-[11%] py-4 px-8 flex items-center">
+        <h2 className="text-xl">공지사항</h2>
       </section>
-      <section className="border w-full rounded-md h-[14%] py-4 px-8 flex items-center">
-        <h2 className="text-xl">사용정보</h2>
+      <section className="border w-full rounded-md h-[11%] py-4 px-8 flex items-center">
+        <h2 className="text-xl">고객센터</h2>
       </section>
-      <section className="border w-full rounded-md h-[43%] py-4 px-8 flex flex-col">
+      <section className="border w-full rounded-md h-[40%] py-4 px-8 flex flex-col">
         <h2 className="text-xl mb-3">알림 설정</h2>
         <ul className="h-3/4 w-full">
           {adData.map((list, index) => {
@@ -77,6 +103,10 @@ const MyPage = () => {
             );
           })}
         </ul>
+      </section>
+      <section className="border w-full rounded-md h-[11%] py-4 px-8 flex items-center justify-between">
+        <h2 className="text-xl">버전</h2>
+        <label className="text-sm">1.0.0</label>
       </section>
     </div>
   );

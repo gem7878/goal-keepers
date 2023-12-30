@@ -1,9 +1,9 @@
-"use server";
+'use server';
 
-import { POST } from "@/app/api/(users)/auth/login/route";
-import { serialize } from "cookie";
-import Cookies from "js-cookie";
-import { cookies } from "next/headers";
+import { POST } from '@/app/api/auth/login/route';
+import { serialize } from 'cookie';
+import Cookies from 'js-cookie';
+import { cookies } from 'next/headers';
 
 // 액세스 토큰을 쿠키에 저장하는 함수
 const setAccessTokenCookie = (token: string) => {
@@ -13,13 +13,13 @@ const setAccessTokenCookie = (token: string) => {
   expiresDate.setTime(expiresDate.getTime() + oneDayInSeconds * 1000);
 
   cookies().set({
-    name: "accessToken",
+    name: 'accessToken',
     value: token,
     httpOnly: true,
     expires: expiresDate,
-    path: "/",
-    secure: process.env.NEXT_PUBLIC_ENV === "production",
-    sameSite: "strict",
+    path: '/',
+    secure: process.env.NEXT_PUBLIC_ENV === 'production',
+    sameSite: 'strict',
   });
 };
 export const handleLogin = async (postData: {
@@ -29,7 +29,7 @@ export const handleLogin = async (postData: {
   return POST(postData)
     .then((response) => {
       if (response.statusCode == 200) {
-        setAccessTokenCookie(JSON.parse(response.body).accessToken);
+        setAccessTokenCookie(JSON.parse(response.body).data.accessToken);
         return { ok: true };
       } else {
         return { ok: false };
