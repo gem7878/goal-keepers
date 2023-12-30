@@ -3,10 +3,7 @@
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/aurora.jpg';
-import {
-  handleDeletePost,
-  handlePutPost,
-} from '@/app/community/actions';
+import { handleDeletePost, handlePutPost } from '@/app/community/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
 import { CommentBox } from './index';
@@ -33,7 +30,17 @@ const PostBoxDetail: React.FC<{
   index: number;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
   onLikePost: (index: number) => void;
-}> = ({ data, myNickname, setFocusNum, index, onLikePost }) => {
+  onShareGoal: (index: number) => void;
+  onGetShareData: (index: number) => void;
+}> = ({
+  data,
+  myNickname,
+  setFocusNum,
+  index,
+  onLikePost,
+  onShareGoal,
+  onGetShareData,
+}) => {
   const [isPostEdit, setIsPostEdit] = useState(false);
   const [postTitle, setPostTitle] = useState(data.title);
   const [postContent, setPostContent] = useState(data.content);
@@ -145,7 +152,13 @@ const PostBoxDetail: React.FC<{
             </label>
           </li>
           <li className="flex items-center gap-1">
-            <button>➕</button>
+            <button
+              onClick={() => {
+                data.share ? onGetShareData(data.goalId) : onShareGoal(index);
+              }}
+            >
+              ➕
+            </button>
             <label
               className={`text-xs	${
                 data.share ? 'text-orange-400' : 'text-gray-300'
