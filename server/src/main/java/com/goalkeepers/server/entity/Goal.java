@@ -2,11 +2,13 @@ package com.goalkeepers.server.entity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
 import com.goalkeepers.server.dto.GoalRequestDto;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -65,6 +68,13 @@ public class Goal {
     @ColumnDefault("0")
     private int shareCnt;
 
+    @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY)
+    private Set<GoalShare> shareList;
+
+    @OneToOne
+    @JoinColumn(name = "share_id", nullable = true)
+    private GoalShare share;
+
     @OneToMany(mappedBy = "goal")
     private List<Post> posts;
 
@@ -75,5 +85,15 @@ public class Goal {
         goal.endDate = requestDto.getEndDate();
         goal.imageUrl = requestDto.getImageUrl();
         return goal;
+    }
+
+    public Goal(GoalShare share, String title, String description, String imageUrl, LocalDate startDate, LocalDate endDate, Member member) {
+        this.share = share;
+        this.member = member;
+        this.title = title;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.imageUrl = imageUrl;
     }
 }

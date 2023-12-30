@@ -1,11 +1,14 @@
-"use client";
+'use client';
 
-import { CreateButton, Modal, MyGoals } from "@/components/index.js";
-import { useEffect, useState } from "react";
-import Image1 from "../../public/assets/images/aurora.jpg";
-import Image2 from "../../public/assets/images/gem.png";
-import { createPortal } from "react-dom";
-import { StaticImageData } from "next/image";
+import { CreateButton, Modal, MyGoals } from '@/components/index.js';
+import { useEffect, useState } from 'react';
+import Image1 from '../../public/assets/images/aurora.jpg';
+import Image2 from '../../public/assets/images/gem.png';
+import { createPortal } from 'react-dom';
+import { StaticImageData } from 'next/image';
+import { handleConfirmToken, handleGetGoalListAll } from './actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectRender } from '@/redux/renderSlice';
 
 export default function Home() {
   const [isMyGoals, setIsMyGoals] = useState(true);
@@ -13,57 +16,29 @@ export default function Home() {
   const [portalElement, setPortalElement] = useState<Element | null>(null);
   const [selectGoalNum, setSelectGoalNum] = useState<number | null>(null);
   const [selectData, setSelectData] = useState<{
-    image: any;
-    goalTitle: string;
-    goalContent: string;
+    imageUrl: any;
+    title: string;
+    description: string;
     startDate: string;
     endDate: string;
-    goalComment: string[];
+    shareCnt: number;
+    goalId: number;
   } | null>(null);
+  const [myGoalList, setMyGoalList] = useState([]);
 
-  const myGoalList = [
-    {
-      image: Image1,
-      goalTitle: "오로라보기1",
-      goalContent:
-        "상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
-    },
-    {
-      image: Image2,
-      goalTitle: "오로라보기2",
-      goalContent: "상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
-    },
-    {
-      image: Image1,
-      goalTitle: "오로라보기3",
-      goalContent: "상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
-    },
-    {
-      image: Image1,
-      goalTitle: "오로라보기4",
-      goalContent: "상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
-    },
-    {
-      image: Image2,
-      goalTitle: "오로라보기5",
-      goalContent: "상세내용",
-      startDate: "2023-12-17",
-      endDate: "2024-03-17",
-      goalComment: ["예약했음"],
-    },
-  ];
+  const handleFetchGoalListAll = async () => {
+    await handleGetGoalListAll()
+      .then((response) => {
+        setMyGoalList(response.data);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const reduxGoalData = useSelector(selectRender);
+
+  useEffect(() => {
+    handleFetchGoalListAll();
+  }, [reduxGoalData.goalBoolean]);
 
   useEffect(() => {
     selectGoalNum !== null ? setOpen(true) : setOpen(false);
@@ -77,7 +52,7 @@ export default function Home() {
   }, [selectGoalNum]);
 
   useEffect(() => {
-    setPortalElement(document.getElementById("portal"));
+    setPortalElement(document.getElementById('portal'));
   }, [isOpen]);
 
   const handleTab = (boolean: boolean) => {
@@ -130,7 +105,7 @@ export default function Home() {
               selectData={selectData}
               setSelectGoalNum={setSelectGoalNum}
             />,
-            portalElement
+            portalElement,
           )
         : null}
     </div>

@@ -1,8 +1,8 @@
-"use server";
+'use server';
 
-import { POST as EmailPOST } from "@/app/api/(users)/auth/email/route";
-import { POST as NickNamePOST } from "@/app/api/(users)/auth/nickname/route";
-import { POST as FormPOST } from "@/app/api/(users)/auth/signup/route";
+import { POST as EmailPOST } from '@/app/api/auth/email/route';
+import { POST as NickNamePOST } from '@/app/api/auth/nickname/route';
+import { POST as FormPOST } from '@/app/api/auth/signup/route';
 
 export const handleConfirmEmail = async (email: string) => {
   const postData = {
