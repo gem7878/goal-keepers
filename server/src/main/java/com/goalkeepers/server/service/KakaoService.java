@@ -119,9 +119,18 @@ public class KakaoService {
 			String nickname = kakaoAccountDto.getKakao_account().getProfile().getNickname();
 			int maxAttempts = 10; // Limit the number of attempts to generate a unique nickname
 			int attempts = 0;
+			String tempNickname = nickname;
+			int size = nickname.length();
+			while (memberRepository.existsByNickname(tempNickname) && attempts < maxAttempts) {
+				tempNickname = nickname + randomString(size);
+				attempts++;
+			} 
 
-			while (memberRepository.existsByNickname(nickname) && attempts < maxAttempts) {
-				nickname = "닉네임변경필요" + UUID.randomUUID().toString().substring(0,8);
+			// 만약 10번을 랜덤을 돌려도 존재하는 닉네임이면 Exception 보내기
+			if (attempts == maxAttempts) {
+				throw new CustomException("닉네임 오류입니다. 다시 소셜 로그인을 진행해주세요.");
+			} else {
+				nickname = tempNickname;
 			}
 
 			// db 저장
@@ -187,5 +196,9 @@ public class KakaoService {
 		} catch (JsonProcessingException e) {
 			throw new CustomException("------------Json Error------------" + e.getMessage());
 		}
+	}
+
+	private String randomString(int size) {
+		return UUID.randomUUID().toString().substring(0,15-size);
 	}
 }
