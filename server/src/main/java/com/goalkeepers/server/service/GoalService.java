@@ -1,22 +1,18 @@
 package com.goalkeepers.server.service;
 
-import static com.goalkeepers.server.entity.QMember.member;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.io.IOException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.goalkeepers.server.config.SecurityUtil;
-import com.goalkeepers.server.dto.GoalPostResponseDto;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
+import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 import com.goalkeepers.server.entity.Goal;
-import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.exception.CustomException;
@@ -35,6 +31,7 @@ public class GoalService extends CommonService{
     private final MemberRepository memberRepository;
     private final LikeShareService shareService;
     private final GoalShareRepository shareRepository;
+    private final S3ImageFileService imageFileService;
     
 
     /*
@@ -63,18 +60,40 @@ public class GoalService extends CommonService{
         return GoalResponseDto.of(goal, isShare);
     }
 
-    public GoalResponseDto createMyGoal(GoalRequestDto requestDto) {
+    public GoalResponseDto createMyGoal(GoalRequestDto requestDto, String imageUrl) {
         Member member = isMemberCurrent(memberRepository);    
-        return GoalResponseDto.of(goalRepository.save(requestDto.toGoal(member)));
+        return GoalResponseDto.of(goalRepository.save(requestDto.toGoal(member, imageUrl)));
     }
 
-    public GoalResponseDto updateMyGoal(GoalRequestDto requestDto, Long goalId) {
-        return GoalResponseDto.of(Goal.goalUpdate(isMyGoal(memberRepository, goalRepository, goalId), requestDto));
+    public GoalResponseDto updateMyGoal(GoalUpdateRequestDto requestDto, Long goalId, MultipartFile multipartFile) throws IOException {
+        Goal currentGoal = isMyGoal(memberRepository, goalRepository, goalId);
+        
+        if (multipartFile == null && requestDto != null) {
+            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto));
+        } else {
+            String imageUrl = currentGoal.getImageUrl();
+            if (imageUrl != null) {
+                // 원래 골의 이미지 삭제
+                String[] urlArray = imageUrl.split("/");
+                imageFileService.delete(urlArray[3], urlArray[4]);
+            }            
+            // 새로운 이미지 업로드
+            String newImageUrl = imageFileService.upload(multipartFile, "images");
+            // 업로드된 이미지 주소로 DB 업데이트
+            if (requestDto == null) {
+                return GoalResponseDto.of(Goal.goalUpdate(currentGoal, newImageUrl));
+            }
+            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, newImageUrl));
+        }
     }
 
     public void deleteMyGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
-
+        String imageUrl = goal.getImageUrl();
+        if (imageUrl != null) {
+            String[] urlArray = imageUrl.split("/");
+            imageFileService.delete(urlArray[3], urlArray[4]);
+        }
         disconnectedPost(goal);
         shareService.deleteShare(goal);
         goalRepository.delete(goal);

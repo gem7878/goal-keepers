@@ -7,6 +7,7 @@ import java.util.Set;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.goalkeepers.server.dto.GoalRequestDto;
+import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -51,15 +52,12 @@ public class Goal {
     private String title;
 
     @Column(columnDefinition = "TEXT")
-    @NotNull
     private String description;
 
     @Column
-    @NotNull
     private LocalDate startDate;
 
     @Column
-    @NotNull
     private LocalDate endDate;
 
     @Column
@@ -78,12 +76,25 @@ public class Goal {
     @OneToMany(mappedBy = "goal")
     private List<Post> posts;
 
-    public static Goal goalUpdate(Goal goal, GoalRequestDto requestDto) {
+    public static Goal goalUpdate(Goal goal, GoalUpdateRequestDto requestDto, String imageUrl) {
         goal.title = requestDto.getTitle();
         goal.description = requestDto.getDescription();
         goal.startDate = requestDto.getStartDate();
         goal.endDate = requestDto.getEndDate();
-        goal.imageUrl = requestDto.getImageUrl();
+        goal.imageUrl = imageUrl;
+        return goal;
+    }
+
+    public static Goal goalUpdate(Goal goal, GoalUpdateRequestDto requestDto) {
+        goal.title = requestDto.getTitle();
+        goal.description = requestDto.getDescription();
+        goal.startDate = requestDto.getStartDate();
+        goal.endDate = requestDto.getEndDate();
+        return goal;
+    }
+
+    public static Goal goalUpdate(Goal goal, String imageUrl) {
+        goal.imageUrl = imageUrl;
         return goal;
     }
 

@@ -1,20 +1,27 @@
 package com.goalkeepers.server.controller;
 
+import java.io.IOException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
+import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 import com.goalkeepers.server.service.GoalService;
+import com.goalkeepers.server.service.S3ImageFileService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +40,7 @@ public class GoalController {
      */
 
     private final GoalService goalService;
+    private final S3ImageFileService imageFileService;
 
     @GetMapping("/all")
     public ResponseEntity<CommonResponseDto> getMyGoalLists(@RequestParam(name = "page") int pageNumber) {
@@ -41,14 +49,23 @@ public class GoalController {
     }
 
     @PostMapping("/goal")
-    public ResponseEntity<CommonResponseDto> createMyGoal(@Valid @RequestBody GoalRequestDto requestDto) {
-        GoalResponseDto response = goalService.createMyGoal(requestDto);
+    public ResponseEntity<CommonResponseDto> createMyGoal(@Valid @RequestPart(value = "goalInformation") GoalRequestDto requestDto,
+                                                                @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException {
+        
+        String imageUrl = "";                                                           
+        if (multipartFile != null) {
+            imageUrl = imageFileService.upload(multipartFile, "images");
+        }
+        GoalResponseDto response = goalService.createMyGoal(requestDto, imageUrl);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
     @PutMapping("/goal")
-    public ResponseEntity<CommonResponseDto> updateMyGoal(@RequestParam(name = "id", required = true) Long id, @Valid @RequestBody GoalRequestDto requestDto) {
-        GoalResponseDto response = goalService.updateMyGoal(requestDto, id);
+    public ResponseEntity<CommonResponseDto> updateMyGoal(@RequestParam(name = "id", required = true) Long id,
+                                                    @Valid @RequestPart(value = "goalInformation", required = false) GoalUpdateRequestDto requestDto,
+                                                    @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException {
+        
+        GoalResponseDto response = goalService.updateMyGoal(requestDto, id, multipartFile);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
