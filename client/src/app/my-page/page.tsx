@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { handleGetUserInfo } from '../actions';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const MyPage = () => {
   const [adData, setAdData] = useState([
@@ -23,7 +24,8 @@ const MyPage = () => {
     },
   ]);
   const [nickname, setNickname] = useState('');
-  const [email, setEmail] = useState('');
+
+  const router = useRouter();
 
   useEffect(() => {}, [adData]);
   useEffect(() => {
@@ -34,7 +36,6 @@ const MyPage = () => {
     await handleGetUserInfo()
       .then((response) => {
         setNickname(response.nickname);
-        setEmail(response.emai);
       })
       .catch((error) => console.log(error));
   };
@@ -61,20 +62,22 @@ const MyPage = () => {
           <Link
             href={{
               pathname: '/my-page/account',
-              query: {
-                nickname: nickname,
-                email: email,
-              },
             }}
           >
             <button>계정 관리</button>
           </Link>
         </div>
       </section>
-      <section className="border w-full rounded-md h-[11%] py-4 px-8 flex items-center">
+      <section
+        className="border w-full rounded-md h-[11%] py-4 px-8 flex items-center"
+        onClick={() => router.push('/my-page/notice')}
+      >
         <h2 className="text-xl">공지사항</h2>
       </section>
-      <section className="border w-full rounded-md h-[11%] py-4 px-8 flex items-center">
+      <section
+        className="border w-full rounded-md h-[11%] py-4 px-8 flex items-center"
+        onClick={() => router.push('/my-page/cs')}
+      >
         <h2 className="text-xl">고객센터</h2>
       </section>
       <section className="border w-full rounded-md h-[40%] py-4 px-8 flex flex-col">

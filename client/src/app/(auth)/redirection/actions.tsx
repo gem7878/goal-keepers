@@ -1,20 +1,19 @@
-"use server";
+'use server';
 
-import axios from "axios";
+import { GET } from '@/app/api/auth/kakao/route';
+import { setAccessTokenCookie } from '../login/actions';
 
-export const kakaoLogin = (code : String | null)=> {
-    const geturl = `http://localhost:8080/api/kakao/login?code=${code}`;
-    axios.get(
-        geturl, 
-        {
-          headers: { 
-            "Content-Type": "application/json;charset=utf-8",
-          },
-        }).then((res) => {
-          console.log(res.data);
-          if(res.status === 200) {
-              console.log(res.data);
-          }
-      });
-}
+export const handleKakaoLogin = async (code: string) => {
+  try {
+    const response = await GET(code);
+    if ('statusCode' in response && response.statusCode === 200) {
+      const accessToken = JSON.parse(response.body).data.accessToken;
+      setAccessTokenCookie(accessToken);
 
+      return { ok: true };
+    }
+  } catch (error) {
+    console.error(error);
+    return { ok: false };
+  }
+};

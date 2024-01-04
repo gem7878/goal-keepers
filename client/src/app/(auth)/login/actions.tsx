@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import { cookies } from 'next/headers';
 
 // 액세스 토큰을 쿠키에 저장하는 함수
-const setAccessTokenCookie = (token: string) => {
+export const setAccessTokenCookie = (token: string) => {
   // 쿠키 만료 날짜 설정
   const oneDayInSeconds = 24 * 60 * 60;
   const expiresDate = new Date();

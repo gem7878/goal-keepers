@@ -49,3 +49,4 @@ Dockerfile
 flyway.user.toml
 report.html
 report.json
+*.sql

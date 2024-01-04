@@ -3,22 +3,34 @@
 import { handleConfirmNickName } from '@/app/(auth)/register/actions';
 import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
-import { handleChangeNickname } from './actions';
-import { useSearchParams } from 'next/navigation';
-
+import { handleChangeNickname, handleChangePassword } from './actions';
+import { useRouter, useSearchParams } from 'next/navigation';
+interface IFormInput {
+  email: string;
+  exPassword: string;
+  newPassword: string;
+}
 const Account = () => {
-  const searchParams = useSearchParams();
-
-  const { control, getValues, setError, watch } = useForm({
+  const {
+    control,
+    getValues,
+    setError,
+    watch,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm({
     mode: 'onChange',
     defaultValues: {
-      password: '',
+      email: '',
+      exPassword: '',
       newPassword: '',
     },
   });
   const [focusBtn, setFocusBtn] = useState('');
   const [nicknameInput, setNicknameInput] = useState('');
   const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
+
+  const router = useRouter();
 
   const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#])[\da-zA-Z!@#]{8,20}$/;
 
@@ -43,7 +55,8 @@ const Account = () => {
         await handleChangeNickname(nicknameInput)
           .then((response) => {
             if (response.success) {
-              alert('닉네임 변경 완료!');
+              alert('닉네임이 변경되었습니다.');
+              return router.push('/my-page');
             }
           })
           .catch((error) => console.log(error));
@@ -53,25 +66,40 @@ const Account = () => {
     }
   };
   const onChangePassword = async () => {
-    const email = searchParams.get('email');
-    if (isCheckingDuplicate === false) {
-      alert('닉네임 중복 확인을 해주세요.');
-    } else {
-      if (nicknameInput.length > 0) {
-        await handleChangeNickname(nicknameInput)
-          .then((response) => {
-            if (response.success) {
-              alert('닉네임 변경 완료!');
+    const emailValue = getValues('email');
+    const exPwValue = getValues('exPassword');
+    const newPwValue = getValues('newPassword');
+
+    if (
+      emailValue.length > 0 &&
+      exPwValue.length > 0 &&
+      newPwValue.length > 0
+    ) {
+      const formData = {
+        email: emailValue,
+        exPassword: exPwValue,
+        newPassword: newPwValue,
+      };
+      await handleChangePassword(formData)
+        .then((response) => {
+          if (response.status === 400) {
+            if (response.validation !== null) {
+              alert(response.validation[0].message);
+            } else {
+              alert(response.message);
             }
-          })
-          .catch((error) => console.log(error));
-      } else {
-        alert('닉네임을 입력하세요');
-      }
+          } else if (response.success === true) {
+            alert('비밀번호가 변경되었습니다.');
+            return router.push('/my-page');
+          }
+        })
+        .catch((error) => console.log(error));
+    } else {
+      alert('빈 칸을 모두 채워주세요.');
     }
   };
   return (
-    <div className="w-10/12 h-2/3 flex flex-col items-center justify-between">
+    <div className="w-10/12 h-3/4 flex flex-col items-center justify-between">
       <h2 className="font-bold text-2xl">계정 관리</h2>
       <section className="w-full mb-10">
         <ul className="w-full flex flex-col gap-5">
@@ -115,6 +143,7 @@ const Account = () => {
                 <button
                   className={`w-20 h-10 border mt-4`}
                   onClick={() => onUpdateNickname()}
+                  type="button"
                 >
                   변경
                 </button>
@@ -136,7 +165,22 @@ const Account = () => {
               <div className=" p-4 flex flex-col items-center">
                 <div className="flex flex-col justify-between w-full mt-3">
                   <Controller
-                    name="password"
+                    name="email"
+                    control={control}
+                    rules={{
+                      required: true,
+                    }}
+                    render={({ field }) => (
+                      <input
+                        type="email"
+                        className="w-full border-b"
+                        {...field}
+                        placeholder="현재 사용중인 이메일 입력하세요"
+                      ></input>
+                    )}
+                  ></Controller>
+                  <Controller
+                    name="exPassword"
                     control={control}
                     rules={{
                       required: true,
@@ -145,7 +189,7 @@ const Account = () => {
                     render={({ field }) => (
                       <input
                         type="password"
-                        className="w-full border-b"
+                        className="w-full border-b mt-4"
                         {...field}
                         placeholder="현재 사용중인 비밀번호를 입력하세요"
                       ></input>
@@ -168,15 +212,18 @@ const Account = () => {
                     )}
                   ></Controller>
                   <span className="text-red-600 text-xs">
-                    * 소문자 영단어, 숫자, 특수문자를 모두 포함 8~20자
+                    {errors.newPassword?.type == 'pattern'
+                      ? '* 소문자 영단어, 숫자, 특수문자를 모두 포함 8~20자'
+                      : ''}
                   </span>
                 </div>
-                <button
+                <input
                   className={`w-20 h-10 border mt-4`}
-                  onClick={() => onUpdateNickname()}
-                >
-                  변경
-                </button>
+                  onClick={() => onChangePassword()}
+                  type="submit"
+                  value={'변경'}
+                  disabled={isValid === false}
+                ></input>
               </div>
             )}
           </li>

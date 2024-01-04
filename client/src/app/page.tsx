@@ -27,11 +27,15 @@ export default function Home() {
   const [myGoalList, setMyGoalList] = useState([]);
 
   const handleFetchGoalListAll = async () => {
-    await handleGetGoalListAll()
-      .then((response) => {
-        setMyGoalList(response.data);
-      })
-      .catch((error) => console.log(error));
+    try {
+      const response = await handleGetGoalListAll();
+
+      if (response.data) {
+        setMyGoalList(response.data.content);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const reduxGoalData = useSelector(selectRender);
