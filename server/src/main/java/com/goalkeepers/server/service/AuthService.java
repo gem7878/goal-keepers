@@ -16,6 +16,7 @@ import com.goalkeepers.server.dto.MemberResponseDto;
 import com.goalkeepers.server.dto.TokenDto;
 import com.goalkeepers.server.entity.EmailCode;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.entity.SNS;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.jwt.TokenProvider;
 import com.goalkeepers.server.repository.EmailCodeRepository;
@@ -127,6 +128,16 @@ public class AuthService extends CommonService {
     private String findPassword(String email) {
         Member member = memberRepository.findByEmail(email)
                                         .orElseThrow(() -> new CustomException("가입되지 않은 이메일입니다."));
+        SNS sns = member.getSns();
+        if (sns != null) {
+            String snsKorean = "";
+            if (sns == SNS.KAKAO) {
+                snsKorean = "카카오";
+            } else if (sns == SNS.NAVER) {
+                snsKorean = "네이버";
+            }
+            throw new CustomException(snsKorean+ "를 통해 로그인된 이메일입니다. " + snsKorean + " 로그인을 이용해주세요.");
+        }
 
         String newPassword = UUID.randomUUID().toString().substring(0,12);
         member.setPassword(passwordEncoder.encode(newPassword));
