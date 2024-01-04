@@ -4,7 +4,7 @@ import { handleConfirmNickName } from '@/app/(auth)/register/actions';
 import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { handleChangeNickname, handleChangePassword } from './actions';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 interface IFormInput {
   email: string;
   exPassword: string;
@@ -30,6 +30,8 @@ const Account = () => {
   const [nicknameInput, setNicknameInput] = useState('');
   const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
 
+  const router = useRouter();
+
   const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#])[\da-zA-Z!@#]{8,20}$/;
 
   // 닉네임 중복 확인
@@ -53,7 +55,8 @@ const Account = () => {
         await handleChangeNickname(nicknameInput)
           .then((response) => {
             if (response.success) {
-              alert('닉네임 변경 완료!');
+              alert('닉네임이 변경되었습니다.');
+              return router.push('/my-page');
             }
           })
           .catch((error) => console.log(error));
@@ -79,7 +82,6 @@ const Account = () => {
       };
       await handleChangePassword(formData)
         .then((response) => {
-          console.log(response);
           if (response.status === 400) {
             if (response.validation !== null) {
               alert(response.validation[0].message);
@@ -88,6 +90,7 @@ const Account = () => {
             }
           } else if (response.success === true) {
             alert('비밀번호가 변경되었습니다.');
+            return router.push('/my-page');
           }
         })
         .catch((error) => console.log(error));
