@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.goalkeepers.server.config.SecurityUtil;
+import com.goalkeepers.server.dto.LoginRequestDto;
 import com.goalkeepers.server.dto.MemberResponseDto;
+import com.goalkeepers.server.dto.TokenDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
@@ -28,6 +30,7 @@ public class MemberService extends CommonService {
     private final GoalRepository goalRepository;
     private final PostRepository postRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     @Transactional(readOnly = true)
     public MemberResponseDto getMyInfoBySecurity() {
@@ -46,7 +49,7 @@ public class MemberService extends CommonService {
 
     // 비밀번호 변경
     @Transactional
-    public MemberResponseDto changeMemberPassword(String email, String exPassword, String newPassword) {
+    public TokenDto changeMemberPassword(String email, String exPassword, String newPassword) {
         Member member = isMemberCurrent(memberRepository);
 
         if(!member.getEmail().equals(email)) {
@@ -62,7 +65,9 @@ public class MemberService extends CommonService {
         }
 
         member.setPassword(passwordEncoder.encode(newPassword));
-        return MemberResponseDto.of(memberRepository.save(member));
+        Member savedMember = memberRepository.save(member);
+        LoginRequestDto requestDto = new LoginRequestDto(savedMember.getEmail(), newPassword);
+		return authService.login(requestDto);
     }
 
     // 탈퇴

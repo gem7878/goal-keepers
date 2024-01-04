@@ -1,5 +1,7 @@
 package com.goalkeepers.server.exception;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +96,24 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	protected ResponseEntity<ErrorResponseDto> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
 		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST, "RequestParams가 비어있습니다.");
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/**
+	 *  파일 에러
+	 */
+	@ExceptionHandler(value = IOException.class)
+	protected ResponseEntity<ErrorResponseDto> handleIOException(IOException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.FILE_ERROR);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/**
+	 * 파일을 못 찾을 때
+	 */
+	@ExceptionHandler(value = MalformedURLException.class)
+	protected ResponseEntity<ErrorResponseDto> handleMalformedURLException(MalformedURLException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.FILE_NOT_FOUND);
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 
