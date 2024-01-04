@@ -25,13 +25,8 @@ export const handleConfirmNickName = async (nickname: string) => {
   };
   return NickNamePOST(postData)
     .then((response) => {
-      if (response.statusCode === 200) {
-        return JSON.parse(response.body);
-      } else {
-        console.log(response.body);
-      }
+      return JSON.parse(response.body);
     })
-    .catch((error) => console.log(error));
 };
 
 export const handleSubmitForm = async (formData: any) => {
