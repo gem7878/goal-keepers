@@ -13,6 +13,7 @@ public class ErrorResponseDto {
     private int status;
     private List<FieldError> validation;
     private String code;
+    private boolean success = false;
 
     @Getter
     @Setter

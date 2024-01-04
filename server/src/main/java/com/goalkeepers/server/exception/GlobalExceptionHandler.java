@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
 			errors.add(error);
 		}
 
-		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST, errors);
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.INVALID_INPUT_VALUE, errors);
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 
