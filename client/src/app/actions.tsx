@@ -47,8 +47,6 @@ export const handleGetUserInfo = async () => {
 export const handleGetGoalListAll = async () => {
   return AllGET()
     .then((response: any) => {
-      // console.log('나오나요', response);
-
       return JSON.parse(response.body);
     })
     .catch((error) => console.log(error));

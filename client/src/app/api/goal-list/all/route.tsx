@@ -6,12 +6,15 @@ export const GET = async () => {
   const token: string | undefined = cookieStore.get('accessToken')?.value;
 
   try {
-    const response = await axios.get('http://localhost:8080/goal-list/all', {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    const response = await axios.get(
+      `http://localhost:8080/goal-list/all?page=${1}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error) {
