@@ -1,36 +1,39 @@
-import axios from "axios";
+import axios from 'axios';
+
+import { cookies } from 'next/headers';
+
+const cookieStore = cookies();
+const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 interface POSTTypes {
   email: string;
-  password: string;
-  nickname: string;
+  exPassword: string;
+  newPassword: string;
 }
 
 export const POST = async (request: POSTTypes) => {
   try {
     const response = await axios.post(
-      "http://localhost:8080/member/password",
+      'http://localhost:8080/member/password',
       {
         email: request.email,
-        password: request.password,
-        nickname: request.nickname,
+        exPassword: request.exPassword,
+        newPassword: request.newPassword,
       },
       {
         headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMjU1OTI2MiwiaWF0IjoxNzAyNTQ4NDYyfQ.XhEGH5blxSOfpAJymR0pCpTQ0JGyacTd4c4bfSQLu-A",
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
-      }
+      },
     );
-    
+
     return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error: any) {
-    console.error("Error during request setup:", error.message);
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal Server Error" }),
+      statusCode: 400,
+      body: JSON.stringify(error.response.data),
     };
   }
 };

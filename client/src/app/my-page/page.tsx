@@ -23,7 +23,6 @@ const MyPage = () => {
     },
   ]);
   const [nickname, setNickname] = useState('');
-  const [email, setEmail] = useState('');
 
   useEffect(() => {}, [adData]);
   useEffect(() => {
@@ -34,7 +33,6 @@ const MyPage = () => {
     await handleGetUserInfo()
       .then((response) => {
         setNickname(response.nickname);
-        setEmail(response.emai);
       })
       .catch((error) => console.log(error));
   };
@@ -61,10 +59,6 @@ const MyPage = () => {
           <Link
             href={{
               pathname: '/my-page/account',
-              query: {
-                nickname: nickname,
-                email: email,
-              },
             }}
           >
             <button>계정 관리</button>
