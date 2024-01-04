@@ -40,7 +40,6 @@ const Login = () => {
   const KakaoLoginAPI = `https://kauth.kakao.com/oauth/authorize?client_id=${API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
 
   const openKakaoLogin = () => {
-    console.log('clicked');
 
     window.open(KakaoLoginAPI, '_self');
   };
