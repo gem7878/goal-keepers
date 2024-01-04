@@ -22,11 +22,11 @@ const Redirection = () => {
     }, [code]);
 
     return (
-        <>
-          <h2 className="w-full text-center text-3xl font-extrabold mt-20 h-24 font-['MoiraiOne'] text-orange-400">
-            {code}
+        <div className="h-full w-full flex flex-col items-center justify-center pb-10">
+          <h2 className="w-full text-center text-2xl font-extrabold ">
+              로그인 중입니다...
           </h2>
-        </>
+        </div>
       );
 }
 
