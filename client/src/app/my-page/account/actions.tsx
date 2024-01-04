@@ -23,9 +23,7 @@ export const handleChangePassword = async (formData: {
 }) => {
   return PasswordPOST(formData)
     .then((response: any) => {
-      console.log(response);
       if (response.statusCode === 200) {
-
         setAccessTokenCookie(JSON.parse(response.body).data.accessToken);
         return JSON.parse(response.body);
       } else if (response.statusCode === 400) {
