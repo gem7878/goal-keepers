@@ -34,7 +34,7 @@ jobs:
     
     - name: make application-prod.properties
       run: |
-        cd ./src/main/resources
+        cd ./server/src/main/resources
         touch ./application-prod.properties
         echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.properties
     
@@ -52,8 +52,8 @@ jobs:
         aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY }}
     
     - name: S3에 업로드
-      run: aws deploy push --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --ignore-hidden-files --s3-location s3://$AWS_S3_BUCKET/goalkeepers-server-cicd-instance/$GITHUB_SHA.zip --source .
-    
+      run: aws deploy push --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --ignore-hidden-files --s3-location s3://$AWS_S3_BUCKET/goalkeepers-server-cicd-instance/$GITHUB_SHA.zip --source ./build/libs/
+
     - name: EC2에 배포
       run: aws deploy create-deployment --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} --s3-location bucket=$AWS_S3_BUCKET,key=goalkeepers-server-cicd-instance/$GITHUB_SHA.zip,bundleType=zip
         
