@@ -9,17 +9,38 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@reduxjs/toolkit": "^2.0.1",
+    "@types/cookie": "^0.6.0",
+    "@types/js-cookie": "^3.0.6",
+    "@types/shortid": "^0.0.32",
+    "axios": "^1.6.2",
+    "cookie": "^0.6.0",
+    "date-fns": "^3.0.6",
+    "http-proxy-middleware": "^2.0.6",
+    "js-cookie": "^3.0.5",
     "next": "14.0.3",
     "react": "^18",
+    "react-calendar": "^4.7.0",
+    "react-day-picker": "^8.10.0",
     "react-dom": "^18",
-    "styled-components": "^6.1.1"
+    "react-hook-form": "^7.49.2",
+    "react-redux": "^9.0.4",
+    "react-tailwindcss-datepicker": "^1.6.6",
+    "redux": "^5.0.1",
+    "shortid": "^2.2.16"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.3",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }
 }
