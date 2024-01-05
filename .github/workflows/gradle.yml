@@ -10,7 +10,7 @@ on:
       
 env:
   AWS_REGION: ap-northeast-2
-  AWS_S3_BUCKET: app-release-files
+  AWS_S3_BUCKET: gemcicdbucket
   AWS_CODE_DEPLOY_APPLICATION: goalkeepers-server-cicd
   AWS_CODE_DEPLOY_GROUP: goalkeepers-server-cicd-group
 
@@ -30,8 +30,8 @@ jobs:
     - name: make application-prod.yml
       run: |
         cd ./server/src/main/resources
-        touch ./application-prod.yml
-        echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.yml
+        touch ./application-prod.properties
+        echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.properties
     - name: gradlew에 실행 권한 부여
       run: chmod +x ./gradlew
     - name: 프로젝트 빌드
