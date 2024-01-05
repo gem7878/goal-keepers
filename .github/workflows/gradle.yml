@@ -29,7 +29,6 @@ jobs:
       with:
         java-version: '17'
         distribution: 'corretto'
-      working-directory: ${{ env.working-directory }}
     
     - name: make application-prod.properties
       run: |
