@@ -15,37 +15,45 @@ env:
   AWS_CODE_DEPLOY_GROUP: goalkeepers-server-cicd-group
 
 jobs:
-  build-with-gradle:
+  build:
     runs-on: ubuntu-20.04
     steps:
     - name: master 브랜치로 이동
       uses: actions/checkout@v3
       with:
         ref: master
+    
     - name: JDK 17 설치
       uses: gradle/setup-java@v3
       with:
         java-version: '17'
         distribution: 'corretto'
+    
     - name: Change to server directory
       run: cd server
-    - name: make application-prod.yml
+    
+    - name: make application-prod.properties
       run: |
-        cd ./server/src/main/resources
+        cd ./src/main/resources
         touch ./application-prod.properties
         echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.properties
+    
     - name: gradlew에 실행 권한 부여
       run: chmod +x ./gradlew
+    
     - name: 프로젝트 빌드
       run: ./gradlew clean build -x test
+    
     - name: AWS credential 설정
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-region: ${{ env.AWS_REGION }}
         aws-access-key-id: ${{ secrets.CICD_ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY }}
+    
     - name: S3에 업로드
       run: aws deploy push --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --ignore-hidden-files --s3-location s3://$AWS_S3_BUCKET/goalkeepers-server-cicd-instance/$GITHUB_SHA.zip --source .
+    
     - name: EC2에 배포
       run: aws deploy create-deployment --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} --s3-location bucket=$AWS_S3_BUCKET,key=goalkeepers-server-cicd-instance/$GITHUB_SHA.zip,bundleType=zip
         
