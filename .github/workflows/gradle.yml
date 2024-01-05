@@ -29,20 +29,13 @@ jobs:
         java-version: '17'
         distribution: 'corretto'
     
-    - name: Change to server directory
-      run: cd server
-    
-    - name: make application-prod.properties
+    - name: Change to server directory and create properties
       run: |
-        cd ./server/src/main/resources
+        cd server/src/main/resources
         touch ./application-prod.properties
         echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.properties
-    
-    - name: gradlew에 실행 권한 부여
-      run: chmod +x ./gradlew
-    
-    - name: 프로젝트 빌드
-      run: ./gradlew clean build -x test
+        chmod +x ../gradlew
+        ../gradlew clean build -x test
     
     - name: AWS credential 설정
       uses: aws-actions/configure-aws-credentials@v1
