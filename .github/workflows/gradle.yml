@@ -13,6 +13,7 @@ env:
   AWS_S3_BUCKET: gemcicdbucket
   AWS_CODE_DEPLOY_APPLICATION: goalkeepers-server-cicd
   AWS_CODE_DEPLOY_GROUP: goalkeepers-server-cicd-group
+  working-directory: ./server
 
 jobs:
   build:
@@ -28,15 +29,22 @@ jobs:
       with:
         java-version: '17'
         distribution: 'corretto'
+      working-directory: ${{ env.working-directory }}
     
-    - name: Change to server directory and create properties and build
+    - name: make application-prod.properties
       run: |
-        cd server/src/main/resources
+        cd ./src/main/resources
         touch ./application-prod.properties
         echo "${{ secrets.APPLICATION_PROD }}" > ./application-prod.properties
-        cd ../../
-        chmod +x ./gradlew
-        ./gradlew clean build -x test
+      working-directory: ${{ env.working-directory }}
+    
+    - name: gradlew에 실행 권한 부여
+      run: chmod +x ./gradlew
+      working-directory: ${{ env.working-directory }}
+    
+    - name: 프로젝트 빌드
+      run: ./gradlew clean build -x test
+      working-directory: ${{ env.working-directory }}
     
     - name: AWS credential 설정
       uses: aws-actions/configure-aws-credentials@v1
