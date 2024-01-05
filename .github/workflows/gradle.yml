@@ -24,7 +24,7 @@ jobs:
         ref: master
     
     - name: JDK 17 설치
-      uses: gradle/setup-java@v3
+      uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'corretto'
