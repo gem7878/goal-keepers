@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { addDays, format } from 'date-fns';
 import { DateRange, DayPicker } from 'react-day-picker';
@@ -11,15 +11,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   setTitle,
   selectGoalData,
-  setImageUrl,
   setStartDate,
   setEndDate,
+  setDescription,
 } from '@/redux/goalDataSlice';
+import { setStateGoal } from '@/redux/renderSlice';
 
 const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
   const [titleValue, setTitleValue] = useState('');
   const [descriptionValue, setDescriptionValue] = useState('');
-  const [imageUrlValue, setImageUrlValue] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [date, setDate] = useState<{
     startDate: {
       year: number | undefined;
@@ -47,7 +48,10 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
   const [range, setRange] = useState<DateRange | undefined>();
   const [createGoalId, setCreateGoalId] = useState(1);
 
+  const router = useRouter();
+
   const reduxGoalData = useSelector(selectGoalData);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setCreateGoalId(parseInt(params.createGoalId));
@@ -74,40 +78,66 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
     });
   }, [range]);
 
-  const dispatch = useDispatch();
-  const handleSaveGoalData = () => {
+  const handleSaveGoalData = (e: any) => {
+    e.preventDefault();
     if (createGoalId === 1) {
-      dispatch(setTitle(titleValue));
+      if (titleValue.length > 0) {
+        dispatch(setTitle(titleValue));
+        router.push(`/create-goal/${createGoalId + 1}`);
+      } else {
+        return alert('목표를 입력하세요.');
+      }
     } else if (createGoalId === 2) {
-      dispatch(setImageUrl(imageUrlValue));
-    } else if (createGoalId === 3) {
+      router.push(`/create-goal/${createGoalId + 1}`);
       let formatStartDate =
         date.startDate.year && date.startDate.month && date.startDate.day
-          ? `${date.startDate.year}-${date.startDate.month}-${date.startDate.day}`
+          ? `${date.startDate.year}-${String(date.startDate.month).padStart(
+              2,
+              '0',
+            )}-${String(date.startDate.day).padStart(2, '0')}`
           : '';
       let formatEndDate =
         date.endDate.year && date.endDate.month && date.endDate.day
-          ? `${date.endDate.year}-${date.endDate.month}-${date.endDate.day}`
+          ? `${date.endDate.year}-${String(date.endDate.month).padStart(
+              2,
+              '0',
+            )}-${String(date.endDate.day).padStart(2, '0')}`
           : '';
       dispatch(setStartDate(formatStartDate));
       dispatch(setEndDate(formatEndDate));
-    } else if (createGoalId === 4) {
-      dispatch(setTitle(titleValue));
+    } else if (createGoalId === 3) {
+      router.push(`/create-goal/${createGoalId + 1}`);
+      dispatch(setDescription(descriptionValue));
     }
   };
 
-  const handleCreateGoal = async () => {
-    const goalData = {
+  const handleCreateGoal = async (e: any) => {
+    e.preventDefault();
+
+    if (imageFile === null) {
+      return alert('이미지를 첨부하세요');
+    }
+    const goalInformation = {
       title: reduxGoalData.title,
-      description: descriptionValue,
+      description: reduxGoalData.description,
       startDate: reduxGoalData.startDate,
       endDate: reduxGoalData.endDate,
-      imageUrl: reduxGoalData.imageUrl,
     };
+    const formData = new FormData();
 
-    await handlePostGoalData(goalData)
+    const jsonBlob = new Blob([JSON.stringify(goalInformation)], {
+      type: 'application/json',
+    });
+    formData.append('goalInformation', jsonBlob);
+    if (imageFile) formData.append('image', imageFile);
+
+    await handlePostGoalData(formData)
       .then((response) => {
-        console.log(response);
+        if (response?.ok) {
+          alert('목표가 생성되었습니다!');
+          dispatch(setStateGoal(true));
+          router.push(`/`);
+        }
       })
       .catch((error) => console.log(error));
   };
@@ -117,7 +147,7 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
       <section className="h-96	w-full flex flex-col	items-center">
         {params.createGoalId === '1' ? (
           <>
-            <h1 className="gk-primary-h1">목표의 이름을 설정하세요</h1>
+            <h1 className="gk-primary-h1">목표의 이름을 설정하세요*</h1>
             <input
               type="text"
               placeholder="이름을 입력하세요."
@@ -128,20 +158,20 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
               onChange={(e) => setTitleValue(e.target.value)}
             ></input>
           </>
-        ) : params.createGoalId === '2' ? (
+        ) : params.createGoalId === '4' ? (
           <>
-            <h1 className="gk-primary-h1">이미지를 선택하세요</h1>
+            <h1 className="gk-primary-h1">이미지를 선택하세요*</h1>
             <div className="border w-full h-40">
               <input
                 type="file"
                 className="w-full"
                 onChange={(e) => {
-                  setImageUrlValue(e.target.files?.[0]?.name || '');
+                  setImageFile((e.target.files?.[0] as File) || null);
                 }}
               ></input>
             </div>
           </>
-        ) : params.createGoalId === '3' ? (
+        ) : params.createGoalId === '2' ? (
           <>
             <h1 className="gk-primary-h1">기간을 설정하세요(선택)</h1>
             <div className="border w-full h-8 rounded-md flex justify-center align-bottom">
@@ -247,7 +277,7 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
             </div>
             <DayPicker mode="range" selected={range} onSelect={setRange} />
           </>
-        ) : params.createGoalId === '4' ? (
+        ) : params.createGoalId === '3' ? (
           <>
             <h1 className="gk-primary-h1">상세내용을 입력하세요(선택)</h1>
             <textarea
@@ -264,18 +294,17 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
       </section>
       {createGoalId >= 4 ? (
         <Link className="gk-primary-next-a" href={'/'}>
-          <button className="w-full h-full" onClick={() => handleCreateGoal()}>
+          <button className="w-full h-full" onClick={handleCreateGoal}>
             완료
           </button>
         </Link>
       ) : (
-        <Link className="gk-primary-next-a" href={`${createGoalId + 1}`}>
-          <button
-            className="w-full h-full"
-            onClick={() => handleSaveGoalData()}
-          >
-            다음
-          </button>
+        <Link
+          className="gk-primary-next-a"
+          href={`${createGoalId + 1}`}
+          onClick={handleSaveGoalData}
+        >
+          <button className="w-full h-full">다음</button>
         </Link>
       )}
     </>

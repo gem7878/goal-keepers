@@ -9,7 +9,7 @@ interface POSTTypes {
   description: string;
   startDate: string;
   endDate: string;
-  imageUrl: string;
+  imageUrl: File;
 }
 interface PUTTypes {
   goalId: number | undefined;
@@ -47,20 +47,14 @@ export const GET = async (request: GETTypes) => {
   }
 };
 
-export const POST = async (request: POSTTypes) => {
+export const POST = async (request: any) => {
   try {
     const response = await axios.post(
       'http://localhost:8080/goal-list/goal',
-      {
-        title: request.title,
-        description: request.description,
-        startDate: request.startDate,
-        endDate: request.endDate,
-        imageUrl: request.imageUrl,
-      },
+      request.formData,
       {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
@@ -69,29 +63,23 @@ export const POST = async (request: POSTTypes) => {
 
     return { statusCode: 200, body: JSON.stringify(response.data.data) };
   } catch (error: any) {
-    console.error('Error during request setup:', error.message);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal Server Error' }),
-    };
+    console.error('Error during request setup:', error);
+    // return {
+    //   statusCode: 500,
+    //   body: JSON.stringify({ error: 'Internal Server Error' }),
+    // };
   }
 };
 
-export const PUT = async (request: PUTTypes) => {
+export const PUT = async (request: any) => {
   try {
     const id = request.goalId;
     const response = await axios.put(
       `http://localhost:8080/goal-list/goal?id=${id}`,
-      {
-        title: request.title,
-        description: request.description,
-        startDate: request.startDate,
-        endDate: request.endDate,
-        imageUrl: request.imageUrl,
-      },
+      request.formData,
       {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
         withCredentials: true,

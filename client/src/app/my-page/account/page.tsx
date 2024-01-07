@@ -126,7 +126,7 @@ const Account = () => {
   return (
     <div className="w-10/12 h-3/4 flex flex-col items-center justify-between">
       <h2 className="font-bold text-2xl">계정 관리</h2>
-      <section className="w-full mb-10">
+      <section className="w-full">
         <ul className="w-full flex flex-col gap-5">
           <li className="flex flex-col">
             <button
@@ -251,6 +251,9 @@ const Account = () => {
                 ></input>
               </div>
             )}
+          </li>
+          <li>
+            <button className="gk-primary-login-button">로그아웃</button>
           </li>
           <li>
             <button 

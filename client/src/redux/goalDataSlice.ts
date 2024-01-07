@@ -22,7 +22,7 @@ const goalDataSlice = createSlice({
     setEndDate: (state, action) => {
       state.endDate = action.payload;
     },
-    setImageUrl: (state, action) => {
+    setImageFileData: (state, action) => {
       state.imageUrl = action.payload;
     },
   },
@@ -33,7 +33,7 @@ export const {
   setDescription,
   setStartDate,
   setEndDate,
-  setImageUrl,
+  setImageFileData,
 } = goalDataSlice.actions;
 export const selectGoalData = (state: any) => state.goalData; // 선택자(selectors) 추가
 export default goalDataSlice.reducer;
