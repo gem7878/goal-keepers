@@ -97,7 +97,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
 
   return (
     <div className="w-full h-[35%] flex-col text-sm">
-      <h3 className="h-4">댓글</h3>
+      <h3 className="h-4 ml-1">댓글</h3>
       <div className="w-full h-[calc(100%-20px)] mt-1 border rounded-lg p-2">
         <ul className="w-full h-3/4 overflow-y-scroll">
           {commentList.map((list, index) => {

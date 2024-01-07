@@ -22,7 +22,7 @@ const MyGoals: React.FC<{
   };
 
   return (
-    <div className="bg-orange-300 w-full h-[calc(100%-40px)]">
+    <div className="w-full h-[calc(100%-40px)] border-x border-b border-orange-300">
       <ul className="w-full max-h-full flex flex-wrap pr-2 pl-4 py-6 overflow-y-scroll gap-2">
         {myGoalList.map((list, index) => {
           return (

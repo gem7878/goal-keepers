@@ -7,6 +7,8 @@ import { handleDeletePost, handlePutPost } from '@/app/community/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
 import { CommentBox } from './index';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart, faShare } from '@fortawesome/free-solid-svg-icons';
 
 interface postDataTypes {
   content: string;
@@ -136,7 +138,11 @@ const PostBoxDetail: React.FC<{
           className="absolute right-0 bottom-0 mb-1 mr-3 flex justify-center	text-white gap-2"
         >
           <li className="flex items-center gap-1">
-            <button onClick={() => onLikePost(index)}>🧡</button>
+            <FontAwesomeIcon
+              icon={faHeart}
+              onClick={() => onLikePost(index)}
+              className="text-orange-500"
+            />
             <label
               className={`text-xs	${
                 data.like ? 'text-orange-400' : 'text-gray-300'
@@ -146,13 +152,13 @@ const PostBoxDetail: React.FC<{
             </label>
           </li>
           <li className="flex items-center gap-1">
-            <button
+            <FontAwesomeIcon
+              icon={faShare}
               onClick={() => {
                 data.share ? onGetShareData(data.goalId) : onShareGoal(index);
               }}
-            >
-              ➕
-            </button>
+              className="text-gray-400"
+            />
             <label
               className={`text-xs	${
                 data.share ? 'text-orange-400' : 'text-gray-300'

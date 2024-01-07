@@ -9,6 +9,8 @@ import { StaticImageData } from 'next/image';
 import { handleConfirmToken, handleGetGoalListAll } from './actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender } from '@/redux/renderSlice';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
 
 export default function Home() {
   const [isMyGoals, setIsMyGoals] = useState(true);
@@ -64,16 +66,18 @@ export default function Home() {
   };
   return (
     <div className="flex flex-col	w-full h-full items-center justify-center">
-      <header className="fixed top-3 right-5">
-        <button>alarm</button>
+      <header className="w-full flex flex-col items-end mr-5 mb-6">
+        <FontAwesomeIcon icon={faBell} className="w-5 h-5 text-gray-500" />
       </header>
-      <section className="w-11/12 h-[calc(100%-60px)]  text-white">
+      <section className="w-11/12 h-5/6 text-white">
         <nav className="w-full h-10">
           <ul className="flex h-full">
             <li
-              className={`w-24 ${
-                isMyGoals ? `bg-orange-300` : `bg-amber-500`
-              } rounded-se-full`}
+              className={`w-1/2 ${
+                isMyGoals
+                  ? `bg-white border-x border-t border-orange-300 text-orange-500 `
+                  : `bg-orange-100 border-b border-orange-300 text-orange-300 `
+              } `}
             >
               <button
                 className="w-full h-full pr-3"
@@ -83,15 +87,17 @@ export default function Home() {
               </button>
             </li>
             <li
-              className={`w-24 ${
-                !isMyGoals ? `bg-orange-300` : `bg-amber-500`
-              } rounded-se-full`}
+              className={`w-1/2 ${
+                !isMyGoals
+                  ? `bg-white border-x border-t border-orange-300 text-orange-500 `
+                  : `bg-orange-100 border-b border-orange-300 text-orange-300 `
+              } `}
             >
               <button
-                className="w-full h-full pr-3"
+                className="w-full h-full pr-3 "
                 onClick={() => handleTab(false)}
               >
-                팀 목표
+                나의 포스트
               </button>
             </li>
           </ul>
