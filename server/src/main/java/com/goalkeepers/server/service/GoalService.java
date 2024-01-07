@@ -31,7 +31,8 @@ public class GoalService extends CommonService{
     private final MemberRepository memberRepository;
     private final LikeShareService shareService;
     private final GoalShareRepository shareRepository;
-    private final S3ImageFileService imageFileService;
+    // private final S3ImageFileService imageFileService;
+    private final FirebaseStorageService firebaseStorageService;
     
 
     /*
@@ -71,19 +72,19 @@ public class GoalService extends CommonService{
         if (multipartFile == null && requestDto != null) {
             return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto));
         } else {
-            String imageUrl = currentGoal.getImageUrl();
-            if (imageUrl != null) {
-                // 원래 골의 이미지 삭제
-                String[] urlArray = imageUrl.split("/");
-                imageFileService.delete(urlArray[3], urlArray[4]);
-            }            
-            // 새로운 이미지 업로드
-            String newImageUrl = imageFileService.upload(multipartFile, "images");
-            // 업로드된 이미지 주소로 DB 업데이트
-            if (requestDto == null) {
-                return GoalResponseDto.of(Goal.goalUpdate(currentGoal, newImageUrl));
-            }
-            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, newImageUrl));
+            // String imageUrl = currentGoal.getImageUrl();
+            // if (imageUrl != null) {
+            //     // 원래 골의 이미지 삭제
+            //     String[] urlArray = imageUrl.split("/");
+            //     imageFileService.delete(urlArray[3], urlArray[4]);
+            // }            
+            // // 새로운 이미지 업로드
+            // String newImageUrl = imageFileService.upload(multipartFile, "images");
+            // // 업로드된 이미지 주소로 DB 업데이트
+            // if (requestDto == null) {
+            //     return GoalResponseDto.of(Goal.goalUpdate(currentGoal, newImageUrl));
+            // }
+            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, "newImageUrl"));
         }
     }
 
@@ -92,7 +93,7 @@ public class GoalService extends CommonService{
         String imageUrl = goal.getImageUrl();
         if (imageUrl != null) {
             String[] urlArray = imageUrl.split("/");
-            imageFileService.delete(urlArray[3], urlArray[4]);
+            // imageFileService.delete(urlArray[3], urlArray[4]);
         }
         disconnectedPost(goal);
         shareService.deleteShare(goal);
