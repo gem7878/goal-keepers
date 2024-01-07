@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { handleConfirmToken } from './actions';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,6 +29,8 @@ function RootLayout({ children }: { children: React.ReactNode }) {
     '/social-register',
     '/redirection',
   ];
+
+  const queryClient = new QueryClient();
 
   useEffect(() => {
     const fetchData = async () => {

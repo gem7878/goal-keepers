@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 import { cookies } from 'next/headers';
-
+interface GETTypes {
+  postId: number;
+}
 interface POSTTypes {
   title: string;
   content: string;
@@ -18,6 +20,28 @@ interface DELETETypes {
 }
 const cookieStore = cookies();
 const token: string | undefined = cookieStore.get('accessToken')?.value;
+
+
+export const GET = async (request: GETTypes) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/board/post?post-id=${request.postId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return { statusCode: 200, body: JSON.stringify(response.data) };
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
+};
+
 
 export const POST = async (request: POSTTypes) => {
   try {

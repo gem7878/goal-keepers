@@ -64,7 +64,7 @@ const PostBox: React.FC<{
       w-11/12
       inset-x-0
       mx-auto
-      "
+       "
     >
       <div className="w-1/2 h-full relative px-2 z-0 flex flex-col	justify-between items-center">
         <Image

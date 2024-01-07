@@ -47,6 +47,15 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
 
   const [range, setRange] = useState<DateRange | undefined>();
   const [createGoalId, setCreateGoalId] = useState(1);
+  const [formData, setFormData] = useState({
+    goalInformation: {
+      title: '',
+      description: '',
+      startDate: '',
+      endDate: '',
+    },
+    image: null,
+  });
 
   const router = useRouter();
 
