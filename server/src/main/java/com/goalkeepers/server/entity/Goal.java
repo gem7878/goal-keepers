@@ -6,10 +6,8 @@ import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
-import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

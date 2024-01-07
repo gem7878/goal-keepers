@@ -35,8 +35,11 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	// AWS S3
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	// implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+	// Firabase Storage
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	
 	// email
 	implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.1'
 	

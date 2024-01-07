@@ -20,8 +20,9 @@ import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalUpdateRequestDto;
+import com.goalkeepers.server.service.FirebaseStorageService;
 import com.goalkeepers.server.service.GoalService;
-import com.goalkeepers.server.service.S3ImageFileService;
+import com.google.firebase.FirebaseException;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,8 @@ public class GoalController {
      */
 
     private final GoalService goalService;
-    private final S3ImageFileService imageFileService;
+    //private final S3ImageFileService imageFileService;
+    private final FirebaseStorageService firebaseStorageService;
 
     @GetMapping("/all")
     public ResponseEntity<CommonResponseDto> getMyGoalLists(@RequestParam(name = "page") int pageNumber) {
@@ -50,11 +52,11 @@ public class GoalController {
 
     @PostMapping("/goal")
     public ResponseEntity<CommonResponseDto> createMyGoal(@Valid @RequestPart(value = "goalInformation") GoalRequestDto requestDto,
-                                                                @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException {
+                                                                @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException, FirebaseException {
         
         String imageUrl = "";                                                           
         if (multipartFile != null) {
-            imageUrl = imageFileService.upload(multipartFile, "images");
+            imageUrl = firebaseStorageService.upload(multipartFile, "images");
         }
         GoalResponseDto response = goalService.createMyGoal(requestDto, imageUrl);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
