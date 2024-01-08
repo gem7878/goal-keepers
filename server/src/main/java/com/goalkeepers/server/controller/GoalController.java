@@ -6,10 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -54,18 +52,19 @@ public class GoalController {
     public ResponseEntity<CommonResponseDto> createMyGoal(@Valid @RequestPart(value = "goalInformation") GoalRequestDto requestDto,
                                                                 @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException, FirebaseException {
         
-        String imageUrl = "";                                                           
+        String imageUrl = null;                                                           
         if (multipartFile != null) {
             imageUrl = firebaseStorageService.upload(multipartFile, "images");
         }
         GoalResponseDto response = goalService.createMyGoal(requestDto, imageUrl);
+        response.setImageUrl(firebaseStorageService.showFile(response.getImageUrl()));
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
     @PutMapping("/goal")
     public ResponseEntity<CommonResponseDto> updateMyGoal(@RequestParam(name = "id", required = true) Long id,
                                                     @Valid @RequestPart(value = "goalInformation", required = false) GoalUpdateRequestDto requestDto,
-                                                    @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException {
+                                                    @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException, FirebaseException {
         
         GoalResponseDto response = goalService.updateMyGoal(requestDto, id, multipartFile);
         return ResponseEntity.ok(new CommonResponseDto(true, response));

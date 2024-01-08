@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.google.cloud.storage.StorageException;
+
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,7 +106,7 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(value = IOException.class)
 	protected ResponseEntity<ErrorResponseDto> handleIOException(IOException e) {
-		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.FILE_ERROR);
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.FILE_ERROR, e.getLocalizedMessage());
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 
@@ -117,6 +119,15 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 
+	/**
+	 * Firebase Exception
+	 */
+	@ExceptionHandler(value = StorageException.class)
+	protected ResponseEntity<ErrorResponseDto> handleStorageException(StorageException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.FIREBASE_FILE_NOT_FOUND);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+	
 	/**
 	 * Business Logic 수행 중 발생시킬 커스텀 에러
 	 */

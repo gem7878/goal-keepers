@@ -1,77 +1,67 @@
 package com.goalkeepers.server.service;
 
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.*;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ClassPathResource;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-@Slf4j
 @Service
 public class FirebaseStorageService {
-
-    @Value("${app.firebase-configuration-file}")
-    private String firebaseConfigPath;
-
-    @Value("${app.firebase-bucket}")
-    private String firebaseBucket;
 
     private final Bucket bucket;
 
     public FirebaseStorageService() {
-        initialize();;
         this.bucket = StorageClient.getInstance().bucket();
     }
-    
-    private void initialize() {
-        try {
-            System.out.println(firebaseConfigPath);
-            Resource resource = new ClassPathResource(firebaseConfigPath);
-            InputStream serviceAccount = resource.getInputStream();
 
+    public String upload(MultipartFile file, String dirName) throws IOException, StorageException{
+        InputStream content = new ByteArrayInputStream(file.getBytes());
+        String fileName = convertName(file, dirName);
+        bucket.create(fileName, content, file.getContentType());
+        return fileName;
+    }
 
-            GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
-            FirebaseOptions options = FirebaseOptions.builder()
-                                        .setCredentials(credentials)
-                                        .setStorageBucket(firebaseBucket)
-                                        .build();
-            if(FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
-                log.info("Firebase has been initialized");
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void deleteFile(String fileName) throws StorageException{
+        if (Objects.nonNull(fileName) && !fileName.isEmpty()) {
+            bucket.get(fileName).delete();
         }
     }
 
-    public String upload(MultipartFile file, String dirName) throws IOException, FirebaseException{
-        InputStream content = new ByteArrayInputStream(file.getBytes());
-        BlobInfo blobInfo = bucket.create(convertName(file, dirName), content, file.getContentType());
-        return blobInfo.getMediaLink();
+    public String copyAndRenameFile(String fileName, String dirName) throws StorageException{
+        Blob blob = bucket.get(fileName);
+        String newName = rename(fileName, dirName);
+        bucket.create(newName, blob.getContent());
+        return newName;
     }
 
-    public void deleteFile(String fileName) {
-        bucket.get(fileName).delete();
+    public String showFile(String fileName) {
+        if (Objects.isNull(fileName)) {
+            return null;
+        }
+        Blob blob = bucket.get(fileName);
+        URL signedUrl = blob.signUrl(30, TimeUnit.MINUTES);
+        return signedUrl.toString();
     }
     
     private String convertName(MultipartFile uploadFile, String dirName) {
-        String newName = UUID.randomUUID() + "_" + uploadFile.getName();
+        String originName = uploadFile.getOriginalFilename();
+        String newName = UUID.randomUUID() + "_" + originName.replaceAll("_","");
+        return dirName + "/" + newName;
+    }
+
+    private String rename(String fileName, String dirName) {
+        String[] nameArray = fileName.split("_");
+        String originName = nameArray[nameArray.length - 1];
+        String newName = UUID.randomUUID() + "_" + originName;
         return dirName + "/" + newName;
     }
 }

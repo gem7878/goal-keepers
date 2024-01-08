@@ -1,5 +1,6 @@
 package com.goalkeepers.server.service;
 
+import java.util.Objects;
 import java.io.IOException;
 
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+import com.google.firebase.FirebaseException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +33,6 @@ public class GoalService extends CommonService{
     private final MemberRepository memberRepository;
     private final LikeShareService shareService;
     private final GoalShareRepository shareRepository;
-    // private final S3ImageFileService imageFileService;
     private final FirebaseStorageService firebaseStorageService;
     
 
@@ -45,7 +46,7 @@ public class GoalService extends CommonService{
 
     public Page<GoalResponseDto> getMyGoalList(int pageNumber) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        return goalRepository.searchMyAllGoal(PageRequest.of(pageNumber - 1, 10), memberId);
+        return goalRepository.searchMyAllGoal(PageRequest.of(pageNumber - 1, 18), memberId);
     }
 
     // 모든 유저가 접근 가능
@@ -54,46 +55,61 @@ public class GoalService extends CommonService{
         Member member = memberId != null ? memberRepository.findById(memberId).get() : null;
         Goal goal = goalRepository.findById(goalId)
                                     .orElseThrow(() -> new CustomException("Goal Id를 확인해주세요."));
+        String imageUrl = goal.getImageUrl();
+        if(Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
+            imageUrl = firebaseStorageService.showFile(imageUrl);
+        }
         if(member == null) {
-            return GoalResponseDto.of(goal);
+            return GoalResponseDto.of(goal, imageUrl);
         }
         Boolean isShare = shareRepository.existsByMemberAndGoal(member, goal);
-        return GoalResponseDto.of(goal, isShare);
+        return GoalResponseDto.of(goal, imageUrl, isShare);
     }
 
     public GoalResponseDto createMyGoal(GoalRequestDto requestDto, String imageUrl) {
-        Member member = isMemberCurrent(memberRepository);    
+        Member member = isMemberCurrent(memberRepository);
         return GoalResponseDto.of(goalRepository.save(requestDto.toGoal(member, imageUrl)));
     }
 
-    public GoalResponseDto updateMyGoal(GoalUpdateRequestDto requestDto, Long goalId, MultipartFile multipartFile) throws IOException {
+    public GoalResponseDto updateMyGoal(GoalUpdateRequestDto requestDto, Long goalId, MultipartFile multipartFile) throws IOException, FirebaseException {
         Goal currentGoal = isMyGoal(memberRepository, goalRepository, goalId);
         
         if (multipartFile == null && requestDto != null) {
-            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto));
+            /* 이미지를 변경하지 않고 삭제 */
+            if(requestDto.getDeleteImage() == true) {
+                String imageUrl = currentGoal.getImageUrl();
+                if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
+                    firebaseStorageService.deleteFile(imageUrl);
+                }
+                return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null));
+            }
+            /* 이미지 변경 안함 */
+            String showImageUrl = firebaseStorageService.showFile(currentGoal.getImageUrl());
+            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null), showImageUrl);
+            
         } else {
-            // String imageUrl = currentGoal.getImageUrl();
-            // if (imageUrl != null) {
-            //     // 원래 골의 이미지 삭제
-            //     String[] urlArray = imageUrl.split("/");
-            //     imageFileService.delete(urlArray[3], urlArray[4]);
-            // }            
-            // // 새로운 이미지 업로드
-            // String newImageUrl = imageFileService.upload(multipartFile, "images");
-            // // 업로드된 이미지 주소로 DB 업데이트
-            // if (requestDto == null) {
-            //     return GoalResponseDto.of(Goal.goalUpdate(currentGoal, newImageUrl));
-            // }
-            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, "newImageUrl"));
+            /* 이미지 변경 */
+            String imageUrl = currentGoal.getImageUrl();
+            if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
+                // 원래 골의 이미지 삭제
+                firebaseStorageService.deleteFile(imageUrl);
+            }
+            // 새로운 이미지 업로드
+            String newImageUrl = firebaseStorageService.upload(multipartFile, "images");
+            
+            // 이미지 url 가져오기
+            String showImageUrl = firebaseStorageService.showFile(newImageUrl);
+
+            // DB 업데이트
+            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, newImageUrl), showImageUrl);
         }
     }
 
     public void deleteMyGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
         String imageUrl = goal.getImageUrl();
-        if (imageUrl != null) {
-            String[] urlArray = imageUrl.split("/");
-            // imageFileService.delete(urlArray[3], urlArray[4]);
+        if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
+            firebaseStorageService.deleteFile(imageUrl);
         }
         disconnectedPost(goal);
         shareService.deleteShare(goal);
