@@ -39,8 +39,9 @@ public class BoardController {
     private final GoalService goalService;
 
     /*
-     *  여러 유저의 포스트 보기
-     *  나의 포스트 보기
+     * 모든 게시글 가져오기
+     * 나의 모든 게시글 가져오기
+     * 하나의 게시글 가져오기
      */
 
     @GetMapping("/all")
@@ -55,6 +56,11 @@ public class BoardController {
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
+    @GetMapping("/post")
+    public ResponseEntity<CommonResponseDto> getOnePost(@RequestParam(name = "post-id") Long postId) {
+        PostListPageResponseDto response = boardService.getOnePost(postId);
+        return ResponseEntity.ok(new CommonResponseDto(true, response));
+    }
     /*
      * 좋아요
      * 공유
@@ -112,7 +118,7 @@ public class BoardController {
     }
 
     /*
-     *  게시글 상세보기 (전체 댓글 보기)
+     *  전체 댓글 보기
         댓글 쓰기
         댓글 삭제
         댓글 수정
