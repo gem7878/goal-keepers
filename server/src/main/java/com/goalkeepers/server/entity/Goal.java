@@ -1,7 +1,9 @@
 package com.goalkeepers.server.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -75,24 +77,15 @@ public class Goal {
     private List<Post> posts;
 
     public static Goal goalUpdate(Goal goal, GoalUpdateRequestDto requestDto, String imageUrl) {
-        goal.title = requestDto.getTitle();
-        goal.description = requestDto.getDescription();
-        goal.startDate = requestDto.getStartDate();
-        goal.endDate = requestDto.getEndDate();
-        goal.imageUrl = imageUrl;
-        return goal;
-    }
-
-    public static Goal goalUpdate(Goal goal, GoalUpdateRequestDto requestDto) {
-        goal.title = requestDto.getTitle();
-        goal.description = requestDto.getDescription();
-        goal.startDate = requestDto.getStartDate();
-        goal.endDate = requestDto.getEndDate();
-        return goal;
-    }
-
-    public static Goal goalUpdate(Goal goal, String imageUrl) {
-        goal.imageUrl = imageUrl;
+        if (Objects.isNull(requestDto)) {
+            goal.imageUrl = imageUrl;
+            return goal;
+        }
+        goal.title = Optional.ofNullable(requestDto.getTitle()).orElse(goal.getTitle());
+        goal.description = Optional.ofNullable(requestDto.getDescription()).orElse(goal.getDescription());
+        goal.startDate = Optional.ofNullable(requestDto.getStartDate()).orElse(goal.getStartDate());
+        goal.endDate = Optional.ofNullable(requestDto.getEndDate()).orElse(goal.getEndDate());
+        goal.imageUrl = Optional.ofNullable(imageUrl).orElse(goal.getImageUrl());
         return goal;
     }
 
