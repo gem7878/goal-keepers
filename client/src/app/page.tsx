@@ -49,7 +49,7 @@ export default function Home() {
   return (
     <div className="flex flex-col	w-full h-full items-center justify-center">
       <header className="w-full flex flex-col items-end mr-5 mb-6">
-        <FontAwesomeIcon icon={faBell} className="w-5 h-5 text-gray-500" />
+        <FontAwesomeIcon icon={faBell}  className="w-5 h-5 text-gray-500" />
       </header>
       <section className="w-11/12 h-5/6 text-white">
         <nav className="w-full h-10">

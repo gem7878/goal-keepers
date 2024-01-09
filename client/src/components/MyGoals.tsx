@@ -124,7 +124,6 @@ const MyGoals: React.FC<{
       handleFetchGoalListAll(pageNumber);
     }
   };
-  // h-[calc(100%-40px)]
   return (
     <div className="w-full h-[calc(100%-40px)] border-x border-b border-orange-300">
       <ul
