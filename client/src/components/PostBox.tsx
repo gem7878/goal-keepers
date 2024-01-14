@@ -41,6 +41,7 @@ const PostBox: React.FC<{
 }) => {
   const likeRef = useRef<HTMLUListElement>(null);
 
+
   const handleFocus = (e: { target: any }) => {
     if (!likeRef.current?.contains(e.target)) {
       if (focusNum === index) {

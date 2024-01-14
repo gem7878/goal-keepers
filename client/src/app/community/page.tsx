@@ -22,7 +22,6 @@ import {
   faChevronCircleRight,
   faChevronCircleLeft,
 } from '@fortawesome/free-solid-svg-icons';
-import { useQuery, useInfiniteQuery } from 'react-query';
 
 interface postTypes {
   postId: number;
@@ -55,6 +54,7 @@ const Community = (props: any) => {
   useEffect(() => {
     onGetUserInfo();
   }, []);
+
   useEffect(() => {
     onGetAllPost(page);
   }, [page, reduxPostData.postBoolean]);
