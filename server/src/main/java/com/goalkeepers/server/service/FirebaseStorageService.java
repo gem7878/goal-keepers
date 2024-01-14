@@ -1,8 +1,13 @@
 package com.goalkeepers.server.service;
 
 import com.google.cloud.storage.*;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.StorageClient;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,13 +19,20 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
+@DependsOn("firebaseConfig")
 public class FirebaseStorageService {
 
     private final Bucket bucket;
 
     public FirebaseStorageService() {
         this.bucket = StorageClient.getInstance().bucket();
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        log.info("FirebaseStorageService initialized");
     }
 
     public String upload(MultipartFile file, String dirName) throws IOException, StorageException{

@@ -50,3 +50,6 @@ flyway.user.toml
 report.html
 report.json
 *.sql
+*.json
+*.properties
+*.yaml

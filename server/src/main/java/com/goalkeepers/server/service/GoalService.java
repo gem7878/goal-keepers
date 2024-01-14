@@ -3,6 +3,7 @@ package com.goalkeepers.server.service;
 import java.util.Objects;
 import java.io.IOException;
 
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@DependsOn("firebaseStorageService")
 public class GoalService extends CommonService{
     
     private final GoalRepository goalRepository;
