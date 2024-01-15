@@ -1,13 +1,16 @@
 import axios from 'axios';
 import { cookies } from 'next/headers';
 
-export const GET = async () => {
+interface GETTypes {
+  pageNum: number;
+}
+export const GET = async (request: GETTypes) => {
   const cookieStore = cookies();
   const token: string | undefined = cookieStore.get('accessToken')?.value;
 
   try {
     const response = await axios.get(
-      `http://localhost:8080/goal-list/all?page=${1}`,
+      `http://localhost:8080/goal-list/all?page=${request.pageNum}`,
       {
         headers: {
           'Content-Type': 'application/json',

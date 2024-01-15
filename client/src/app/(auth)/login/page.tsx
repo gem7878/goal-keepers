@@ -87,7 +87,7 @@ const Login = () => {
           ></Image>
         </button>
         <Link
-          href={'/forgot-password'}
+          href={'/find'}
           className="w-full text-center h-9 border rounded-md leading-9 text-sm text-gray-600"
         >
           아이디 / 비밀번호 찾기

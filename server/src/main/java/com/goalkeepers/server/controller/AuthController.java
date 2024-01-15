@@ -67,7 +67,7 @@ public class AuthController {
     }
 
     // 비밀번호 찾기
-    @PostMapping("/email/password-request")
+    @PostMapping("/password/find")
     public ResponseEntity<CommonResponseDto> findPassword(@Valid @RequestBody ConfirmEmailRequestDto requestDto) {
         authService.sendPasswordToEmail(requestDto.getEmail());
         return ResponseEntity.ok(new CommonResponseDto(true, "이메일을 전송하였습니다."));

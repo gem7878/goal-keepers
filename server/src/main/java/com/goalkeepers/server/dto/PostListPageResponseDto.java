@@ -1,6 +1,7 @@
 package com.goalkeepers.server.dto;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import com.goalkeepers.server.entity.Post;
 
@@ -28,16 +29,18 @@ public class PostListPageResponseDto {
     private int shareCnt;
     private boolean isShare;
 
-    public static PostListPageResponseDto of(Post post, boolean isLike, boolean isShare) {
-        if (post.getGoal() == null) {
-            return PostListPageResponseDto.builder()
-                .postId(post.getId())
-                .nickname(post.getMember().getNickname())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .likeCnt(post.getLikeCnt())
-                .isLike(isLike)
-                .updatedAt(post.getUpdatedAt())
+    public static PostListPageResponseDto of(Post post, String imageUrl, boolean isLike, boolean isShare) {
+        PostListPageResponseDtoBuilder builder = PostListPageResponseDto.builder()
+            .postId(post.getId())
+            .nickname(post.getMember().getNickname())
+            .title(post.getTitle())
+            .content(post.getContent())
+            .likeCnt(post.getLikeCnt())
+            .isLike(isLike)
+            .updatedAt(post.getUpdatedAt());
+    
+        if (Objects.isNull(post.getGoal())) {
+            return builder
                 .goalId(null)
                 .goalTitle(null)
                 .goalDescription(null)
@@ -46,21 +49,14 @@ public class PostListPageResponseDto {
                 .isShare(false)
                 .build();
         } else {
-            return PostListPageResponseDto.builder()
-                .postId(post.getId())
-                .nickname(post.getMember().getNickname())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .likeCnt(post.getLikeCnt())
-                .isLike(isLike)
-                .updatedAt(post.getUpdatedAt())
+            return builder
                 .goalId(post.getGoal().getId())
                 .goalTitle(post.getGoal().getTitle())
                 .goalDescription(post.getGoal().getDescription())
-                .goalImageUrl(post.getGoal().getImageUrl())
+                .goalImageUrl(imageUrl)
                 .shareCnt(post.getGoal().getShareCnt())
                 .isShare(isShare)
                 .build();
         }
-    }
+    }    
 }

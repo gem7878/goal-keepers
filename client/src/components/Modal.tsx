@@ -2,15 +2,12 @@
 
 import Image, { StaticImageData } from 'next/image';
 import React, { SetStateAction, useEffect, useRef, useState } from 'react';
-import Image1 from '../../public/assets/images/aurora.jpg';
-import {
-  handleDeleteGoal,
-  handleGetGoalListAll,
-  handleUpdateGoal,
-} from '@/app/actions';
+import Image1 from '../../public/assets/images/goalKeepers.png';
+import { handleDeleteGoal, handleUpdateGoal } from '@/app/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStateGoal } from '@/redux/renderSlice';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 interface selectDataTypes {
   imageUrl: any;
   title: string;
@@ -34,6 +31,7 @@ const Modal: React.FC<{
   const [editStartDate, setEditStartDate] = useState(selectData?.startDate);
   const [editEndDate, setEditEndDate] = useState(selectData?.endDate);
   const containerRef = useRef<HTMLElement>(null);
+  const [imageFile, setImageFile] = useState<File | null>(selectData?.imageUrl);
 
   const reduxGoalData = useSelector(selectRender);
   const dispatch = useDispatch();
@@ -45,18 +43,27 @@ const Modal: React.FC<{
     }
   };
   const handleEditGoal = async () => {
-    const updateData = {
-      goalId: selectData?.goalId,
+    const goalInformation = {
       title: editTitle,
       description: editDescription,
       startDate: editStartDate,
       endDate: editEndDate,
-      imageUrl: selectData?.imageUrl,
     };
-    await handleUpdateGoal(updateData)
+    const formData = new FormData();
+    const jsonBlob = new Blob([JSON.stringify(goalInformation)], {
+      type: 'application/json',
+    });
+    formData.append('goalInformation', jsonBlob);
+    if (imageFile) formData.append('image', imageFile);
+
+    const putData = {
+      formData: formData,
+      goalId: selectData?.goalId,
+    };
+    await handleUpdateGoal(putData)
       .then((response) => {
         if (response.success) {
-          dispatch(setStateGoal(!reduxGoalData.goalBoolean));
+          dispatch(setStateGoal(true));
           setOpen(false);
           setSelectGoalNum(null);
         }
@@ -94,7 +101,7 @@ const Modal: React.FC<{
         return handleEditGoal();
       }
     } else {
-      setIsEdit(true);
+      setIsEdit(false);
       setOpen(false);
       setSelectGoalNum(null);
     }
@@ -107,10 +114,10 @@ const Modal: React.FC<{
       <main className="w-3/4 h-3/5 bg-white opacity-100 " ref={containerRef}>
         <section className="w-full h-1/5 relative">
           <Image
-            // src={selectData?.imageUrl}
-            src={Image1}
+            src={selectData?.imageUrl === null ? Image1 : selectData?.imageUrl}
             alt=""
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            fill
+            style={{ objectFit: 'cover' }}
           ></Image>
           <div className="absolute top-0 w-full h-full bg-opacity-50 bg-black flex items-center">
             <h2 className="text-white ml-8 text-base font-bold">
@@ -126,21 +133,28 @@ const Modal: React.FC<{
               )}
             </h2>
           </div>
-          {!isEdit && (
+          {!isEdit ? (
             <>
-              <button
-                className="absolute text-white text-xs bottom-1 right-12"
+              <FontAwesomeIcon
+                className="absolute text-white text-xs bottom-2 right-6"
                 onClick={() => setIsEdit(true)}
-              >
-                edit
-              </button>
-              <button
-                className="absolute text-white text-xs bottom-1 right-2"
+                icon={faEdit}
+              />
+
+              <FontAwesomeIcon
+                className="absolute text-white text-xs bottom-2 right-2"
                 onClick={() => handleRemoveGoal()}
-              >
-                delete
-              </button>
+                icon={faTrash}
+              />
             </>
+          ) : (
+            <input
+              type="file"
+              className="absolute text-white text-xs bottom-2 right-2 w-[150px]"
+              onChange={(e) => {
+                setImageFile((e.target.files?.[0] as File) || null);
+              }}
+            ></input>
           )}
         </section>
         <section className="h-3/5 w-full pt-8 px-8 flex flex-col justify-between">
@@ -172,13 +186,21 @@ const Modal: React.FC<{
             )}
           </span>
         </section>
-        <section className="h-1/5 w-full flex items-center justify-center">
+        <section className="h-1/5 w-full flex items-center justify-center gap-2">
           <button
             className="w-1/4 bg-orange-300 rounded-lg h-1/3 text-white"
             onClick={() => handleConfirmButton()}
           >
             {isEdit ? '수정' : '확인'}
           </button>
+          {isEdit && (
+            <button
+              className="w-1/4 bg-slate-100 rounded-lg h-1/3 text-current"
+              onClick={() => setIsEdit(false)}
+            >
+              취소
+            </button>
+          )}
         </section>
       </main>
     </div>

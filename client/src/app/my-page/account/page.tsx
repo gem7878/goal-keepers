@@ -3,7 +3,7 @@
 import { handleConfirmNickName } from '@/app/(auth)/register/actions';
 import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
-import { handleChangeNickname, handleChangePassword } from './actions';
+import { handleChangeNickname, handleChangePassword, handleRemoveMember } from './actions';
 import { useRouter, useSearchParams } from 'next/navigation';
 interface IFormInput {
   email: string;
@@ -29,20 +29,23 @@ const Account = () => {
   const [focusBtn, setFocusBtn] = useState('');
   const [nicknameInput, setNicknameInput] = useState('');
   const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
-
+  const [isConfirm, setIsConfirm] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<String | null>(null);
+  
   const router = useRouter();
 
   const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#])[\da-zA-Z!@#]{8,20}$/;
 
   // 닉네임 중복 확인
   const handleConfirmDuplicationNickname = async () => {
+    setIsCheckingDuplicate(false);
     if (nicknameInput.length > 0) {
-      await handleConfirmNickName(nicknameInput)
-        .then((response) => {
-          setIsCheckingDuplicate(response.success);
-          alert(response.message);
-        })
-        .catch((error) => console.log(error));
+      const response = await handleConfirmNickName(nicknameInput)
+      if (response.success) {
+        setIsCheckingDuplicate(true);
+      }
+      alert(response.message);
     } else {
       alert('닉네임을 입력하세요.');
     }
@@ -52,14 +55,13 @@ const Account = () => {
       alert('닉네임 중복 확인을 해주세요.');
     } else {
       if (nicknameInput.length > 0) {
-        await handleChangeNickname(nicknameInput)
-          .then((response) => {
-            if (response.success) {
-              alert('닉네임이 변경되었습니다.');
-              return router.push('/my-page');
-            }
-          })
-          .catch((error) => console.log(error));
+        const response = await handleChangeNickname(nicknameInput)
+        if (response.success) {
+          alert('닉네임이 변경되었습니다.');
+          return router.push('/my-page');
+        } else {
+          alert(response.message);
+        }
       } else {
         alert('닉네임을 입력하세요');
       }
@@ -84,7 +86,11 @@ const Account = () => {
         .then((response) => {
           if (response.status === 400) {
             if (response.validation !== null) {
-              alert(response.validation[0].message);
+              let validations = '';
+              response.validation.forEach((val: any) => {
+                validations += (val.message + " ");
+              });
+              alert(validations);
             } else {
               alert(response.message);
             }
@@ -98,10 +104,29 @@ const Account = () => {
       alert('빈 칸을 모두 채워주세요.');
     }
   };
+  const handleDeleteMember = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = {
+        email: form.email?.value,
+        password: form.password?.value,
+    };
+    const response = await handleRemoveMember(formData);
+    if (response.statusCode == 200) {
+        console.log("success");
+        // 캐시에서 토큰 지우기
+        router.push('/login');
+    } else {
+        console.log(response);
+        setIsError(true);
+        setErrorMessage(response.message);
+        // response.validation
+    }
+  }
   return (
     <div className="w-10/12 h-3/4 flex flex-col items-center justify-between">
       <h2 className="font-bold text-2xl">계정 관리</h2>
-      <section className="w-full mb-10">
+      <section className="w-full">
         <ul className="w-full flex flex-col gap-5">
           <li className="flex flex-col">
             <button
@@ -228,9 +253,60 @@ const Account = () => {
             )}
           </li>
           <li>
-            <button className="w-full text-center h-12 border rounded-md leading-9 text-sm text-gray-600">
+            <button className="gk-primary-login-button">로그아웃</button>
+          </li>
+          <li>
+            <button 
+              onClick={() =>
+                focusBtn === 'delete'
+                  ? setFocusBtn('')
+                  : setFocusBtn('delete')
+              }
+              className="w-full text-center h-12 border rounded-md leading-9 text-sm text-gray-600">
               회원 탈퇴
             </button>
+            {focusBtn === 'delete' && (
+              <div className=" p-4 flex flex-col items-center">
+                {!isConfirm ? 
+                  <div>
+                      <h3 className="text-left text-[15px] mb-2">
+                          탈퇴 시 골, 게시글, 댓글 데이터가 모두 삭제됩니다. 탈퇴하시겠습니까?
+                      </h3>
+                      <button
+                          className="w-full text-center h-9 border bg-red-500 rounded-md leading-9 text-sm text-white"
+                          onClick={() => setIsConfirm(true)}>
+                          네
+                      </button>
+                  </div>
+                  : <div>
+                  <h3 className="text-left text-[15px] mx-2 mb-2">
+                      아이디와 비밀번호를 입력해주세요
+                  </h3>
+                  <form onSubmit={handleDeleteMember} className="">
+                      <input
+                      type="email"
+                      placeholder="example@example.com"
+                      name="email"
+                      className="w-full h-11 border rounded-md p-3"
+                      ></input>
+                      <input
+                      type="password"
+                      placeholder="password"
+                      name="password"
+                      className="w-full h-11 border rounded-md p-3 mb-5"
+                      ></input>
+                      {isError && 
+                      <h1 className="text-left text-[15px] mb-2 mx-2 text-amber-600 font-extrabold">
+                        {errorMessage}
+                      </h1>}
+                      <input
+                      className="w-full bg-red-500 text-white h-11 font-bold text-lg rounded-md"
+                      type="submit"
+                      value={'탈퇴하기'}
+                      ></input>
+                  </form></div>}
+              </div>
+            )}
           </li>
         </ul>
       </section>

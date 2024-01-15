@@ -44,22 +44,15 @@ export const handleGetUserInfo = async () => {
     })
     .catch((error) => console.log(error));
 };
-export const handleGetGoalListAll = async () => {
-  return AllGET()
+export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
+  return AllGET(getData)
     .then((response: any) => {
       return JSON.parse(response.body);
     })
+
     .catch((error) => console.log(error));
 };
-
-export const handleUpdateGoal = async (putData: {
-  goalId: number | undefined;
-  title: string | undefined;
-  description: string | undefined;
-  startDate: string | undefined;
-  endDate: string | undefined;
-  imageUrl: any;
-}) => {
+export const handleUpdateGoal = async (putData: any) => {
   return PUT(putData)
     .then((reponse) => {
       return JSON.parse(reponse.body);

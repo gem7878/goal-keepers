@@ -2,19 +2,16 @@
 
 import { POST } from '@/app/api/goal-list/goal/route';
 
-export const handlePostGoalData = async (postData: {
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  imageUrl: string;
-}) => {
+export const handlePostGoalData = async (formData: any) => {
+  const postData = {
+    formData: formData,
+  };
   return POST(postData)
     .then((response) => {
-      if (response.statusCode === 200) {
-        return JSON.parse(response.body);
+      if (response?.statusCode === 200) {
+        return { ok: true };
       } else {
-        console.log(response.body);
+        return { ok: false };
       }
     })
     .catch((error) => console.log(error));

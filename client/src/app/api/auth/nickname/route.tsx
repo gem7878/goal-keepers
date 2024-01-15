@@ -16,13 +16,11 @@ export const POST = async (request: POSTTypes) => {
         withCredentials: true,
       }
     );
-
     return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error: any) {
-    console.error("Error during request setup:", error.message);
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal Server Error" }),
-    };
+        statusCode: error.response.status,
+        body: JSON.stringify(error.response.data)
+    }
   }
 };

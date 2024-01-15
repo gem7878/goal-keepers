@@ -34,9 +34,13 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	// AWS S3
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-
+	// GCP
+	implementation 'org.springframework.cloud:spring-cloud-gcp-starter-sql-postgresql:1.2.8.RELEASE'
+    implementation 'com.google.api-client:google-api-client:1.31.1'
+	
+	// Firabase Storage
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	
 	// email
 	implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.1'
 	

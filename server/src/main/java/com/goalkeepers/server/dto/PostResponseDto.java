@@ -1,6 +1,7 @@
 package com.goalkeepers.server.dto;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import com.goalkeepers.server.entity.Post;
 
@@ -26,8 +27,8 @@ public class PostResponseDto {
     private String goalImageUrl;
     private int shareCnt;
 
-    public static PostResponseDto of(Post post) {
-        if (post.getGoal() == null) {
+    public static PostResponseDto of(Post post, String imageUrl) {
+        if(Objects.isNull(post.getGoal())) {
             return PostResponseDto.builder()
                 .postId(post.getId())
                 .nickname(post.getMember().getNickname())
@@ -53,16 +54,7 @@ public class PostResponseDto {
                 .goalId(post.getGoal().getId())
                 .goalTitle(post.getGoal().getTitle())
                 .goalDescription(post.getGoal().getDescription())
-                .goalImageUrl(post.getGoal().getImageUrl())
-                .build();
-    }
-
-    public static PostResponseDto listOf(Post post) {
-        return PostResponseDto.builder()
-                .postId(post.getId())
-                .title(post.getTitle())
-                .likeCnt(post.getLikeCnt())
-                .updatedAt(post.getUpdatedAt())
+                .goalImageUrl(imageUrl)
                 .build();
     }
 }

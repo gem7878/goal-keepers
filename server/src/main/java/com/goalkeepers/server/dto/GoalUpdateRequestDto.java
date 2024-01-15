@@ -13,4 +13,6 @@ public class GoalUpdateRequestDto {
     private LocalDate startDate;
 
     private LocalDate endDate;
+
+    private Boolean deleteImage = false;
 }

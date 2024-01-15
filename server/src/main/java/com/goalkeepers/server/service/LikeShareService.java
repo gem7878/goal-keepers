@@ -1,6 +1,8 @@
 package com.goalkeepers.server.service;
 
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ public class LikeShareService extends CommonService {
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;
     private final PostRepository postRepository;
+    private final FirebaseStorageService firebaseStorageService;
 
     // 좋아요
     public String addLike(PostLikeRequestDto requestDto) {
@@ -79,12 +82,17 @@ public class LikeShareService extends CommonService {
             goal.setShareCnt(goal.getShareCnt()+1);
             
             // 새로운 골 만들기
+            String originImageUrl = goal.getImageUrl();
+            String copyImageName = originImageUrl;
+            if(originImageUrl != null) {
+                copyImageName = firebaseStorageService.copyAndRenameFile(originImageUrl, "images");
+            }
             LocalDate startDate = LocalDate.now();
             Goal newGoal = goalRepository.save(new Goal(
                                 share,
                                 goal.getTitle(),
                                 goal.getDescription(),
-                                goal.getImageUrl(),
+                                copyImageName,
                                 startDate,
                                 startDate.plusYears(1),
                                 member));
@@ -92,14 +100,22 @@ public class LikeShareService extends CommonService {
         }
     }
 
-    // Share 데이터 삭제
+    // Goal Delete - Share 데이터 삭제
     public void deleteShare(Goal goal) {
         GoalShare share = goal.getShare();
-        if (share != null) {
+        if (Objects.nonNull(share)) {
             Goal sharedGoal = share.getGoal();
             sharedGoal.setShareCnt(sharedGoal.getShareCnt()-1);
             goal.setShare(null);
             shareRepository.delete(share);
+        }
+    }
+
+    // Post Delete - Like 데이터 삭제
+    public void deleteLike(Post post) {
+        List<PostLike> likeList = likeRepository.findAllByPost(post);
+        for (PostLike like : likeList) {
+            likeRepository.delete(like);
         }
     }
 

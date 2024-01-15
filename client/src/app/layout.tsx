@@ -7,7 +7,6 @@ import { Navbar } from '@/components/index.js';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { handleConfirmToken } from './actions';
-
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
 
@@ -22,12 +21,12 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const loginPath = [
-    "/login",
-    "/register",
-    "/forgot-password",
-    "/find",
-    "social-register",
-    "/redirection"
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/find',
+    '/social-register',
+    '/redirection',
   ];
 
   useEffect(() => {
@@ -49,7 +48,6 @@ function RootLayout({ children }: { children: React.ReactNode }) {
             {children}
           </main>
           {loginPath.includes(pathname) || <Navbar></Navbar>}
-
           <div id="portal"></div>
         </body>
       </html>

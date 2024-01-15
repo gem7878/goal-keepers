@@ -2,7 +2,9 @@
 
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
-import Image1 from '../../public/assets/images/aurora.jpg';
+import Image1 from '../../public/assets/images/goalKeepers.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart, faShare } from '@fortawesome/free-solid-svg-icons';
 
 interface postDataTypes {
   content: string;
@@ -62,27 +64,32 @@ const PostBox: React.FC<{
       w-11/12
       inset-x-0
       mx-auto
-      "
+       "
     >
       <div className="w-1/2 h-full relative px-2 z-0 flex flex-col	justify-between items-center">
-        <Image
-          // src={data.image}
-          src={Image1}
-          alt=""
-          style={{
-            width: '100%',
-            height: '75%',
-            objectFit: 'cover',
-            zIndex: 1,
-          }}
-        ></Image>
+        <div className="w-full h-3/4 relative">
+          <Image
+            src={data.goalImageUrl === null ? Image1 : data.goalImageUrl}
+            alt=""
+            fill
+            style={{
+              objectFit: 'cover',
+              zIndex: 1,
+            }}
+          ></Image>
+        </div>
+
         <h3 className="text-center px-1 max-w-fit mx-4	text-white	font-bold absolute top-1/3 -translate-y-1/3 z-10 bg-black text-ellipsis	">
           {data.goalTitle}
           {data.goalTitle.length > 22 && '...'}
         </h3>
         <ul ref={likeRef} className="flex w-full justify-center	gap-2">
           <li className="flex items-center gap-1">
-            <button onClick={() => onLikePost(index)}>🧡</button>
+            <FontAwesomeIcon
+              icon={faHeart}
+              onClick={() => onLikePost(index)}
+              className="text-orange-500"
+            />
             <label
               className={`text-xs	${
                 data.like ? 'text-orange-400' : 'text-gray-500'
@@ -92,13 +99,13 @@ const PostBox: React.FC<{
             </label>
           </li>
           <li className="flex items-center gap-1">
-            <button
+            <FontAwesomeIcon
+              icon={faShare}
               onClick={() => {
                 data.share ? onGetShareData(data.goalId) : onShareGoal(index);
               }}
-            >
-              ➕
-            </button>
+              className="text-gray-600"
+            />
             <label
               className={`text-xs	${
                 data.share ? 'text-orange-400' : 'text-gray-500'

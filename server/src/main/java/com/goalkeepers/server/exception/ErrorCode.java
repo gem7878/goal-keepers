@@ -15,6 +15,7 @@ public enum ErrorCode {
 	BAD_CREDENTIALS(400, "BAD_CREDENTIALS", "아이디 또는 비밀번호가 올바르지 않습니다."),
 	FILE_ERROR(400, "FILE_ERROR", "파일을 저장하거나 불러오는데 실패했습니다."),
 	FILE_NOT_FOUND(400, "FILE_NOT_FOUND", "파일을 찾을 수 없습니다."),
+	FIREBASE_FILE_NOT_FOUND(400, "FIREBASE_FILE_NOT_FOUND", "스토리지에서 파일을 찾을 수 없습니다."),
 
 	/* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
 	UNAUTHENTICATED_USERS(401, "UNAUTHORIZED","인증이 필요합니다."),
