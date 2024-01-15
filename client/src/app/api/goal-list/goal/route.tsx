@@ -29,7 +29,7 @@ const token: string | undefined = cookieStore.get('accessToken')?.value;
 export const GET = async (request: GETTypes) => {
   try {
     const response = await axios.get(
-      `http://localhost:8080/goal-list/goal?id=${request.goalId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${request.goalId}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const GET = async (request: GETTypes) => {
 export const POST = async (request: any) => {
   try {
     const response = await axios.post(
-      'http://localhost:8080/goal-list/goal',
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal`,
       request.formData,
       {
         headers: {
@@ -75,7 +75,7 @@ export const PUT = async (request: any) => {
   try {
     const id = request.goalId;
     const response = await axios.put(
-      `http://localhost:8080/goal-list/goal?id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${id}`,
       request.formData,
       {
         headers: {
@@ -100,7 +100,7 @@ export const DELETE = async (request: DELETETypes) => {
     console.log(request.goalId);
 
     const response = await axios.delete(
-      `http://localhost:8080/goal-list/goal?id=${request.goalId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${request.goalId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

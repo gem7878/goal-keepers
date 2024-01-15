@@ -7,14 +7,14 @@ interface POSTTypes {
 export const POST = async (request: POSTTypes) => {
   try {
     const response = await axios.post(
-      "http://localhost:8080/auth/email",
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/email`,
       {
         email: request.email,
       },
       {
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
-      }
+      },
     );
     
     return { statusCode: 200, body: JSON.stringify(response.data) };

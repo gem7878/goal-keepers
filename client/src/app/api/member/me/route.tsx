@@ -3,7 +3,6 @@ import { cookies } from 'next/headers';
 
 const cookieStore = cookies();
 const token: string | undefined = cookieStore.get('accessToken')?.value;
-const uri = 'http://localhost:8080';
 
 interface DELETETypes {
   email: string;
@@ -12,11 +11,14 @@ interface DELETETypes {
 
 export const GET = async () => {
   try {
-    const response = await axios.get(`${uri}/member/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/member/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     return { statusCode: 200, body: JSON.stringify(response.data) };
   } catch (error) {
@@ -29,15 +31,18 @@ export const GET = async () => {
 
 export const DELETE = async (request : DELETETypes) => {
   try {
-    const response = await axios.delete(`${uri}/member/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const response = await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL}/member/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          email: request.email,
+          password: request.password,
+        },
       },
-      data: {
-        email: request.email,
-        password: request.password
-      }
-    })
+    );
     return { statusCode: 200, ...response.data };
   } catch (error : any) {
     const statusCode = error.response.status;

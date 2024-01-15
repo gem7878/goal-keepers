@@ -9,7 +9,7 @@ interface POSTTypes {
 export const POST = async (request: POSTTypes) => {
   try {
     const response = await axios.post(
-      'http://localhost:8080/auth/login',
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
       {
         email: request.email,
         password: request.password,

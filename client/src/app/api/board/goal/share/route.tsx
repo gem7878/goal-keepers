@@ -17,7 +17,7 @@ export const GET = async (request: GETTypes) => {
   const id = request.goalId;
   try {
     const response = await axios.get(
-      `http://localhost:8080/board/goal/share?goal-id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/board/goal/share?goal-id=${id}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const GET = async (request: GETTypes) => {
 export const POST = async (request: POSTTypes) => {
   try {
     const response = await axios.post(
-      `http://localhost:8080/board/goal/share`,
+      `${process.env.NEXT_PUBLIC_API_URL}/board/goal/share`,
       {
         goalId: request.goalId,
       },
@@ -65,7 +65,7 @@ export const POST = async (request: POSTTypes) => {
 export const DELETE = async (request: DELETETypes) => {
   try {
     const response = await axios.delete(
-      `http://localhost:8080/board/goal/share`,
+      `${process.env.NEXT_PUBLIC_API_URL}/board/goal/share`,
       {
         data: {
           goalId: request.goalId,

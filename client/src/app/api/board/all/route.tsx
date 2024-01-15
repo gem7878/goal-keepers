@@ -11,7 +11,7 @@ interface GETTypes {
 export const GET = async (request: GETTypes) => {
   try {
     const response = await axios.get(
-      `http://localhost:8080/board/all?page=${request.pageNum}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/board/all?page=${request.pageNum}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

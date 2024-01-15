@@ -9,16 +9,16 @@ interface POSTTypes {
 export const POST = async (request: POSTTypes) => {
   try {
     const response = await axios.post(
-      "http://localhost:8080/auth/signup",
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/signup`,
       {
         email: request.email,
         password: request.password,
         nickname: request.nickname,
       },
       {
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
-      }
+      },
     );
 
     return { statusCode: 200, body: JSON.stringify(response.data) };

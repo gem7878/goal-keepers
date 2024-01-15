@@ -3,7 +3,7 @@ import axios from 'axios';
 export const GET = async (code: string) => {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/kakao/login?code=${code}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/kakao/login?code=${code}`,
       {
         headers: { 'Content-Type': 'application/json' },
       },

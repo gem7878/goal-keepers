@@ -12,7 +12,7 @@ interface POSTTypes {
 export const POST = async (request: POSTTypes) => {
   try {
     const response = await axios.post(
-      'http://localhost:8080/member/nickname',
+      `${process.env.NEXT_PUBLIC_API_URL}/member/nickname`,
       {
         nickname: request.nickname,
       },

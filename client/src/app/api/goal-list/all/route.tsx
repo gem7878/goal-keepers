@@ -10,7 +10,7 @@ export const GET = async (request: GETTypes) => {
 
   try {
     const response = await axios.get(
-      `http://localhost:8080/goal-list/all?page=${request.pageNum}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/all?page=${request.pageNum}`,
       {
         headers: {
           'Content-Type': 'application/json',
