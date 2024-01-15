@@ -1,7 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Image1 from '../../../../../public/assets/images/aurora.jpg';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
+import Image1 from '../../../../../public/assets/images/goalKeepers.png';
 import Image2 from '../../../../../public/assets/images/gem.png';
 import Image from 'next/image';
 import { handleGetGoalListAll } from '@/app/actions';
@@ -24,20 +30,76 @@ const SelectGoal = () => {
   const [selectNumber, setSelectNumber] = useState<number | null>(null);
   const [myGoalList, setMyGoalList] = useState<goalListTypes[]>([]);
   const [selectGoalId, setSelectGoalId] = useState<number | null>(null);
+  const [pageable, setPageable] = useState({
+    pageNumber: 1,
+    last: false,
+  });
+  const [more, setMore] = useState<boolean>(false);
+  const containerRef = useRef<any>(null);
+  const [pageNum, setPageNum] = useState(1);
 
   const dispatch = useDispatch();
 
-  const handleFetchGoalListAll = async () => {
-    await handleGetGoalListAll()
+  useEffect(() => {
+    handleFetchGoalListAll(pageable.pageNumber);
+  }, []);
+  useEffect(() => {
+    if (more) {
+      handleCheckLastPage();
+    }
+  }, [more]);
+
+  useLayoutEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.addEventListener('scroll', handleScroll);
+      return () =>
+        containerRef.current.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    if (containerRef.current) {
+      const elements = containerRef.current.querySelectorAll('.goal-element');
+
+      if (elements.length > 0) {
+        const lastElement = elements[elements.length - 1];
+
+        const lastElementBottom = lastElement.getBoundingClientRect().bottom;
+        const parentElementBottom =
+          lastElement.parentElement.getBoundingClientRect().bottom;
+
+        if (lastElementBottom - parentElementBottom < -20) {
+          setMore(true);
+        }
+      }
+    }
+  }, []);
+
+  const handleFetchGoalListAll = async (pageParam: number) => {
+    const form = { pageNum: pageParam };
+    await handleGetGoalListAll(form)
       .then((response) => {
-        setMyGoalList(response.data);
+        if (more) {
+          setMyGoalList((prevPostData: any) => [
+            ...prevPostData,
+            ...response.data.content,
+          ]);
+          setPageable({
+            pageNumber: response.data.pageable.pageNumber + 1,
+            last: response.data.last,
+          });
+        } else {
+          setMyGoalList(response.data.content);
+          setPageable({
+            pageNumber: response.data.pageable.pageNumber + 1,
+            last: response.data.last,
+          });
+        }
+        setPageNum(response.data.pageable.pageNumber + 1);
+        setMore(false);
       })
       .catch((error) => console.log(error));
   };
-
-  useEffect(() => {
-    handleFetchGoalListAll();
-  }, []);
 
   useEffect(() => {
     dispatch(setCreateButton(null));
@@ -50,11 +112,23 @@ const SelectGoal = () => {
     setSelectNumber(index);
     setSelectGoalId(goalId);
   };
+
+  const handleCheckLastPage = () => {
+    const pageNumber = pageable.pageNumber + 1;
+    if (pageable.last) {
+      console.log('마지막 페이지 입니다.');
+    } else {
+      handleFetchGoalListAll(pageNumber);
+    }
+  };
   return (
     <>
       <h1 className="gk-primary-h1">나의 목표를 선택하세요</h1>
       <div className="w-full h-2/3 border rounded-md">
-        <ul className="w-full max-h-full flex flex-wrap pr-2 pl-4 py-6 overflow-y-scroll gap-2">
+        <ul
+          className="w-full max-h-full flex flex-wrap pr-2 pl-4 py-6 overflow-y-scroll gap-2"
+          ref={containerRef}
+        >
           {myGoalList.map((list, index) => {
             return (
               <li
@@ -65,13 +139,13 @@ const SelectGoal = () => {
                 className={`relative w-[calc(33%-8px)] aspect-square	${
                   selectNumber === index &&
                   'outline outline-4 outline-orange-300'
-                }`}
+                } goal-element`}
               >
                 <Image
-                  src={Image1}
-                  // src={list.imageUrl}
+                  src={list.imageUrl === null ? Image1 : list.imageUrl}
+                  fill
                   alt=""
-                  style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                  style={{ objectFit: 'cover' }}
                 ></Image>
                 {hoverNumber === index ? (
                   <div className="absolute top-0 left-0 w-full h-full bg-black opacity-60	">
@@ -98,7 +172,7 @@ const SelectGoal = () => {
         }
         href={{
           pathname: `/create-post/write-post/`,
-          query: { goalId: selectGoalId },
+          query: { goalId: selectGoalId, pageNum: pageNum },
         }}
       >
         <button className="w-full h-full">다음</button>

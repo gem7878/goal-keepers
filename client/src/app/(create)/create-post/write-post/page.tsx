@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-import Image1 from '../../../../../public/assets/images/aurora.jpg';
+import Image1 from '../../../../../public/assets/images/goalKeepers.png';
 import Image2 from '../../../../../public/assets/images/gem.png';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -23,13 +23,16 @@ const WritePost = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const goalId = Number(searchParams.get('goalId'));
+  const pageNum = Number(searchParams.get('pageNum'));
 
   const onFetchGoalListAll = async () => {
-    await handleGetGoalListAll()
+    const form = { pageNum: pageNum };
+    await handleGetGoalListAll(form)
       .then((response) => {
-        const foundGoalData = response.data.find(
+        const foundGoalData = response.data.content.find(
           (item: any) => item.goalId === goalId,
         );
+
         setGoalData(foundGoalData);
         setEditDescription(foundGoalData.description);
       })
@@ -60,14 +63,12 @@ const WritePost = () => {
       <div className="w-full h-2/3 border rounded-md">
         <header className="w-full h-1/4 relative">
           <Image
-            src={Image1}
-            // src={goalData.imageUrl}
+            src={goalData.imageUrl === null ? Image1 : goalData.imageUrl}
             alt=""
+            fill
             style={{
               position: 'absolute',
               objectFit: 'cover',
-              width: '100%',
-              height: '100%',
             }}
           ></Image>
           <div className="absolute top-0 left-0 w-full h-full bg-black opacity-60	">

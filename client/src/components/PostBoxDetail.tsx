@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
-import Image1 from '../../public/assets/images/aurora.jpg';
+import Image1 from '../../public/assets/images/goalKeepers.png';
 import { handleDeletePost, handlePutPost } from '@/app/community/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
@@ -97,9 +97,9 @@ const PostBoxDetail: React.FC<{
     >
       <div className="w-full h-1/4 relative z-0 flex rounded-md	">
         <Image
-          // src={data.image}
-          src={Image1}
+          src={data.goalImageUrl === null ? Image1 : data.goalImageUrl}
           alt=""
+          fill
           style={{
             width: '100%',
             height: '100%',

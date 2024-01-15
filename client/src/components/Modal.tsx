@@ -2,7 +2,7 @@
 
 import Image, { StaticImageData } from 'next/image';
 import React, { SetStateAction, useEffect, useRef, useState } from 'react';
-import Image1 from '../../public/assets/images/aurora.jpg';
+import Image1 from '../../public/assets/images/goalKeepers.png';
 import { handleDeleteGoal, handleUpdateGoal } from '@/app/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStateGoal } from '@/redux/renderSlice';
@@ -114,10 +114,10 @@ const Modal: React.FC<{
       <main className="w-3/4 h-3/5 bg-white opacity-100 " ref={containerRef}>
         <section className="w-full h-1/5 relative">
           <Image
-            // src={selectData?.imageUrl}
-            src={Image1}
+            src={selectData?.imageUrl === null ? Image1 : selectData?.imageUrl}
             alt=""
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            fill
+            style={{ objectFit: 'cover' }}
           ></Image>
           <div className="absolute top-0 w-full h-full bg-opacity-50 bg-black flex items-center">
             <h2 className="text-white ml-8 text-base font-bold">
