@@ -1,18 +1,28 @@
 'use server';
+import axios from 'axios';
+import { cookies } from 'next/headers';
 
-import { POST } from '@/app/api/goal-list/goal/route';
+const cookieStore = cookies();
+const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const handlePostGoalData = async (formData: any) => {
   const postData = {
     formData: formData,
   };
-  return POST(postData)
-    .then((response) => {
-      if (response?.statusCode === 200) {
-        return { ok: true };
-      } else {
-        return { ok: false };
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal`,
+      postData.formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+    return { ok: true };
+  } catch (error: any) {
+    return { ok: false };
+  }
 };

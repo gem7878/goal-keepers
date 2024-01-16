@@ -1,49 +1,82 @@
 'use server';
 
-import { POST as EmailPOST } from '@/app/api/auth/email/route';
-import { POST as NickNamePOST } from '@/app/api/auth/nickname/route';
-import { POST as FormPOST } from '@/app/api/auth/signup/route';
+import axios from 'axios';
 
 export const handleConfirmEmail = async (email: string) => {
   const postData = {
     email: email,
   };
-  return EmailPOST(postData)
-    .then((response) => {
-      if (response.statusCode === 200) {
-        return JSON.parse(response.body);
-      } else {
-        console.log(response.body);
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/email`,
+      {
+        email: postData.email,
+      },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error during request setup:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
+  }
 };
 
 export const handleConfirmNickName = async (nickname: string) => {
   const postData = {
     nickname: nickname,
   };
-  return NickNamePOST(postData)
-    .then((response) => {
-      return JSON.parse(response.body);
-    })
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/nickname`,
+      {
+        nickname: postData.nickname,
+      },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    return {
+      statusCode: error.response.status,
+      body: JSON.stringify(error.response.data),
+    };
+  }
 };
 
 export const handleSubmitForm = async (formData: any) => {
-  console.log(formData);
-
   const postData = {
     email: formData.email,
     password: formData.password,
     nickname: formData.nickname,
   };
-  return FormPOST(postData)
-    .then((response) => {
-      if (response.statusCode === 200) {
-        return JSON.parse(response.body);
-      } else {
-        console.log(response.body);
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/signup`,
+      {
+        email: postData.email,
+        password: postData.password,
+        nickname: postData.nickname,
+      },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error('Error during request setup:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
+  }
 };

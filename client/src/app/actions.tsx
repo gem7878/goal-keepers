@@ -1,20 +1,17 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { GET as AllGET } from '@/app/api/goal-list/all/route';
-import { GET as UserGET } from '@/app/api/member/me/route';
-import { DELETE, PUT } from '@/app/api/goal-list/goal/route';
+import axios from 'axios';
+
+const cookieStore = cookies();
+const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const handleGetAccessToken = () => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
   return token;
 };
 
 export const handleConfirmToken = async () => {
-  const cookieStore = cookies();
   const hasCookie = cookieStore.has('accessToken');
-  const accessToken: string | undefined = cookieStore.get('accessToken')?.value;
 
   function isTokenExpired(token: any) {
     const decodedToken = decodeToken(token);
@@ -29,47 +26,93 @@ export const handleConfirmToken = async () => {
     return JSON.parse(decodedPayload);
   }
 
-  if (!hasCookie || isTokenExpired(accessToken)) {
+  if (!hasCookie || !token || isTokenExpired(token)) {
     return false;
   } else {
     return true;
   }
 };
 export const handleGetUserInfo = async () => {
-  return UserGET()
-    .then((response: any) => {
-      if (response.statusCode === 200) {
-        return JSON.parse(response.body).data;
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/member/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
 };
 export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
-  return AllGET(getData)
-    .then((response: any) => {
-      return JSON.parse(response.body);
-    })
-
-    .catch((error) => console.log(error));
+  const cookieStore = cookies();
+  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/all?page=${getData.pageNum}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
 };
 export const handleUpdateGoal = async (putData: any) => {
-  return PUT(putData)
-    .then((reponse) => {
-      return JSON.parse(reponse.body);
-    })
-    .catch((error) => console.log(error));
+  try {
+    const id = putData.goalId;
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${id}`,
+      putData.formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error during request setup:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
+  }
 };
 
 export const handleDeleteGoal = async (deleteData: {
   goalId: number | undefined;
 }) => {
-  return DELETE(deleteData)
-    .then((reponse) => {
-      if (typeof reponse.body === 'string') {
-        return JSON.parse(reponse.body);
-      } else {
-        return reponse.body;
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${deleteData.goalId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
 };

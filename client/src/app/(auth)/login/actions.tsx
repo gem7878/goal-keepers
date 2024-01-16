@@ -1,8 +1,6 @@
 'use server';
 
-import { POST } from '@/app/api/auth/login/route';
-import { serialize } from 'cookie';
-import Cookies from 'js-cookie';
+import axios from 'axios';
 import { cookies } from 'next/headers';
 
 // 액세스 토큰을 쿠키에 저장하는 함수
@@ -22,18 +20,26 @@ export const setAccessTokenCookie = (token: string) => {
     sameSite: 'strict',
   });
 };
+
 export const handleLogin = async (postData: {
   email: string;
   password: string;
 }) => {
-  return POST(postData)
-    .then((response) => {
-      if (response.statusCode == 200) {
-        setAccessTokenCookie(JSON.parse(response.body).data.accessToken);
-        return { ok: true };
-      } else {
-        return { ok: false };
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+      {
+        email: postData.email,
+        password: postData.password,
+      },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      },
+    );
+    setAccessTokenCookie(response.data.data.accessToken);
+    return { ok: true };
+  } catch (error: any) {
+    return { ok: false };
+  }
 };
