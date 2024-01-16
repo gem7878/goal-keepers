@@ -94,3 +94,8 @@ export const handleRemoveMember = async (formData: {
     };
   }
 };
+
+export const handleLogout = async () => {
+  cookieStore.delete('accessToken');
+  return { ok: true };
+};
