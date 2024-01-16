@@ -42,12 +42,11 @@ export const handleConfirmNickName = async (nickname: string) => {
         withCredentials: true,
       },
     );
+    console.log(response);
+
     return response.data;
   } catch (error: any) {
-    return {
-      statusCode: error.response.status,
-      body: JSON.stringify(error.response.data),
-    };
+    return error.response.data.validation[0];
   }
 };
 

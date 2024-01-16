@@ -158,7 +158,7 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
               type="text"
               placeholder="이름을 입력하세요."
               className="border-b	w-full outline-none h-10"
-              maxLength={24}
+              maxLength={18}
               autoFocus
               value={titleValue}
               onChange={(e) => setTitleValue(e.target.value)}
@@ -291,6 +291,7 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
               placeholder="내용을 입력하세요."
               autoFocus
               value={descriptionValue}
+              maxLength={65}
               onChange={(e) => setDescriptionValue(e.target.value)}
             ></textarea>
           </>
