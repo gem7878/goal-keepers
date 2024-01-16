@@ -75,8 +75,6 @@ const Community = (props: any) => {
   const onGetUserInfo = async () => {
     await handleGetUserInfo()
       .then((response) => {
-        console.log(response);
-
         setNickname(response.nickname);
       })
       .catch((error) => console.log(error));

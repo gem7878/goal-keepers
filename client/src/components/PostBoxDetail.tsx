@@ -74,6 +74,9 @@ const PostBoxDetail: React.FC<{
         .catch((error) => console.log(error));
     }
   };
+  const test =
+    '차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차';
+  console.log(test.length);
   const onDeletePost = async () => {
     const postData = {
       postId: data.postId,
@@ -143,8 +146,8 @@ const PostBoxDetail: React.FC<{
             : data.goalTitle}
         </h3>
         <p className="text-white w-5/6 absolute top-1/3 text-xs mt-2 mx-4">
-          {data.goalDescription.length > 47
-            ? data.goalDescription.slice(0, 47) + '...'
+          {data.goalDescription.length > 65
+            ? data.goalDescription.slice(0, 65) + '...'
             : data.goalDescription}
         </p>
         <ul
