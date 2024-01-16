@@ -4,7 +4,6 @@ import { CreateButton, Modal, MyGoals } from '@/components/index.js';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { StaticImageData } from 'next/image';
-import { handleConfirmToken, handleGetGoalListAll } from './actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender } from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

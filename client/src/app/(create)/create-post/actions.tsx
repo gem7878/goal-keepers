@@ -1,17 +1,38 @@
 'use server';
 
-import { POST } from '@/app/api/board/post/route';
+import axios from 'axios';
+import { cookies } from 'next/headers';
+
+const cookieStore = cookies();
+const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const handleCreatePost = async (postData: {
   goalId: number;
   title: string;
   content: string;
 }) => {
-  return POST(postData)
-    .then((reponse) => {
-      if (reponse.statusCode === 200) {
-        return JSON.parse(reponse.body);
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/board/post`,
+      {
+        title: postData.title,
+        content: postData.content,
+        goalId: postData.goalId,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error during request setup:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
+  }
 };

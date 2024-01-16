@@ -1,44 +1,86 @@
 'use server';
 
-import { GET, POST, DELETE } from '@/app/api/board/goal/share/route';
+import axios from 'axios';
+import { cookies } from 'next/headers';
+
+const cookieStore = cookies();
+const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const handleGetShare = async (goalId: number) => {
   const formData = {
     goalId: goalId,
   };
-
-  return GET(formData)
-    .then((response: any) => {
-      if (response.statusCode === 200) {
-        return JSON.parse(response.body);
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/board/goal/share?goal-id=${formData.goalId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
 };
 
 export const handleCreateShare = async (goalId: number) => {
-  console.log(goalId);
   const formData = {
     goalId: goalId,
   };
-  return POST(formData)
-    .then((response: any) => {
-      if (response.statusCode === 200) {
-        return JSON.parse(response.body);
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/board/goal/share`,
+      {
+        goalId: formData.goalId,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error during request setup:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
+  }
 };
 
 export const handleDeleteShare = async (goalId: number) => {
   const formData = {
     goalId: goalId,
   };
-  return DELETE(formData)
-    .then((response: any) => {
-      if (response.statusCode === 200) {
-        return JSON.parse(response.body);
-      }
-    })
-    .catch((error) => console.log(error));
+  try {
+    const response = await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL}/board/goal/share`,
+      {
+        data: {
+          goalId: formData.goalId,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
 };
