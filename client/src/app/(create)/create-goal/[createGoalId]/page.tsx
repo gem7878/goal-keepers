@@ -123,9 +123,6 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
   const handleCreateGoal = async (e: any) => {
     e.preventDefault();
 
-    if (imageFile === null) {
-      return alert('이미지를 첨부하세요');
-    }
     const goalInformation = {
       title: reduxGoalData.title,
       description: reduxGoalData.description,
@@ -169,7 +166,7 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
           </>
         ) : params.createGoalId === '4' ? (
           <>
-            <h1 className="gk-primary-h1">이미지를 선택하세요*</h1>
+            <h1 className="gk-primary-h1">이미지를 선택하세요(선택)</h1>
             <div className="border w-full h-40">
               <input
                 type="file"

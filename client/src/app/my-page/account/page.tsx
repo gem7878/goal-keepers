@@ -3,7 +3,12 @@
 import { handleConfirmNickName } from '@/app/(auth)/register/actions';
 import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
-import { handleChangeNickname, handleChangePassword, handleRemoveMember } from './actions';
+import {
+  handleChangeNickname,
+  handleChangePassword,
+  handleLogout,
+  handleRemoveMember,
+} from './actions';
 import { useRouter, useSearchParams } from 'next/navigation';
 interface IFormInput {
   email: string;
@@ -32,7 +37,7 @@ const Account = () => {
   const [isConfirm, setIsConfirm] = useState(false);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<String | null>(null);
-  
+
   const router = useRouter();
 
   const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#])[\da-zA-Z!@#]{8,20}$/;
@@ -41,7 +46,7 @@ const Account = () => {
   const handleConfirmDuplicationNickname = async () => {
     setIsCheckingDuplicate(false);
     if (nicknameInput.length > 0) {
-      const response = await handleConfirmNickName(nicknameInput)
+      const response = await handleConfirmNickName(nicknameInput);
       if (response.success) {
         setIsCheckingDuplicate(true);
       }
@@ -55,7 +60,7 @@ const Account = () => {
       alert('닉네임 중복 확인을 해주세요.');
     } else {
       if (nicknameInput.length > 0) {
-        const response = await handleChangeNickname(nicknameInput)
+        const response = await handleChangeNickname(nicknameInput);
         if (response.success) {
           alert('닉네임이 변경되었습니다.');
           return router.push('/my-page');
@@ -88,7 +93,7 @@ const Account = () => {
             if (response.validation !== null) {
               let validations = '';
               response.validation.forEach((val: any) => {
-                validations += (val.message + " ");
+                validations += val.message + ' ';
               });
               alert(validations);
             } else {
@@ -108,21 +113,34 @@ const Account = () => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const formData = {
-        email: form.email?.value,
-        password: form.password?.value,
+      email: form.email?.value,
+      password: form.password?.value,
     };
     const response = await handleRemoveMember(formData);
     if (response.statusCode == 200) {
-        console.log("success");
-        // 캐시에서 토큰 지우기
-        router.push('/login');
+      console.log('success');
+      // 캐시에서 토큰 지우기
+      router.push('/login');
     } else {
-        console.log(response);
-        setIsError(true);
-        setErrorMessage(response.message);
-        // response.validation
+      console.log(response);
+      setIsError(true);
+      setErrorMessage(response.message);
+      // response.validation
     }
-  }
+  };
+
+  const onLogOut = async () => {
+    const conform = window.confirm('로그아웃 하시겠습니까?');
+
+    if (conform) {
+      const response = await handleLogout();
+      if (response.ok) {
+        router.push('/login');
+      }
+    } else {
+      return false;
+    }
+  };
   return (
     <div className="w-10/12 h-3/4 flex flex-col items-center justify-between">
       <h2 className="font-bold text-2xl">계정 관리</h2>
@@ -253,58 +271,68 @@ const Account = () => {
             )}
           </li>
           <li>
-            <button className="gk-primary-login-button">로그아웃</button>
+            <button
+              className="gk-primary-login-button"
+              onClick={() => onLogOut()}
+            >
+              로그아웃
+            </button>
           </li>
           <li>
-            <button 
+            <button
               onClick={() =>
-                focusBtn === 'delete'
-                  ? setFocusBtn('')
-                  : setFocusBtn('delete')
+                focusBtn === 'delete' ? setFocusBtn('') : setFocusBtn('delete')
               }
-              className="w-full text-center h-12 border rounded-md leading-9 text-sm text-gray-600">
+              className="w-full text-center h-12 border rounded-md leading-9 text-sm text-gray-600"
+            >
               회원 탈퇴
             </button>
             {focusBtn === 'delete' && (
               <div className=" p-4 flex flex-col items-center">
-                {!isConfirm ? 
+                {!isConfirm ? (
                   <div>
-                      <h3 className="text-left text-[15px] mb-2">
-                          탈퇴 시 골, 게시글, 댓글 데이터가 모두 삭제됩니다. 탈퇴하시겠습니까?
-                      </h3>
-                      <button
-                          className="w-full text-center h-9 border bg-red-500 rounded-md leading-9 text-sm text-white"
-                          onClick={() => setIsConfirm(true)}>
-                          네
-                      </button>
+                    <h3 className="text-left text-[15px] mb-2">
+                      탈퇴 시 골, 게시글, 댓글 데이터가 모두 삭제됩니다.
+                      탈퇴하시겠습니까?
+                    </h3>
+                    <button
+                      className="w-full text-center h-9 border bg-red-500 rounded-md leading-9 text-sm text-white"
+                      onClick={() => setIsConfirm(true)}
+                    >
+                      네
+                    </button>
                   </div>
-                  : <div>
-                  <h3 className="text-left text-[15px] mx-2 mb-2">
+                ) : (
+                  <div>
+                    <h3 className="text-left text-[15px] mx-2 mb-2">
                       아이디와 비밀번호를 입력해주세요
-                  </h3>
-                  <form onSubmit={handleDeleteMember} className="">
+                    </h3>
+                    <form onSubmit={handleDeleteMember} className="">
                       <input
-                      type="email"
-                      placeholder="example@example.com"
-                      name="email"
-                      className="w-full h-11 border rounded-md p-3"
+                        type="email"
+                        placeholder="example@example.com"
+                        name="email"
+                        className="w-full h-11 border rounded-md p-3"
                       ></input>
                       <input
-                      type="password"
-                      placeholder="password"
-                      name="password"
-                      className="w-full h-11 border rounded-md p-3 mb-5"
+                        type="password"
+                        placeholder="password"
+                        name="password"
+                        className="w-full h-11 border rounded-md p-3 mb-5"
                       ></input>
-                      {isError && 
-                      <h1 className="text-left text-[15px] mb-2 mx-2 text-amber-600 font-extrabold">
-                        {errorMessage}
-                      </h1>}
+                      {isError && (
+                        <h1 className="text-left text-[15px] mb-2 mx-2 text-amber-600 font-extrabold">
+                          {errorMessage}
+                        </h1>
+                      )}
                       <input
-                      className="w-full bg-red-500 text-white h-11 font-bold text-lg rounded-md"
-                      type="submit"
-                      value={'탈퇴하기'}
+                        className="w-full bg-red-500 text-white h-11 font-bold text-lg rounded-md"
+                        type="submit"
+                        value={'탈퇴하기'}
                       ></input>
-                  </form></div>}
+                    </form>
+                  </div>
+                )}
               </div>
             )}
           </li>
