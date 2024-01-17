@@ -1,6 +1,7 @@
 package com.goalkeepers.server.service;
 
 import java.util.Objects;
+import java.time.LocalDate;
 import java.io.IOException;
 
 import org.springframework.context.annotation.DependsOn;
@@ -62,15 +63,15 @@ public class GoalService extends CommonService{
             imageUrl = firebaseStorageService.showFile(imageUrl);
         }
         if(member == null) {
-            return GoalResponseDto.of(goal, imageUrl);
+            return GoalResponseDto.of(goal, imageUrl, findJoinMemberList(goal));
         }
         Boolean isShare = shareRepository.existsByMemberAndGoal(member, goal);
-        return GoalResponseDto.of(goal, imageUrl, isShare);
+        return GoalResponseDto.of(goal, imageUrl, isShare, findJoinMemberList(goal));
     }
 
     public GoalResponseDto createMyGoal(GoalRequestDto requestDto, String imageUrl) {
         Member member = isMemberCurrent(memberRepository);
-        return GoalResponseDto.of(goalRepository.save(requestDto.toGoal(member, imageUrl)));
+        return GoalResponseDto.of(goalRepository.save(requestDto.toGoal(member, imageUrl)), null);
     }
 
     public GoalResponseDto updateMyGoal(GoalUpdateRequestDto requestDto, Long goalId, MultipartFile multipartFile) throws IOException, FirebaseException {
@@ -83,11 +84,11 @@ public class GoalService extends CommonService{
                 if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
                     firebaseStorageService.deleteFile(imageUrl);
                 }
-                return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null));
+                return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null), findJoinMemberList(currentGoal));
             }
             /* 이미지 변경 안함 */
             String showImageUrl = firebaseStorageService.showFile(currentGoal.getImageUrl());
-            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null), showImageUrl);
+            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null), showImageUrl, findJoinMemberList(currentGoal));
             
         } else {
             /* 이미지 변경 */
@@ -103,7 +104,7 @@ public class GoalService extends CommonService{
             String showImageUrl = firebaseStorageService.showFile(newImageUrl);
 
             // DB 업데이트
-            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, newImageUrl), showImageUrl);
+            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, newImageUrl), showImageUrl, findJoinMemberList(currentGoal));
         }
     }
 
@@ -116,6 +117,13 @@ public class GoalService extends CommonService{
         disconnectedPost(goal);
         shareService.deleteShare(goal);
         goalRepository.delete(goal);
+    }
+
+    public void completeMyGoal(Long goalId) {
+        Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
+        LocalDate today = LocalDate.now();
+        goal.setCompleted(true);
+        goal.setEndDate(today); // goal.setCompleteDate(today);
     }
 
     private void disconnectedPost(Goal goal) {

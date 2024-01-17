@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +40,6 @@ public class GoalController {
      */
 
     private final GoalService goalService;
-    //private final S3ImageFileService imageFileService;
     private final FirebaseStorageService firebaseStorageService;
 
     @GetMapping("/all")
@@ -59,6 +59,12 @@ public class GoalController {
         GoalResponseDto response = goalService.createMyGoal(requestDto, imageUrl);
         response.setImageUrl(firebaseStorageService.showFile(response.getImageUrl()));
         return ResponseEntity.ok(new CommonResponseDto(true, response));
+    }
+
+    @PatchMapping("/goal/completed")
+    public ResponseEntity<CommonResponseDto> completeMyGoal(@RequestParam(name = "id", required = true) Long id) {
+        goalService.completeMyGoal(id);
+        return ResponseEntity.ok(new CommonResponseDto(true, id + " Goal을 완료하였습니다."));
     }
 
     @PutMapping("/goal")

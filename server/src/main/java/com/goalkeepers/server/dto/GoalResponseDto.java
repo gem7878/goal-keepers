@@ -1,5 +1,7 @@
 package com.goalkeepers.server.dto;
 
+import java.util.List;
+import java.util.Map;
 import java.time.LocalDate;
 
 import com.goalkeepers.server.entity.Goal;
@@ -24,8 +26,10 @@ public class GoalResponseDto {
     private String imageUrl;
     private int shareCnt;
     private Boolean isShare;
+    private Boolean completed;
+    private List<Map<String, Object>> joinMemberList;
 
-    public static GoalResponseDto of(Goal goal, String imageUrl, Boolean isShare) {
+    public static GoalResponseDto of(Goal goal, String imageUrl, Boolean isShare, List<Map<String, Object>> joinMemberList) {
         return GoalResponseDto.builder()
                 .goalId(goal.getId())
                 .title(goal.getTitle())
@@ -35,14 +39,16 @@ public class GoalResponseDto {
                 .imageUrl(imageUrl)
                 .shareCnt(goal.getShareCnt())
                 .isShare(isShare)
+                .completed(goal.isCompleted())
+                .joinMemberList(joinMemberList)
                 .build();
     }
 
-    public static GoalResponseDto of(Goal goal, String imageUrl) {
-        return of(goal, imageUrl, false);
+    public static GoalResponseDto of(Goal goal, String imageUrl, List<Map<String, Object>> joinMemberList) {
+        return of(goal, imageUrl, false, joinMemberList);
     }
 
-    public static GoalResponseDto of(Goal goal) {
-        return of(goal, goal.getImageUrl(), false);
+    public static GoalResponseDto of(Goal goal, List<Map<String, Object>> joinMemberList) {
+        return of(goal, goal.getImageUrl(), false, joinMemberList);
     }
 }

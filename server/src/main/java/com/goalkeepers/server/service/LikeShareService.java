@@ -64,13 +64,19 @@ public class LikeShareService extends CommonService {
         Goal shareGoal = goalRepository.findByShare(share)
                                         .orElseThrow(() -> new CustomException("나의 Goal이 없습니다."));
 
-        return GoalResponseDto.of(shareGoal);
+        return GoalResponseDto.of(shareGoal, null); // findJoinMemberList(shareGoal) 같이 담기한 유저들 리스트가 필요하면
     }
 
     // 공유하기 -> 골 만들기
     public GoalResponseDto addShare(GoalShareRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
+        
         Goal goal = isGoal(goalRepository, requestDto.getGoalId());
+        GoalShare goalShare = goal.getShare();
+        // goal이 shareGoal일 경우엔 shareGoal 정보로 바꾸기
+        if(Objects.nonNull(goalShare)) {
+            goal = goalShare.getGoal();
+        }
 
         // 공유한 적이 없는지 -> 내 골이 아닌지 -> 골 만들기
         if (shareRepository.existsByMemberAndGoal(member, goal)) {
@@ -96,7 +102,7 @@ public class LikeShareService extends CommonService {
                                 startDate,
                                 startDate.plusYears(1),
                                 member));
-            return GoalResponseDto.of(newGoal);
+            return GoalResponseDto.of(newGoal, null);
         }
     }
 

@@ -47,11 +47,11 @@ public class Goal {
     @NotNull
     private Member member;
 
-    @Column(length = 50)
+    @Column(length = 18)
     @NotNull
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 65)
     private String description;
 
     @Column
@@ -65,6 +65,9 @@ public class Goal {
 
     @ColumnDefault("0")
     private int shareCnt;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean completed;
 
     @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY)
     private Set<GoalShare> shareList;
