@@ -3,15 +3,17 @@
 import { cookies } from 'next/headers';
 import axios from 'axios';
 
-const cookieStore = cookies();
-const token: string | undefined = cookieStore.get('accessToken')?.value;
 // const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
 
 export const handleGetAccessToken = () => {
+  const cookieStore = cookies();
+  const token: string | undefined = cookieStore.get('accessToken')?.value;
   return token;
 };
 
 export const handleConfirmToken = async () => {
+  const cookieStore = cookies();
+  const token: string | undefined = cookieStore.get('accessToken')?.value;
   const hasCookie = cookieStore.has('accessToken');
   // const hasCookie = cookieStore.has('_vercel_jwt');
 
@@ -84,6 +86,8 @@ export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
   }
 };
 export const handleUpdateGoal = async (putData: any) => {
+  const cookieStore = cookies();
+  const token: string | undefined = cookieStore.get('accessToken')?.value;
   try {
     const id = putData.goalId;
     const response = await axios.put(
@@ -110,6 +114,8 @@ export const handleUpdateGoal = async (putData: any) => {
 export const handleDeleteGoal = async (deleteData: {
   goalId: number | undefined;
 }) => {
+  const cookieStore = cookies();
+  const token: string | undefined = cookieStore.get('accessToken')?.value;
   try {
     const response = await axios.delete(
       `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${deleteData.goalId}`,
