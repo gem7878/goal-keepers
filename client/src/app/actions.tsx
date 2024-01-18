@@ -39,6 +39,11 @@ export const handleConfirmToken = async () => {
   }
 };
 export const handleGetUserInfo = async () => {
+  // const cookieStore = cookies();
+  // const token: string | undefined = cookieStore.get('accessToken')?.value;
+
+  console.log(token);
+
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/member/me`,
