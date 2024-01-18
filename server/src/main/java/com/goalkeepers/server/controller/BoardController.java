@@ -61,6 +61,13 @@ public class BoardController {
         PostListPageResponseDto response = boardService.getOnePost(postId);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<CommonResponseDto> searchGoalAndPost(@RequestParam(name = "page", required = true) int pageNumber, @RequestParam(name = "query", required = true) String query, @RequestParam(name = "sort", required = false) String sort) {
+        Page<PostListPageResponseDto> response = boardService.searchGoalAndPost(pageNumber, query, sort);
+        return ResponseEntity.ok(new CommonResponseDto(true, response));
+    }
+
     /*
      * 좋아요
      * 공유

@@ -43,12 +43,12 @@ public class BoardService extends CommonService {
      */
 
     public Page<PostListPageResponseDto> getAllPostList(int pageNumber) {
-        return postRepository.searchAll(PageRequest.of(pageNumber - 1, 10));
+        return postRepository.getAll(PageRequest.of(pageNumber - 1, 10));
     }
 
     public Page<PostListPageResponseDto> getMyAllPostList(int pageNumber) {
         Member member = isMemberCurrent(memberRepository);
-        return postRepository.searchMyAllPost(PageRequest.of(pageNumber - 1, 10), member);
+        return postRepository.getMyAllPost(PageRequest.of(pageNumber - 1, 10), member);
     }
 
     public PostListPageResponseDto getOnePost(Long postId) {
@@ -62,6 +62,10 @@ public class BoardService extends CommonService {
             isShare = shareRepository.existsByMemberAndGoal(member, goal);
         }
         return PostListPageResponseDto.of(post, getGoalImageUrl(goal), isLike, isShare);
+    }
+
+    public Page<PostListPageResponseDto> searchGoalAndPost(int pageNumber, String query, String sort) {
+        return postRepository.searchAll(PageRequest.of(pageNumber - 1, 10), query, sort);
     }
 
     /*

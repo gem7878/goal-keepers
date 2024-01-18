@@ -7,6 +7,7 @@ import com.goalkeepers.server.dto.PostListPageResponseDto;
 import com.goalkeepers.server.entity.Member;
 
 public interface PostRepositoryCustom {
-    Page<PostListPageResponseDto> searchAll(Pageable pageable);
-    Page<PostListPageResponseDto> searchMyAllPost(Pageable pageable, Member member);
+    Page<PostListPageResponseDto> getAll(Pageable pageable);
+    Page<PostListPageResponseDto> getMyAllPost(Pageable pageable, Member member);
+    Page<PostListPageResponseDto> searchAll(Pageable pageable, String query, String sort);
 }

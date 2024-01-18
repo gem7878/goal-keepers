@@ -31,7 +31,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private final FirebaseStorageService firebaseStorageService;
 
     @Override
-    public Page<PostListPageResponseDto> searchAll(Pageable pageable) {
+    public Page<PostListPageResponseDto> getAll(Pageable pageable) {
 
         List<Post> posts = queryFactory
                             .selectFrom(post)
@@ -65,7 +65,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Page<PostListPageResponseDto> searchMyAllPost(Pageable pageable, Member member) {
+    public Page<PostListPageResponseDto> getMyAllPost(Pageable pageable, Member member) {
         
         List<Post> posts = queryFactory
                             .selectFrom(post)
@@ -91,6 +91,46 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         int totalSize = queryFactory
                         .selectFrom(post)
                         .where(post.member.eq(member))
+                        .fetch()
+                        .size();
+
+        return new PageImpl<>(page, pageable, totalSize);
+    }
+
+    @Override
+    public Page<PostListPageResponseDto> searchAll(Pageable pageable, String query, String sort) {
+        // List<Post> posts = queryFactory
+        //                     .selectFrom(post)
+        //                     .where(post.content.contains(query))
+        //                     .orderBy(post.id.desc())
+        //                     .offset(pageable.getOffset())
+        //                     .limit(pageable.getPageSize())
+        //                     .fetch();
+        List<Post> posts = queryFactory
+                            .selectFrom(post)
+                            .orderBy(post.id.desc())
+                            .offset(pageable.getOffset())
+                            .limit(pageable.getPageSize())
+                            .fetch();
+        
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<PostListPageResponseDto> page = posts.stream().map(post -> {
+            boolean isLike = false;
+            boolean isShare = false;
+            String imageUrl = null;
+            if (Objects.nonNull(post.getGoal()) && Objects.nonNull(post.getGoal().getImageUrl())) {
+                imageUrl = firebaseStorageService.showFile(post.getGoal().getImageUrl());
+                if (Objects.nonNull(memberId)) {
+                    Optional<Member> member = memberRepository.findById(memberId);
+                    isLike = likeRepository.existsByMemberAndPost(member.get(), post);
+                    isShare = shareRepository.existsByMemberAndGoal(member.get(), post.getGoal());
+                }
+            }
+            return PostListPageResponseDto.of(post, imageUrl, isLike, isShare);
+        }).collect(Collectors.toList());
+        
+        int totalSize = queryFactory
+                        .selectFrom(post)
                         .fetch()
                         .size();
 
