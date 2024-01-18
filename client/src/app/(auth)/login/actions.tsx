@@ -11,7 +11,8 @@ export const setAccessTokenCookie = (token: string) => {
   expiresDate.setTime(expiresDate.getTime() + oneDayInSeconds * 1000);
 
   cookies().set({
-    name: 'accessToken',
+    // name: 'accessToken',
+    name: '_vercel_jwt',
     value: token,
     httpOnly: true,
     expires: expiresDate,
