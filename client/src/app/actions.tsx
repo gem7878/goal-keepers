@@ -4,16 +4,16 @@ import { cookies } from 'next/headers';
 import axios from 'axios';
 
 const cookieStore = cookies();
-// const token: string | undefined = cookieStore.get('accessToken')?.value;
-const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
+const token: string | undefined = cookieStore.get('accessToken')?.value;
+// const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
 
 export const handleGetAccessToken = () => {
   return token;
 };
 
 export const handleConfirmToken = async () => {
-  // const hasCookie = cookieStore.has('accessToken');
-  const hasCookie = cookieStore.has('_vercel_jwt');
+  const hasCookie = cookieStore.has('accessToken');
+  // const hasCookie = cookieStore.has('_vercel_jwt');
 
   function isTokenExpired(token: any) {
     const decodedToken = decodeToken(token);
@@ -30,9 +30,8 @@ export const handleConfirmToken = async () => {
   console.log(hasCookie);
   console.log(token);
   console.log(isTokenExpired(token));
-  
 
-  if (!hasCookie || !token || isTokenExpired(token)) {
+  if (!hasCookie || !token || !isTokenExpired(token)) {
     return false;
   } else {
     return true;
@@ -58,8 +57,8 @@ export const handleGetUserInfo = async () => {
 };
 export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
   const cookieStore = cookies();
-  // const token: string | undefined = cookieStore.get('accessToken')?.value;
-  const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
+  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  // const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/goal-list/all?page=${getData.pageNum}`,
