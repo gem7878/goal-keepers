@@ -1,15 +1,13 @@
 'use server';
 
+import { handleGetToken } from '@/utils/getToken';
 import axios from 'axios';
-import { cookies } from 'next/headers';
-
-const cookieStore = cookies();
-const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const handleGetComment = async (getData: {
   postId: number;
   page: number;
 }) => {
+  const token = handleGetToken().token;
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/board/all-comment?post-id=${getData.postId}&page=${getData.page}`,
@@ -35,6 +33,7 @@ export const handleCreateComment = async (formData: {
   postId: number;
   content: string;
 }) => {
+  const token = handleGetToken().token;
   try {
     const id = formData.postId;
     const response = await axios.post(
@@ -64,6 +63,7 @@ export const handleUpdateComment = async (formData: {
   commentId: number;
   content: string;
 }) => {
+  const token = handleGetToken().token;
   try {
     const id = formData.commentId;
     const response = await axios.put(
@@ -91,6 +91,7 @@ export const handleUpdateComment = async (formData: {
 
 export const handleDeleteComment = async (formData: { commentId: number }) => {
   try {
+    const token = handleGetToken().token;
     const id = formData.commentId;
     const response = await axios.delete(
       `${process.env.NEXT_PUBLIC_API_URL}/board/comment?comment-id=${id}`,

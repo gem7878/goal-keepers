@@ -12,7 +12,8 @@ export const handleKakaoLogin = async (code: string) => {
       },
     );
 
-    const accessToken = response.data.accessToken;
+    const accessToken = response.data.data.accessToken;
+
     setAccessTokenCookie(accessToken);
 
     return { ok: true };

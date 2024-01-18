@@ -1,38 +1,42 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import axios from 'axios';
+import { handleGetToken } from '@/utils/getToken';
 
-const cookieStore = cookies();
-const token: string | undefined = cookieStore.get('accessToken')?.value;
+// const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
 
 export const handleGetAccessToken = () => {
+  const token = handleGetToken().token;
   return token;
 };
 
 export const handleConfirmToken = async () => {
-  const hasCookie = cookieStore.has('accessToken');
+  const token = handleGetToken().token;
+  const hasCookie = handleGetToken().cookieStore.has('accessToken');
 
   function isTokenExpired(token: any) {
-    const decodedToken = decodeToken(token);
+    // const decodedToken = decodeToken(token);
     // 만료 시간이 없거나 현재 시간이 만료 시간 이후이면 토큰이 만료되지 않았음
-    return !decodedToken.exp || Date.now() >= decodedToken.exp * 1000;
+    return !token.exp || Date.now() >= token.exp * 1000;
+    // return !decodedToken.exp || Date.now() >= decodedToken.exp * 1000;
   }
 
-  function decodeToken(token: any) {
-    // Base64 디코딩 후 JSON 파싱
-    const payload = token.split('.')[1];
-    const decodedPayload = Buffer.from(payload, 'base64').toString('utf-8');
-    return JSON.parse(decodedPayload);
-  }
+  // function decodeToken(token: any) {
+  //   // Base64 디코딩 후 JSON 파싱
+  //   const payload = token.split('.')[1];
+  //   const decodedPayload = Buffer.from(payload, 'base64').toString('utf-8');
+  //   return JSON.parse(decodedPayload);
+  // }
 
-  if (!hasCookie || !token || isTokenExpired(token)) {
+  if (!hasCookie || !token || !isTokenExpired(token) || token === '') {
     return false;
   } else {
     return true;
   }
 };
 export const handleGetUserInfo = async () => {
+  const token = handleGetToken().token;
+
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/member/me`,
@@ -51,8 +55,8 @@ export const handleGetUserInfo = async () => {
   }
 };
 export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  const token = handleGetToken().token;
+  // const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/goal-list/all?page=${getData.pageNum}`,
@@ -72,6 +76,7 @@ export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
   }
 };
 export const handleUpdateGoal = async (putData: any) => {
+  const token = handleGetToken().token;
   try {
     const id = putData.goalId;
     const response = await axios.put(
@@ -98,6 +103,7 @@ export const handleUpdateGoal = async (putData: any) => {
 export const handleDeleteGoal = async (deleteData: {
   goalId: number | undefined;
 }) => {
+  const token = handleGetToken().token;
   try {
     const response = await axios.delete(
       `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${deleteData.goalId}`,

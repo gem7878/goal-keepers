@@ -12,12 +12,13 @@ export const setAccessTokenCookie = (token: string) => {
 
   cookies().set({
     name: 'accessToken',
+    // name: '_vercel_jwt',
     value: token,
     httpOnly: true,
     expires: expiresDate,
     path: '/',
     secure: process.env.NEXT_PUBLIC_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: process.env.NEXT_PUBLIC_ENV === 'production' ? 'none' : 'lax',
   });
 };
 

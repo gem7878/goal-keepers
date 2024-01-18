@@ -1,12 +1,11 @@
 'use server';
 
+import { handleGetToken } from '@/utils/getToken';
 import axios from 'axios';
-import { cookies } from 'next/headers';
 
-const cookieStore = cookies();
-const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const handleGetPostAll = async (getData: { pageNum: number }) => {
+  const token = handleGetToken().token;
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/board/all?page=${getData.pageNum}`,
@@ -32,6 +31,7 @@ export const handlePutPost = async (postData: {
   goalId: number;
   postId: number;
 }) => {
+  const token = handleGetToken().token;
   try {
     const response = await axios.put(
       `${process.env.NEXT_PUBLIC_API_URL}/board/post?post-id=${postData.postId}`,
@@ -59,6 +59,7 @@ export const handlePutPost = async (postData: {
 };
 
 export const handleDeletePost = async (postData: { postId: number }) => {
+  const token = handleGetToken().token;
   try {
     const id = postData.postId;
     const response = await axios.delete(
@@ -81,6 +82,7 @@ export const handleDeletePost = async (postData: { postId: number }) => {
 };
 
 export const handleLikePost = async (postId: number) => {
+  const token = handleGetToken().token;
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/board/post/like`,

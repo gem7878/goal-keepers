@@ -1,12 +1,10 @@
 'use server';
 
+import { handleGetToken } from '@/utils/getToken';
 import axios from 'axios';
-import { cookies } from 'next/headers';
-
-const cookieStore = cookies();
-const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const handleGetShare = async (goalId: number) => {
+  const token = handleGetToken().token;
   const formData = {
     goalId: goalId,
   };
@@ -31,6 +29,7 @@ export const handleGetShare = async (goalId: number) => {
 };
 
 export const handleCreateShare = async (goalId: number) => {
+  const token = handleGetToken().token;
   const formData = {
     goalId: goalId,
   };
@@ -59,6 +58,7 @@ export const handleCreateShare = async (goalId: number) => {
 };
 
 export const handleDeleteShare = async (goalId: number) => {
+  const token = handleGetToken().token;
   const formData = {
     goalId: goalId,
   };
