@@ -13,6 +13,10 @@ export const handleKakaoLogin = async (code: string) => {
     );
 
     const accessToken = response.data.accessToken;
+
+    console.log(response);
+    console.log(accessToken);
+
     setAccessTokenCookie(accessToken);
 
     return { ok: true };
