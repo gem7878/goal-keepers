@@ -1,11 +1,9 @@
 'use server';
+import { handleGetToken } from '@/utils/getToken';
 import axios from 'axios';
-import { cookies } from 'next/headers';
-
-const cookieStore = cookies();
-const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const handlePostGoalData = async (formData: any) => {
+  const token = handleGetToken().token;
   const postData = {
     formData: formData,
   };
