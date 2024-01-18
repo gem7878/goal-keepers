@@ -50,7 +50,7 @@ public class AuthService extends CommonService {
     public TokenDto login(LoginRequestDto requestDto) {
         UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
         Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
-        return tokenProvider.createJwt(authentication,12);
+        return tokenProvider.createJwt(authentication,24);
     }
 
     // 멤버 정보 가져오기
