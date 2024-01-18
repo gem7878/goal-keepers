@@ -25,6 +25,10 @@ export const handleConfirmToken = async () => {
     const decodedPayload = Buffer.from(payload, 'base64').toString('utf-8');
     return JSON.parse(decodedPayload);
   }
+  console.log(hasCookie);
+  console.log(token);
+  console.log(isTokenExpired(token));
+  
 
   if (!hasCookie || !token || isTokenExpired(token)) {
     return false;
