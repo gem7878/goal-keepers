@@ -30,9 +30,8 @@ export const handleConfirmToken = async () => {
   console.log(hasCookie);
   console.log(token);
   console.log(isTokenExpired(token));
-  
 
-  if (!hasCookie || !token || isTokenExpired(token)) {
+  if (!hasCookie || !token || !isTokenExpired(token)) {
     return false;
   } else {
     return true;
