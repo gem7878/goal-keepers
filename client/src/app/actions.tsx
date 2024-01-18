@@ -39,8 +39,8 @@ export const handleConfirmToken = async () => {
   }
 };
 export const handleGetUserInfo = async () => {
-  // const cookieStore = cookies();
-  // const token: string | undefined = cookieStore.get('accessToken')?.value;
+  const cookieStore = cookies();
+  const token: string | undefined = cookieStore.get('accessToken')?.value;
 
   console.log(token);
 
