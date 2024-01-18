@@ -17,7 +17,7 @@ export const setAccessTokenCookie = (token: string) => {
     expires: expiresDate,
     path: '/',
     secure: process.env.NEXT_PUBLIC_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: process.env.NEXT_PUBLIC_ENV === 'production' ? 'none' : 'lax',
   });
 };
 
