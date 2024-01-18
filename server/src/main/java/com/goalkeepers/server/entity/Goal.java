@@ -84,7 +84,6 @@ public class Goal {
             goal.imageUrl = imageUrl;
             return goal;
         }
-        goal.title = Optional.ofNullable(requestDto.getTitle()).orElse(goal.getTitle());
         goal.description = Optional.ofNullable(requestDto.getDescription()).orElse(goal.getDescription());
         goal.startDate = Optional.ofNullable(requestDto.getStartDate()).orElse(goal.getStartDate());
         goal.endDate = Optional.ofNullable(requestDto.getEndDate()).orElse(goal.getEndDate());
