@@ -1,12 +1,11 @@
 'use server';
 
 import { setAccessTokenCookie } from '@/app/(auth)/login/actions';
+import { handleGetToken } from '@/utils/getToken';
 import axios from 'axios';
-import { cookies } from 'next/headers';
 
 export const handleChangeNickname = async (nickname: string) => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  const token = handleGetToken().token;
   const formData = {
     nickname: nickname,
   };
@@ -37,8 +36,7 @@ export const handleChangePassword = async (formData: {
   exPassword: string;
   newPassword: string;
 }) => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  const token = handleGetToken().token;
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/member/password`,
@@ -68,8 +66,7 @@ export const handleRemoveMember = async (formData: {
   email: string;
   password: string;
 }) => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  const token = handleGetToken().token;
   try {
     const response = await axios.delete(
       `${process.env.NEXT_PUBLIC_API_URL}/member/me`,
@@ -99,7 +96,7 @@ export const handleRemoveMember = async (formData: {
 };
 
 export const handleLogout = async () => {
-  const cookieStore = cookies();
+  const cookieStore = handleGetToken().cookieStore;
   cookieStore.delete('accessToken');
   return { ok: true };
 };

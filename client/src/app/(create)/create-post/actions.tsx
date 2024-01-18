@@ -1,16 +1,14 @@
 'use server';
 
+import { handleGetToken } from '@/utils/getToken';
 import axios from 'axios';
-import { cookies } from 'next/headers';
-
-const cookieStore = cookies();
-const token: string | undefined = cookieStore.get('accessToken')?.value;
 
 export const handleCreatePost = async (postData: {
   goalId: number;
   title: string;
   content: string;
 }) => {
+  const token = handleGetToken().token;
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/board/post`,

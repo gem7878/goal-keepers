@@ -1,21 +1,18 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import axios from 'axios';
+import { handleGetToken } from '@/utils/getToken';
 
 // const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
 
 export const handleGetAccessToken = () => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  const token = handleGetToken().token;
   return token;
 };
 
 export const handleConfirmToken = async () => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
-  const hasCookie = cookieStore.has('accessToken');
-  // const hasCookie = cookieStore.has('_vercel_jwt');
+  const token = handleGetToken().token;
+  const hasCookie = handleGetToken().cookieStore.has('accessToken');
 
   function isTokenExpired(token: any) {
     // const decodedToken = decodeToken(token);
@@ -30,21 +27,15 @@ export const handleConfirmToken = async () => {
   //   const decodedPayload = Buffer.from(payload, 'base64').toString('utf-8');
   //   return JSON.parse(decodedPayload);
   // }
-  console.log(hasCookie);
-  console.log(token);
-  console.log(isTokenExpired(token));
 
-  if (!hasCookie || !token || !isTokenExpired(token)) {
+  if (!hasCookie || !token || !isTokenExpired(token) || token === '') {
     return false;
   } else {
     return true;
   }
 };
 export const handleGetUserInfo = async () => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
-
-  console.log(token);
+  const token = handleGetToken().token;
 
   try {
     const response = await axios.get(
@@ -64,8 +55,7 @@ export const handleGetUserInfo = async () => {
   }
 };
 export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  const token = handleGetToken().token;
   // const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
   try {
     const response = await axios.get(
@@ -86,8 +76,7 @@ export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
   }
 };
 export const handleUpdateGoal = async (putData: any) => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  const token = handleGetToken().token;
   try {
     const id = putData.goalId;
     const response = await axios.put(
@@ -114,8 +103,7 @@ export const handleUpdateGoal = async (putData: any) => {
 export const handleDeleteGoal = async (deleteData: {
   goalId: number | undefined;
 }) => {
-  const cookieStore = cookies();
-  const token: string | undefined = cookieStore.get('accessToken')?.value;
+  const token = handleGetToken().token;
   try {
     const response = await axios.delete(
       `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${deleteData.goalId}`,
