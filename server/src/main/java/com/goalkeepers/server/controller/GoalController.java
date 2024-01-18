@@ -56,9 +56,8 @@ public class GoalController {
         if (multipartFile != null) {
             imageUrl = firebaseStorageService.upload(multipartFile, "images");
         }
-        GoalResponseDto response = goalService.createMyGoal(requestDto, imageUrl);
-        response.setImageUrl(firebaseStorageService.showFile(response.getImageUrl()));
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
+        Long id = goalService.createMyGoal(requestDto, imageUrl);
+        return ResponseEntity.ok(new CommonResponseDto(true, id + " Goal을 생성하였습니다."));
     }
 
     @PatchMapping("/goal/completed")
@@ -72,8 +71,8 @@ public class GoalController {
                                                     @Valid @RequestPart(value = "goalInformation", required = false) GoalUpdateRequestDto requestDto,
                                                     @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException, FirebaseException {
         
-        GoalResponseDto response = goalService.updateMyGoal(requestDto, id, multipartFile);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
+        goalService.updateMyGoal(requestDto, id, multipartFile);
+        return ResponseEntity.ok(new CommonResponseDto(true, id + " Goal을 수정하였습니다."));
     }
 
     @DeleteMapping("/goal")

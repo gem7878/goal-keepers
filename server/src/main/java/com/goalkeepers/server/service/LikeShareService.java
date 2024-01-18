@@ -54,17 +54,16 @@ public class LikeShareService extends CommonService {
     }
 
     // 연결된 골 찾기
-    public GoalResponseDto findGoal(Long goalId) {
+    public void findGoal(Long goalId) {
         Member member = isMemberCurrent(memberRepository);
         Goal goal = isGoal(goalRepository, goalId);
 
         GoalShare share = shareRepository.findByMemberAndGoal(member, goal)
                                         .orElseThrow(() -> new CustomException("이 Goal과 연결된 나의 Goal이 없습니다."));
         
-        Goal shareGoal = goalRepository.findByShare(share)
-                                        .orElseThrow(() -> new CustomException("나의 Goal이 없습니다."));
-
-        return GoalResponseDto.of(shareGoal, null); // findJoinMemberList(shareGoal) 같이 담기한 유저들 리스트가 필요하면
+        if(goalRepository.existsByShare(share)) {
+            throw new CustomException("나의 Goal이 없습니다.");
+        }
     }
 
     // 공유하기 -> 골 만들기

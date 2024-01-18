@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.dto.CommonResponseDto;
-import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalShareRequestDto;
 import com.goalkeepers.server.dto.PostLikeRequestDto;
 import com.goalkeepers.server.dto.PostListPageResponseDto;
@@ -82,8 +81,8 @@ public class BoardController {
     // 연결된 골 찾기
     @GetMapping("/goal/share")
     public ResponseEntity<CommonResponseDto> findMyGoalWithShare(@RequestParam(name = "goal-id") Long goalId) {
-        GoalResponseDto response = likeShareService.findGoal(goalId);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
+        likeShareService.findGoal(goalId);
+        return ResponseEntity.ok(new CommonResponseDto(true, "연결된 Goal이 있습니다."));
     }
 
     // 공유하기 -> 골 만들기
