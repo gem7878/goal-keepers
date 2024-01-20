@@ -180,7 +180,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         
         List<Post> posts = queryFactory
                             .selectFrom(post)
-                            .where(post.contentList.any().content.contains(query).or(post.originalGoal.title.contains(query).or(post.originalGoal.description.contains(query))))
+                            .where(post.contentList.any().content.contains(query)
+                                .or(post.contentList.any().shareGoal.description.contains(query))
+                                .or(post.originalGoal.title.contains(query)
+                                .or(post.originalGoal.description.contains(query))))
                             .orderBy(sort == "like" ? postContent.likeCnt.desc() : postContent.updatedAt.desc())
                             .offset(pageable.getOffset())
                             .limit(pageable.getPageSize())
