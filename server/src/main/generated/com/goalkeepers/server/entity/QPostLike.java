@@ -22,11 +22,11 @@ public class QPostLike extends EntityPathBase<PostLike> {
 
     public static final QPostLike postLike = new QPostLike("postLike");
 
+    public final QPostContent content;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final QMember member;
-
-    public final QPost post;
 
     public QPostLike(String variable) {
         this(PostLike.class, forVariable(variable), INITS);
@@ -46,8 +46,8 @@ public class QPostLike extends EntityPathBase<PostLike> {
 
     public QPostLike(Class<? extends PostLike> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.content = inits.isInitialized("content") ? new QPostContent(forProperty("content"), inits.get("content")) : null;
         this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
-        this.post = inits.isInitialized("post") ? new QPost(forProperty("post"), inits.get("post")) : null;
     }
 
 }

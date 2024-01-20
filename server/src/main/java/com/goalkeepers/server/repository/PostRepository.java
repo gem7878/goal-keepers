@@ -14,5 +14,6 @@ import com.goalkeepers.server.entity.Post;
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom{
     List<Post> findAllByGoal(Optional<Goal> goal);
     List<Post> findAllByOrderByUpdatedAtDesc();
+    Optional<Post> findByOriginalGoal(Goal goal);
     Optional<Post> findByIdAndMember(Long id, Member member);
 }

@@ -16,7 +16,7 @@ import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.GoalShareRequestDto;
 import com.goalkeepers.server.dto.PostLikeRequestDto;
-import com.goalkeepers.server.dto.PostListPageResponseDto;
+import com.goalkeepers.server.dto.PostMyResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.service.BoardService;
@@ -41,29 +41,31 @@ public class BoardController {
      * 모든 게시글 가져오기
      * 나의 모든 게시글 가져오기
      * 하나의 게시글 가져오기
+     * 검색하기
      */
 
     @GetMapping("/all")
     public ResponseEntity<CommonResponseDto> getAllPost(@RequestParam(name = "page") int pageNumber) {
-        Page<PostListPageResponseDto> response = boardService.getAllPostList(pageNumber);
+        Page<PostResponseDto> response = boardService.getAllPostList(pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
     @GetMapping("/all/me")
     public ResponseEntity<CommonResponseDto> getMyAllPost(@RequestParam(name = "page") int pageNumber) {
-        Page<PostListPageResponseDto> response = boardService.getMyAllPostList(pageNumber);
+        Page<PostMyResponseDto> response = boardService.getMyAllPostList(pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
     @GetMapping("/post")
-    public ResponseEntity<CommonResponseDto> getOnePost(@RequestParam(name = "post-id") Long postId) {
-        PostListPageResponseDto response = boardService.getOnePost(postId);
+    public ResponseEntity<CommonResponseDto> getOnePost(@RequestParam(name = "post-id") Long postId,
+                                                        @RequestParam(name = "page") int pageNumber) {
+        PostResponseDto response = boardService.getOnePost(postId, pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
     @GetMapping("/search")
     public ResponseEntity<CommonResponseDto> searchGoalAndPost(@RequestParam(name = "page", required = true) int pageNumber, @RequestParam(name = "query", required = true) String query, @RequestParam(name = "sort", required = false) String sort) {
-        Page<PostListPageResponseDto> response = boardService.searchGoalAndPost(pageNumber, query, sort);
+        Page<PostResponseDto> response = boardService.searchGoalAndPost(pageNumber, query, sort);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
@@ -107,19 +109,19 @@ public class BoardController {
 
     @PostMapping("/post")
     public ResponseEntity<CommonResponseDto> createPost(@Valid @RequestBody PostRequestDto requestDto) {
-        PostResponseDto response = boardService.createMyPost(requestDto);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
+        Long id = boardService.createMyPostContent(requestDto);
+        return ResponseEntity.ok(new CommonResponseDto(true, id + " 게시글을 생성하였습니다."));
     }
 
     @PutMapping("/post")
     public ResponseEntity<CommonResponseDto> updateMyPost(@RequestParam(name = "post-id") Long postId, @Valid @RequestBody PostRequestDto requestDto) {
-        PostResponseDto response = boardService.updateMyPost(requestDto, postId);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
+        boardService.updateMyPostContent(requestDto, postId);
+        return ResponseEntity.ok(new CommonResponseDto(true, postId + " 게시글을 수정하였습니다."));
     }
 
     @DeleteMapping("/post")
     public ResponseEntity<CommonResponseDto> deleteMyPost(@RequestParam(name = "post-id") Long postId) {
-        boardService.deleteMyPost(postId);
+        boardService.deleteMyPostContent(postId);
         return ResponseEntity.ok(new CommonResponseDto(true, postId + " 게시글을 삭제하였습니다."));
     }
 

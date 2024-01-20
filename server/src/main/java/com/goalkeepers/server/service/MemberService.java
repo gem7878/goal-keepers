@@ -13,13 +13,12 @@ import com.goalkeepers.server.dto.TokenDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
-import com.goalkeepers.server.entity.Post;
+import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.entity.PostLike;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
-import com.goalkeepers.server.repository.PostRepository;
-
+import com.goalkeepers.server.repository.PostContentRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,7 +27,7 @@ public class MemberService extends CommonService {
     
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;
-    private final PostRepository postRepository;
+    private final PostContentRepository contentRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
@@ -98,11 +97,11 @@ public class MemberService extends CommonService {
             }
         }
 
-        // 라이크 카운트 -1
+        // 라이크 카운트 -1*
         for (PostLike like : member.getLikes()) {
-            Optional<Post> post = postRepository.findById(like.getPost().getId());
-            if(post.isPresent()) {
-                post.get().setLikeCnt(post.get().getLikeCnt() - 1);
+            Optional<PostContent> content = contentRepository.findById(like.getContent().getId());
+            if(content.isPresent()) {
+                content.get().setLikeCnt(content.get().getLikeCnt() - 1);
             }
         }
         

@@ -3,6 +3,7 @@ package com.goalkeepers.server.dto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
+import com.goalkeepers.server.entity.PostContent;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,20 +18,17 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PostRequestDto {
 
-    @NotBlank(message = "제목을 입력해주세요.")
-    private String title;
-
     @NotBlank(message = "내용을 입력해주세요.")
     private String content;
 
     @NotNull(message = "Goal을 선택해주세요.")
     private Long goalId;
 
-    public Post toPost(Member member, Goal goal) {
-        return Post.builder()
-                .title(title)
+    public PostContent toPostContent(Member member, Goal goal, Post post) {
+        return PostContent.builder()
                 .content(content)
-                .goal(goal)
+                .shareGoal(goal)
+                .post(post)
                 .member(member)
                 .build();
     }

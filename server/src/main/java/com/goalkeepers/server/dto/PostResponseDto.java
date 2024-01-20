@@ -1,10 +1,9 @@
 package com.goalkeepers.server.dto;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.List;
+import java.util.Map;
 
-import com.goalkeepers.server.entity.Post;
-
+import com.goalkeepers.server.entity.Goal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,46 +14,32 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostResponseDto {
-    private Long postId;
-    private String nickname;
-    private String title;
-    private String content;
-    private LocalDateTime updatedAt;
-    private int likeCnt;
-    private Long goalId;
-    private String goalTitle;
-    private String goalDescription;
-    private String goalImageUrl;
-    private int shareCnt;
+    private Long postId; // Post
+	private Long originalGoalId; // Goal : origianl goal id
+    private String originalGoalTitle; // Goal : origianl goal title
+    private String originalGoalDescription; // Goal : origianl goal description
+    private String originalGoalImageUrl; // Goal : origianl goal image_url
+    private int originalGoalshareCnt; // Goal : original goal share_cnt
+    private boolean isShare; // Goal : original goal, Member
+	private List<Map<String, Object>> joinMemberList; // Member, Share
+    private List<PostContentResponseDto> contentList; // PostContent
+    
+    public static PostResponseDto of(Long postId, Goal goal, 
+                            String originalGoalImageUrl, 
+                            boolean isShare, 
+                            List<Map<String, Object>> joinMemberList, 
+                            List<PostContentResponseDto> contentList) {
 
-    public static PostResponseDto of(Post post, String imageUrl) {
-        if(Objects.isNull(post.getGoal())) {
-            return PostResponseDto.builder()
-                .postId(post.getId())
-                .nickname(post.getMember().getNickname())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .likeCnt(post.getLikeCnt())
-                .updatedAt(post.getUpdatedAt())
-                .shareCnt(0)
-                .goalId(null)
-                .goalTitle(null)
-                .goalDescription(null)
-                .goalImageUrl(null)
-                .build();
-        }
         return PostResponseDto.builder()
-                .postId(post.getId())
-                .nickname(post.getMember().getNickname())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .likeCnt(post.getLikeCnt())
-                .updatedAt(post.getUpdatedAt())
-                .shareCnt(post.getGoal().getShareCnt())
-                .goalId(post.getGoal().getId())
-                .goalTitle(post.getGoal().getTitle())
-                .goalDescription(post.getGoal().getDescription())
-                .goalImageUrl(imageUrl)
-                .build();
+            .postId(postId)
+            .originalGoalId(goal.getId())
+            .originalGoalTitle(goal.getTitle())
+            .originalGoalDescription(goal.getDescription())
+            .originalGoalImageUrl(originalGoalImageUrl)
+            .originalGoalshareCnt(goal.getShareCnt())
+            .isShare(isShare)
+            .joinMemberList(joinMemberList)
+            .contentList(contentList)
+            .build();
     }
 }

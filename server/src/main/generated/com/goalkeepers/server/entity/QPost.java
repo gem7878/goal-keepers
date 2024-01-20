@@ -24,21 +24,11 @@ public class QPost extends EntityPathBase<Post> {
 
     public final ListPath<PostComment, QPostComment> comments = this.<PostComment, QPostComment>createList("comments", PostComment.class, QPostComment.class, PathInits.DIRECT2);
 
-    public final StringPath content = createString("content");
-
-    public final QGoal goal;
+    public final ListPath<PostContent, QPostContent> contentList = this.<PostContent, QPostContent>createList("contentList", PostContent.class, QPostContent.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final NumberPath<Integer> likeCnt = createNumber("likeCnt", Integer.class);
-
-    public final SetPath<PostLike, QPostLike> likes = this.<PostLike, QPostLike>createSet("likes", PostLike.class, QPostLike.class, PathInits.DIRECT2);
-
-    public final QMember member;
-
-    public final StringPath title = createString("title");
-
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
+    public final QGoal originalGoal;
 
     public QPost(String variable) {
         this(Post.class, forVariable(variable), INITS);
@@ -58,8 +48,7 @@ public class QPost extends EntityPathBase<Post> {
 
     public QPost(Class<? extends Post> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.goal = inits.isInitialized("goal") ? new QGoal(forProperty("goal"), inits.get("goal")) : null;
-        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
+        this.originalGoal = inits.isInitialized("originalGoal") ? new QGoal(forProperty("originalGoal"), inits.get("originalGoal")) : null;
     }
 
 }

@@ -17,7 +17,6 @@ import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
-import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
@@ -118,7 +117,7 @@ public class GoalService extends CommonService{
         if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
             firebaseStorageService.deleteFile(imageUrl);
         }
-        disconnectedPost(goal);
+        //disconnectedPost(goal);
         shareService.deleteShare(goal);
         goalRepository.delete(goal);
     }
@@ -130,11 +129,14 @@ public class GoalService extends CommonService{
         goal.setEndDate(today); // goal.setCompleteDate(today);
     }
 
-    private void disconnectedPost(Goal goal) {
-        for (Post post : goal.getPosts()) {
-            if(post.getGoal() != null) {
-                post.setGoal(null);
-            }
-        }
-    }
+    // private void disconnectedPost(Goal goal) {
+    //     boolean isShare = goal.getShare() != null;
+    //     for (PostContent content : goal.getShare()) {
+    //         if(isShare) {
+    //             content.setShareGoal(null);
+    //         } else {
+    //             content.setOriginalGoal(null);
+    //         }
+    //     }
+    // }
 }

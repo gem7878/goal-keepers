@@ -16,10 +16,12 @@ import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostComment;
+import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.CommentRepository;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostRepository;
 
 
@@ -46,6 +48,13 @@ public class CommonService {
                             .orElseThrow(() -> new CustomException("나의 Post Id가 아닙니다."));
     }
 
+    // 나의 PostContent 찾기
+    public PostContent isMyPostContent(MemberRepository memberRepository, PostContentRepository contentRepository, Long contentId) {
+        Member member = isMemberCurrent(memberRepository);
+        return contentRepository.findByIdAndMember(contentId, member)
+                            .orElseThrow(() -> new CustomException("나의 PostContent Id가 아닙니다."));
+    }
+
     // Goal ID로 골 찾기
     public Goal isGoal(GoalRepository goalRepository, Long goalId) {
         return goalRepository.findById(goalId)
@@ -56,6 +65,12 @@ public class CommonService {
     public Post isPost(PostRepository postRepository, Long postId) {
         return postRepository.findById(postId)
                     .orElseThrow(() -> new CustomException("Post Id를 확인해주세요."));
+    }
+
+    // PostContent ID로 content 찾기
+    public PostContent isPostContent(PostContentRepository contentRepository, Long contentId) {
+        return contentRepository.findById(contentId)
+                            .orElseThrow(() -> new CustomException("PostContent Id를 확인해주세요."));
     }
 
     // 나의 Comment 찾기

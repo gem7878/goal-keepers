@@ -2,7 +2,6 @@ package com.goalkeepers.server.entity;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -75,9 +74,6 @@ public class Goal {
     @OneToOne
     @JoinColumn(name = "share_id", nullable = true)
     private GoalShare share;
-
-    @OneToMany(mappedBy = "goal")
-    private List<Post> posts;
 
     public static Goal goalUpdate(Goal goal, GoalUpdateRequestDto requestDto, String imageUrl) {
         if (Objects.isNull(requestDto)) {

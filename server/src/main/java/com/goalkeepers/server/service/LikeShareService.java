@@ -13,14 +13,14 @@ import com.goalkeepers.server.dto.PostLikeRequestDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
-import com.goalkeepers.server.entity.Post;
+import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.entity.PostLike;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostLikeRepository;
-import com.goalkeepers.server.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -32,23 +32,23 @@ public class LikeShareService extends CommonService {
     private final GoalShareRepository shareRepository;
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;
-    private final PostRepository postRepository;
+    private final PostContentRepository contentRepository;
     private final FirebaseStorageService firebaseStorageService;
 
-    // 좋아요
+    // 좋아요*
     public String addLike(PostLikeRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
-        Post post = isPost(postRepository, requestDto.getPostId());
+        PostContent content = isPostContent(contentRepository, requestDto.getPostId());
         
-        if(likeRepository.existsByMemberAndPost(member, post)) {
+        if(likeRepository.existsByMemberAndPostContent(member, content)) {
             // 좋아요 취소
-            post.setLikeCnt(post.getLikeCnt()-1);
-            likeRepository.deleteByMemberAndPost(member, post);
+            content.setLikeCnt(content.getLikeCnt()-1);
+            likeRepository.deleteByMemberAndPostContent(member, content);
             return "좋아요 취소";
         } else {
             // 좋아요
-            post.setLikeCnt(post.getLikeCnt()+1);
-            likeRepository.save(new PostLike(member, post));
+            content.setLikeCnt(content.getLikeCnt()+1);
+            likeRepository.save(new PostLike(member, content));
             return "좋아요";
         }
     }
@@ -116,9 +116,9 @@ public class LikeShareService extends CommonService {
         }
     }
 
-    // Post Delete - Like 데이터 삭제
-    public void deleteLike(Post post) {
-        List<PostLike> likeList = likeRepository.findAllByPost(post);
+    // PostContent Delete - Like 데이터 삭제*
+    public void deleteLike(PostContent content) {
+        List<PostLike> likeList = likeRepository.findAllByPostContent(content);
         for (PostLike like : likeList) {
             likeRepository.delete(like);
         }
