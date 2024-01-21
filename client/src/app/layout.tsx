@@ -39,21 +39,19 @@ function RootLayout({ children }: { children: React.ReactNode }) {
     fetchData();
   }, [pathname]);
 
-  function setScreenSize() {
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-  }
-
-  // const wrapElement: any = document.querySelector('.wrap');
-  // wrapElement.style.height = window.innerHeight + 'px';
   useEffect(() => {
     setScreenSize();
   }, []);
 
+  function setScreenSize() {
+    const wrapElement: any = document.querySelector('.wrap');
+    wrapElement.style.height = window.innerHeight + 'px';
+  }
+
   return (
     <Provider store={store}>
       <html lang="en">
-        <body className={`${inter.className} h-[calc(var(--vh, 1vh) * 100)]`}>
+        <body className={`${inter.className} wrap`}>
           <main className="h-[calc(100%-56px)] w-screen flex flex-col	items-center justify-center">
             {children}
           </main>
