@@ -19,6 +19,7 @@ import lombok.Setter;
 @Builder
 public class GoalResponseDto {
     private Long goalId;
+    private String nickname;
     private String title;
     private String description;
     private LocalDate startDate;
@@ -32,6 +33,7 @@ public class GoalResponseDto {
     public static GoalResponseDto of(Goal goal, String imageUrl, Boolean isShare, List<Map<String, Object>> joinMemberList) {
         return GoalResponseDto.builder()
                 .goalId(goal.getId())
+                .nickname(goal.getMember().getNickname())
                 .title(goal.getTitle())
                 .description(goal.getDescription())
                 .startDate(goal.getStartDate())

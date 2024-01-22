@@ -77,8 +77,12 @@ public class GoalController {
 
     @DeleteMapping("/goal")
     public ResponseEntity<CommonResponseDto> deleteMyGoal(@RequestParam(name = "id", required = true) Long id) {
-        goalService.deleteMyGoal(id);
-        return ResponseEntity.ok(new CommonResponseDto(true, id + " Goal을 삭제하였습니다."));
+        if (goalService.deleteMyGoal(id) == "삭제") {
+            return ResponseEntity.ok(new CommonResponseDto(true, id + " Goal을 삭제하였습니다."));
+        }
+        else {
+            return ResponseEntity.ok(new CommonResponseDto(true, id + " Goal을 삭제하였습니다. 이 Goal에 참여한 사람들이 있어 Goal에서 제목, 이미지는 사라지지 않습니다."));
+        }
     }
     
 }

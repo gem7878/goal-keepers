@@ -1,5 +1,6 @@
 package com.goalkeepers.server.service;
 
+import java.util.List;
 import java.util.Objects;
 import java.time.LocalDate;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
@@ -36,6 +38,7 @@ public class GoalService extends CommonService{
     private final LikeShareService shareService;
     private final GoalShareRepository shareRepository;
     private final FirebaseStorageService firebaseStorageService;
+    private final BoardService boardService;
     
 
     /*
@@ -111,15 +114,31 @@ public class GoalService extends CommonService{
         }
     }
 
-    public void deleteMyGoal(Long goalId) {
+    public String deleteMyGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
+        Member member = isMemberCurrent(memberRepository);
         String imageUrl = goal.getImageUrl();
         if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
             firebaseStorageService.deleteFile(imageUrl);
         }
-        //disconnectedPost(goal);
-        shareService.deleteShare(goal);
-        goalRepository.delete(goal);
+        // 포스트 지우기
+        List<PostContent> contents = boardService.getMyPostContentWithGoal(goal);
+        for (PostContent content : contents) {
+            boardService.deleteMyPostContent(content.getId());
+        }
+        if(goal.getShareCnt() == 0 && !shareRepository.existsByMemberAndGoal(member, goal)) {
+            if(Objects.isNull(goal.getShare())) {
+                // 쉐어 지우기
+                shareService.deleteShare(goal);
+            }
+            goalRepository.deleteById(goalId);
+            return "삭제";
+        } else {
+            // 참여한 사람들이 있을 때
+            // title, share_cnt, image_url 제외 정보 지우기
+            Goal.disconnectedGoal(goal);
+            return "정보 삭제";
+        }
     }
 
     public void completeMyGoal(Long goalId) {
@@ -128,15 +147,4 @@ public class GoalService extends CommonService{
         goal.setCompleted(true);
         goal.setEndDate(today); // goal.setCompleteDate(today);
     }
-
-    // private void disconnectedPost(Goal goal) {
-    //     boolean isShare = goal.getShare() != null;
-    //     for (PostContent content : goal.getShare()) {
-    //         if(isShare) {
-    //             content.setShareGoal(null);
-    //         } else {
-    //             content.setOriginalGoal(null);
-    //         }
-    //     }
-    // }
 }

@@ -1,5 +1,6 @@
 package com.goalkeepers.server.service;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.context.annotation.DependsOn;
@@ -93,6 +94,10 @@ public class BoardService extends CommonService {
         PostContent content = isMyPostContent(memberRepository, contentRepository, contentId);
         likeShareService.deleteLike(content);
         contentRepository.delete(content);
+    }
+
+    public List<PostContent> getMyPostContentWithGoal(Goal goal) {
+        return contentRepository.findAllByShareGoal(goal);
     }
 }
 

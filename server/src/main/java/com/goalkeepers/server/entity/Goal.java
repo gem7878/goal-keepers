@@ -42,8 +42,7 @@ public class Goal {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    @NotNull
+    @JoinColumn(name = "member_id", nullable = true)
     private Member member;
 
     @Column(length = 18)
@@ -84,6 +83,16 @@ public class Goal {
         goal.startDate = Optional.ofNullable(requestDto.getStartDate()).orElse(goal.getStartDate());
         goal.endDate = Optional.ofNullable(requestDto.getEndDate()).orElse(goal.getEndDate());
         goal.imageUrl = Optional.ofNullable(imageUrl).orElse(goal.getImageUrl());
+        return goal;
+    }
+
+    public static Goal disconnectedGoal(Goal goal) {
+        goal.description = null;
+        goal.startDate = null;
+        goal.endDate = null;
+        goal.member = null;
+        goal.completed = false;
+        goal.share = null;
         return goal;
     }
 

@@ -52,7 +52,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                                 if(Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
                                     imageUrl = firebaseStorageService.showFile(imageUrl);
                                 }
-                                Goal shareGoal = null;
+                                Goal shareGoal = goal;
                                 GoalShare share = goal.getShare();
                                 if(Objects.nonNull(share)) {
                                     shareGoal = Optional.ofNullable(share.getGoal()).orElse(null);
@@ -62,11 +62,12 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                                 if(Objects.nonNull(shareGoal)) {
                                     for(GoalShare goalShare : shareGoal.getShareList()) {
                                         Map<String, Object> member = new HashMap<>();
-                                        member.put("memberId", goalShare.getMember());
+                                        member.put("memberId", goalShare.getMember().getId());
                                         member.put("nickname", goalShare.getMember().getNickname());
                                         joinMemberList.add(member);
                                     }
                                 }
+                                System.out.println("joinMemberList: " + joinMemberList);
                                 return GoalResponseDto.of(goal, imageUrl, joinMemberList);
                             })
                             .collect(Collectors.toList());

@@ -88,7 +88,7 @@ public class CommonService {
         List<Map<String, Object>> joinMemberList = new ArrayList<>();
         for(GoalShare goalShare : goal.getShareList()) {
             Map<String, Object> member = new HashMap<>();
-            member.put("memberId", goalShare.getMember());
+            member.put("memberId", goalShare.getMember().getId());
             member.put("nickname", goalShare.getMember().getNickname());
             joinMemberList.add(member);
         }
