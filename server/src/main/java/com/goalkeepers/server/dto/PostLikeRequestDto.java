@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PostLikeRequestDto {
 
-    @NotNull(message = "postId 값이 필요합니다.")
-    private Long postId;
+    @NotNull(message = "contentId 값이 필요합니다.")
+    private Long contentId;
 }
