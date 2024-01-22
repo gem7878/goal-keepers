@@ -32,10 +32,10 @@ public class PostLike {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id")
     @NotNull
-    private PostContent content;
+    private PostContent postContent;
 
-    public PostLike(Member member, PostContent content) {
+    public PostLike(Member member, PostContent postContent) {
         this.member = member;
-        this.content = content;
+        this.postContent = postContent;
     }
 }

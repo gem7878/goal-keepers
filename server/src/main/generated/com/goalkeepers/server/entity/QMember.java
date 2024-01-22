@@ -32,7 +32,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath password = createString("password");
 
-    public final ListPath<Post, QPost> posts = this.<Post, QPost>createList("posts", Post.class, QPost.class, PathInits.DIRECT2);
+    public final ListPath<PostContent, QPostContent> postContents = this.<PostContent, QPostContent>createList("postContents", PostContent.class, QPostContent.class, PathInits.DIRECT2);
 
     public final EnumPath<Role> role = createEnum("role", Role.class);
 

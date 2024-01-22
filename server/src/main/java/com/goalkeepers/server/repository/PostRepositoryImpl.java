@@ -123,7 +123,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         List<PostMyResponseDto> page = goals
             .stream()
             .map(goal -> {
-                List<PostContent> contents = contentRepository.findAllByShareGoal(goal);
+                List<PostContent> contents = queryFactory
+                                                .selectFrom(postContent)
+                                                .where(postContent.post.eq(post))
+                                                .orderBy(postContent.id.desc())
+                                                .offset(pageable.getOffset())
+                                                .limit(pageable.getPageSize())
+                                                .fetch();
                 
                 if(Objects.isNull(contents)) {
                     return null;

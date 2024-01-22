@@ -41,13 +41,6 @@ public class CommonService {
                             .orElseThrow(() -> new CustomException("나의 Goal Id가 아닙니다."));
     }
 
-    // 나의 Post 찾기
-    public Post isMyPost(MemberRepository memberRepository, PostRepository postRepository, Long postId) {
-        Member member = isMemberCurrent(memberRepository);
-        return postRepository.findByIdAndMember(postId, member)
-                            .orElseThrow(() -> new CustomException("나의 Post Id가 아닙니다."));
-    }
-
     // 나의 PostContent 찾기
     public PostContent isMyPostContent(MemberRepository memberRepository, PostContentRepository contentRepository, Long contentId) {
         Member member = isMemberCurrent(memberRepository);

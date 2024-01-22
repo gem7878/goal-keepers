@@ -99,7 +99,7 @@ public class MemberService extends CommonService {
 
         // 라이크 카운트 -1*
         for (PostLike like : member.getLikes()) {
-            Optional<PostContent> content = contentRepository.findById(like.getContent().getId());
+            Optional<PostContent> content = contentRepository.findById(like.getPostContent().getId());
             if(content.isPresent()) {
                 content.get().setLikeCnt(content.get().getLikeCnt() - 1);
             }
