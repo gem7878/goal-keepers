@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -30,15 +31,28 @@ import static com.goalkeepers.server.entity.QGoal.goal;
 import lombok.RequiredArgsConstructor;
 
 @Repository
-@RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     private final MemberRepository memberRepository;
     private final PostLikeRepository likeRepository;
     private final GoalShareRepository shareRepository;
-    private final PostContentRepository contentRepository;
     private final FirebaseStorageService firebaseStorageService;
+    private final Pageable contentPageable;
+
+    public PostRepositoryImpl(
+            JPAQueryFactory queryFactory,
+            MemberRepository memberRepository,
+            PostLikeRepository likeRepository,
+            GoalShareRepository shareRepository,
+            FirebaseStorageService firebaseStorageService) {
+        this.queryFactory = queryFactory;
+        this.memberRepository = memberRepository;
+        this.likeRepository = likeRepository;
+        this.shareRepository = shareRepository;
+        this.firebaseStorageService = firebaseStorageService;
+        this.contentPageable = PageRequest.of(1 - 1, 20); // 일단 최신 20개만 보여줌
+    }
 
     @Override
     public Page<PostResponseDto> getAll(Pageable pageable) {
@@ -72,7 +86,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 if(Objects.nonNull(originalGoal)) {
                     for(GoalShare goalShare : originalGoal.getShareList()) {
                         Map<String, Object> joinMember = new HashMap<>();
-                        joinMember.put("memberId", goalShare.getMember());
+                        joinMember.put("memberId", goalShare.getMember().getId());
                         joinMember.put("nickname", goalShare.getMember().getNickname());
                         joinMemberList.add(joinMember);
                     }
@@ -83,8 +97,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                                 .selectFrom(postContent)
                                                 .where(postContent.post.eq(post))
                                                 .orderBy(postContent.id.desc())
-                                                .offset(pageable.getOffset())
-                                                .limit(pageable.getPageSize())
+                                                .offset(contentPageable.getOffset())
+                                                .limit(contentPageable.getPageSize())
                                                 .fetch();
                                             
                 List<PostContentResponseDto> contentList = contents
@@ -111,11 +125,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     @Override
     public Page<PostMyResponseDto> getMyAllPost(Pageable pageable, Member member) {
 
-        // 나의 goal 찾기
+        // 나의 post 찾기
         List<Goal> goals = queryFactory
                     .selectFrom(goal)
                     .where(goal.member.eq(member))
-                    .orderBy(goal.id.desc())
                     .offset(pageable.getOffset())
                     .limit(pageable.getPageSize())
                     .fetch();
@@ -125,10 +138,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             .map(goal -> {
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
-                                                .where(postContent.post.eq(post))
+                                                .where(postContent.shareGoal.eq(goal))
                                                 .orderBy(postContent.id.desc())
-                                                .offset(pageable.getOffset())
-                                                .limit(pageable.getPageSize())
+                                                .offset(contentPageable.getOffset())
+                                                .limit(contentPageable.getPageSize())
                                                 .fetch();
                 
                 if(Objects.isNull(contents)) {
@@ -138,17 +151,23 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 Goal originalGoal = goal;
                 boolean isShare = false;
                 GoalShare share = goal.getShare();
-                if(Objects.nonNull(share) && Objects.nonNull(share.getGoal())) {
-                    originalGoal = share.getGoal();
+                if(Objects.nonNull(share)) {
+                    originalGoal = Objects.nonNull(share.getGoal()) ? share.getGoal() : goal;
                     isShare = true;
                 }
+
+                Long postId = queryFactory
+                                .select(post.id)
+                                .from(post)
+                                .where(post.originalGoal.eq(originalGoal))
+                                .fetchOne();
                 
                 // joinMemberList 가져오기
                 List<Map<String, Object>> joinMemberList = new ArrayList<>();
                 if(Objects.nonNull(originalGoal)) {
                     for(GoalShare goalShare : originalGoal.getShareList()) {
                         Map<String, Object> joinMember = new HashMap<>();
-                        joinMember.put("memberId", goalShare.getMember());
+                        joinMember.put("memberId", goalShare.getMember().getId());
                         joinMember.put("nickname", goalShare.getMember().getNickname());
                         joinMemberList.add(joinMember);
                     }
@@ -169,7 +188,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                     imageUrl = firebaseStorageService.showFile(goal.getImageUrl());
                 }
                 
-                return PostMyResponseDto.of(goal, originalGoal, imageUrl, isShare, joinMemberList, contentList);
+                return PostMyResponseDto.of(postId, goal, originalGoal, imageUrl, isShare, joinMemberList, contentList);
             }).collect(Collectors.toList());        
 
         int totalSize = queryFactory
@@ -217,7 +236,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 if(Objects.nonNull(originalGoal)) {
                     for(GoalShare goalShare : originalGoal.getShareList()) {
                         Map<String, Object> joinMember = new HashMap<>();
-                        joinMember.put("memberId", goalShare.getMember());
+                        joinMember.put("memberId", goalShare.getMember().getId());
                         joinMember.put("nickname", goalShare.getMember().getNickname());
                         joinMemberList.add(joinMember);
                     }
@@ -228,8 +247,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                                 .selectFrom(postContent)
                                                 .where(postContent.post.eq(post))
                                                 .orderBy(postContent.id.desc())
-                                                .offset(pageable.getOffset())
-                                                .limit(pageable.getPageSize())
+                                                .offset(contentPageable.getOffset())
+                                                .limit(contentPageable.getPageSize())
                                                 .fetch();
                                             
                 List<PostContentResponseDto> contentList = contents
@@ -268,8 +287,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                             .selectFrom(postContent)
                             .where(postContent.post.eq(post))
                             .orderBy(postContent.id.desc())
-                            .offset(pageable.getOffset())
-                            .limit(pageable.getPageSize())
+                            .offset(contentPageable.getOffset())
+                            .limit(contentPageable.getPageSize())
                             .fetch();
 
         Goal originalGoal = post.getOriginalGoal();
@@ -297,7 +316,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         if(Objects.nonNull(originalGoal)) {
             for(GoalShare goalShare : originalGoal.getShareList()) {
                 Map<String, Object> joinMember = new HashMap<>();
-                joinMember.put("memberId", goalShare.getMember());
+                joinMember.put("memberId", goalShare.getMember().getId());
                 joinMember.put("nickname", goalShare.getMember().getNickname());
                 joinMemberList.add(joinMember);
             }

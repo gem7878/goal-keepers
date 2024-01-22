@@ -1,6 +1,7 @@
 package com.goalkeepers.server.dto;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.PostContent;
@@ -26,15 +27,16 @@ public class PostContentResponseDto {
     private String goalImageUrl; // Goal : share goal image_url
 
     public static PostContentResponseDto of(PostContent postContent, Goal goal, String nickname, boolean isLike, String imageUrl) {
+        boolean isGoal = Objects.nonNull(goal);
         return PostContentResponseDto.builder()
             .nickname(nickname)
             .content(postContent.getContent())
             .updatedAt(postContent.getUpdatedAt())
             .likeCnt(postContent.getLikeCnt())
             .isLike(isLike)
-            .goalId(goal.getId())
-            .goalTitle(goal.getTitle())
-            .goalDescription(goal.getDescription())
+            .goalId(isGoal ? goal.getId() : null)
+            .goalTitle(isGoal ? goal.getTitle() : null)
+            .goalDescription(isGoal ? goal.getDescription() : null)
             .goalImageUrl(imageUrl)
             .build();
     }

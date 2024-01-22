@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.dto.PostContentUpdateRequestDto;
 import com.goalkeepers.server.dto.PostMyResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
@@ -16,6 +17,7 @@ import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostContent;
+import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostContentRepository;
@@ -51,8 +53,9 @@ public class BoardService extends CommonService {
         return postRepository.getMyAllPost(PageRequest.of(pageNumber - 1, 10), member);
     }
 
-    public PostResponseDto getOnePost(Long postId, int pageNumber) {
-        return postRepository.getOnePost(PageRequest.of(pageNumber - 1, 10), isPost(postRepository, postId));
+    public PostResponseDto getOnePost(Long postId) {
+        // 하나의 포스트에서 일단 최신 20개만 보여줌
+        return postRepository.getOnePost(PageRequest.of(0, 20), isPost(postRepository, postId));
     }
 
     public Page<PostResponseDto> searchGoalAndPost(int pageNumber, String query, String sort) {
@@ -68,7 +71,7 @@ public class BoardService extends CommonService {
     public Long createMyPostContent(PostRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
         Goal goal = isMyGoal(memberRepository, goalRepository, requestDto.getGoalId());
-        Goal originalGoal = Objects.nonNull(goal.getShare()) ? goal.getShare().getGoal() : null;
+        Goal originalGoal = Objects.nonNull(goal.getShare()) ? goal.getShare().getGoal() : goal;
         
         Post post = null;
         if(Objects.nonNull(originalGoal)) {
@@ -77,14 +80,14 @@ public class BoardService extends CommonService {
                 post = postRepository.save(new Post(originalGoal));
             }
         } else {
-            post = postRepository.save(new Post(goal));
-        }      
+            throw new CustomException("원본 goal을 찾을 수 없습니다.");
+        } 
 
         PostContent content = contentRepository.save(requestDto.toPostContent(member, goal, post));
         return content.getId();
     }
 
-    public void updateMyPostContent(PostRequestDto requestDto, Long contentId) {
+    public void updateMyPostContent(PostContentUpdateRequestDto requestDto, Long contentId) {
         PostContent.postUpdate(isMyPostContent(memberRepository, contentRepository, contentId), requestDto);
         // Goal goal = post.getGoal();
         // return PostResponseDto.of(post, getGoalImageUrl(goal));

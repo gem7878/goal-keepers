@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.dto.CommonResponseDto;
+import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalShareRequestDto;
+import com.goalkeepers.server.dto.PostContentUpdateRequestDto;
 import com.goalkeepers.server.dto.PostLikeRequestDto;
 import com.goalkeepers.server.dto.PostMyResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
@@ -57,9 +59,8 @@ public class BoardController {
     }
 
     @GetMapping("/post")
-    public ResponseEntity<CommonResponseDto> getOnePost(@RequestParam(name = "post-id") Long postId,
-                                                        @RequestParam(name = "page") int pageNumber) {
-        PostResponseDto response = boardService.getOnePost(postId, pageNumber);
+    public ResponseEntity<CommonResponseDto> getOnePost(@RequestParam(name = "post-id") Long postId) {
+        PostResponseDto response = boardService.getOnePost(postId);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
@@ -77,28 +78,28 @@ public class BoardController {
     @PostMapping("/post/like")
     public ResponseEntity<CommonResponseDto> postlike(@Valid @RequestBody PostLikeRequestDto requestDto) {
         String response = likeShareService.addLike(requestDto);
-        return ResponseEntity.ok(new CommonResponseDto(true, "Post " + requestDto.getPostId() + response));
+        return ResponseEntity.ok(new CommonResponseDto(true, "Post Content " + requestDto.getContentId() + response));
     }
 
     // 연결된 골 찾기
     @GetMapping("/goal/share")
     public ResponseEntity<CommonResponseDto> findMyGoalWithShare(@RequestParam(name = "goal-id") Long goalId) {
-        likeShareService.findGoal(goalId);
-        return ResponseEntity.ok(new CommonResponseDto(true, "연결된 Goal이 있습니다."));
+        GoalResponseDto response = likeShareService.findGoal(goalId);
+        return ResponseEntity.ok(new CommonResponseDto(true, "연결된 Goal이 있습니다.", response));
     }
 
     // 공유하기 -> 골 만들기
     @PostMapping("/goal/share")
     public ResponseEntity<CommonResponseDto> postShare(@Valid @RequestBody GoalShareRequestDto requestDto) {
         likeShareService.addShare(requestDto);
-        return ResponseEntity.ok(new CommonResponseDto(true, "Goal " + requestDto.getGoalId() + " 담기 성공"));
+        return ResponseEntity.ok(new CommonResponseDto(true, "Goal " + requestDto.getGoalId() + " 담기 성공하였습니다."));
     }
 
     // 공유 취소하기 -> 골 삭제하기
     @DeleteMapping("/goal/share")
     public ResponseEntity<CommonResponseDto> deleteShare(@Valid @RequestBody GoalShareRequestDto requestDto) {
         goalService.deleteMyGoal(requestDto.getGoalId());
-        return ResponseEntity.ok(new CommonResponseDto(true, "Goal " + requestDto.getGoalId() + " 삭제 성공"));
+        return ResponseEntity.ok(new CommonResponseDto(true, "Goal " + requestDto.getGoalId() + " 삭제 성공하였습니다."));
     }
 
     /*
@@ -114,15 +115,15 @@ public class BoardController {
     }
 
     @PutMapping("/post")
-    public ResponseEntity<CommonResponseDto> updateMyPost(@RequestParam(name = "post-id") Long postId, @Valid @RequestBody PostRequestDto requestDto) {
-        boardService.updateMyPostContent(requestDto, postId);
-        return ResponseEntity.ok(new CommonResponseDto(true, postId + " 게시글을 수정하였습니다."));
+    public ResponseEntity<CommonResponseDto> updateMyPost(@RequestParam(name = "content-id") Long contentId, @Valid @RequestBody PostContentUpdateRequestDto requestDto) {
+        boardService.updateMyPostContent(requestDto, contentId);
+        return ResponseEntity.ok(new CommonResponseDto(true, contentId + " 게시글을 수정하였습니다."));
     }
 
     @DeleteMapping("/post")
-    public ResponseEntity<CommonResponseDto> deleteMyPost(@RequestParam(name = "post-id") Long postId) {
-        boardService.deleteMyPostContent(postId);
-        return ResponseEntity.ok(new CommonResponseDto(true, postId + " 게시글을 삭제하였습니다."));
+    public ResponseEntity<CommonResponseDto> deleteMyPost(@RequestParam(name = "content-id") Long contentId) {
+        boardService.deleteMyPostContent(contentId);
+        return ResponseEntity.ok(new CommonResponseDto(true, contentId + " 게시글을 삭제하였습니다."));
     }
 
     /*

@@ -10,6 +10,12 @@ public class CommonResponseDto {
     private String message;
     private Object data;
 
+    public CommonResponseDto(boolean success, String message, Object data) {
+        this.success = success;
+        this.message = message;
+        this.data = data;
+    }
+
     public CommonResponseDto(boolean success, String message) {
         this.success = success;
         this.message = message;

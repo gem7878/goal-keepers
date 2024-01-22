@@ -3,7 +3,7 @@ package com.goalkeepers.server.entity;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.goalkeepers.server.dto.PostRequestDto;
+import com.goalkeepers.server.dto.PostContentUpdateRequestDto;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -66,7 +66,7 @@ public class PostContent {
     @JoinColumn(name = "goal_id", nullable = true)
     private Goal shareGoal;
 
-    public static PostContent postUpdate(PostContent postContent, PostRequestDto requestDto) {
+    public static PostContent postUpdate(PostContent postContent, PostContentUpdateRequestDto requestDto) {
         postContent.content = requestDto.getContent();
         return postContent;
     }

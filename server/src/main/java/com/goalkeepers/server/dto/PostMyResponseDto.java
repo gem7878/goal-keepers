@@ -28,7 +28,8 @@ public class PostMyResponseDto {
 	private List<Map<String, Object>> joinMemberList; // Member, Share
     private List<PostContentResponseDto> myContentList; // PostContent
     
-    public static PostMyResponseDto of(Goal myGoal,
+    public static PostMyResponseDto of(Long postId,
+                            Goal myGoal,
                             Goal originalGoal,
                             String imageUrl, 
                             boolean isShare, 
@@ -36,6 +37,7 @@ public class PostMyResponseDto {
                             List<PostContentResponseDto> contentList) {
 
         return PostMyResponseDto.builder()
+            .postId(postId)
             .myGoalId(myGoal.getId())
             .originalGoalId(originalGoal.getId())
             .myGoalTitle(myGoal.getTitle())
