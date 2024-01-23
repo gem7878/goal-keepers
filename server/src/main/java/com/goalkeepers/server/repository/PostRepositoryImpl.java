@@ -206,10 +206,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         List<Post> posts = queryFactory
                             .selectFrom(post)
                             .where(post.contentList.any().content.contains(query)
-                                .or(post.contentList.any().shareGoal.description.contains(query))
+                                //.or(post.contentList.any().shareGoal.description.contains(query))
                                 .or(post.originalGoal.title.contains(query)
                                 .or(post.originalGoal.description.contains(query))))
-                            .orderBy(sort == "like" ? postContent.likeCnt.desc() : postContent.updatedAt.desc())
+                            .orderBy(sort.equals("like") ? post.contentList.any().likeCnt.desc() : post.contentList.any().updatedAt.desc())
                             .offset(pageable.getOffset())
                             .limit(pageable.getPageSize())
                             .fetch();
@@ -270,8 +270,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
         int totalSize = queryFactory
                         .selectFrom(post)
-                        .where(post.contentList.any().content.contains(query))
-                        .where(postContent.content.contains(query))
+                        .where(post.contentList.any().content.contains(query)
+                                //.or(post.contentList.any().shareGoal.description.contains(query))
+                                .or(post.originalGoal.title.contains(query)
+                                .or(post.originalGoal.description.contains(query))))
                         .fetch()
                         .size();
 

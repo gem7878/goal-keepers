@@ -65,7 +65,9 @@ public class BoardController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<CommonResponseDto> searchGoalAndPost(@RequestParam(name = "page", required = true) int pageNumber, @RequestParam(name = "query", required = true) String query, @RequestParam(name = "sort", required = false) String sort) {
+    public ResponseEntity<CommonResponseDto> searchGoalAndPost(@RequestParam(name = "page", required = true) int pageNumber,
+                                                                @RequestParam(name = "query", required = true) String query,
+                                                                @RequestParam(name = "sort", required = false) String sort) {
         Page<PostResponseDto> response = boardService.searchGoalAndPost(pageNumber, query, sort);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
