@@ -1,6 +1,12 @@
 'use client';
 
-import { CreateButton, Modal, MyGoals, MyPosts } from '@/components/index.js';
+import {
+  CreateButton,
+  GoalModal,
+  MyGoals,
+  MyPosts,
+  PullToRefresh,
+} from '@/components/index.js';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { StaticImageData } from 'next/image';
@@ -24,6 +30,7 @@ export default function Home() {
     goalId: number;
   } | null>(null);
   const [myGoalList, setMyGoalList] = useState<any[]>([]);
+  const containerEl = useRef<any>();
 
   useEffect(() => {
     selectGoalNum !== null ? setOpen(true) : setOpen(false);
@@ -44,7 +51,11 @@ export default function Home() {
     setIsMyGoals(boolean);
   };
   return (
-    <div className="flex flex-col	w-full h-full items-center justify-center">
+    <div
+      className="flex flex-col	w-full h-full items-center justify-center"
+      ref={containerEl}
+    >
+      <PullToRefresh el={containerEl} />
       <header className="w-full flex flex-col items-end mr-5 mb-6">
         <FontAwesomeIcon icon={faBell} className="w-5 h-5 text-gray-500" />
       </header>
@@ -98,7 +109,7 @@ export default function Home() {
       <CreateButton></CreateButton>
       {isOpen && portalElement
         ? createPortal(
-            <Modal
+            <GoalModal
               setOpen={setOpen}
               selectData={selectData}
               setSelectGoalNum={setSelectGoalNum}
