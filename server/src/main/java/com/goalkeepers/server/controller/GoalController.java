@@ -62,8 +62,7 @@ public class GoalController {
 
     @PatchMapping("/goal/completed")
     public ResponseEntity<CommonResponseDto> completeMyGoal(@RequestParam(name = "id", required = true) Long id) {
-        goalService.completeMyGoal(id);
-        return ResponseEntity.ok(new CommonResponseDto(true, id + " Goal을 완료하였습니다."));
+        return ResponseEntity.ok(new CommonResponseDto(true, goalService.completeMyGoal(id)));
     }
 
     @PutMapping("/goal")

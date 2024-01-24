@@ -3,6 +3,7 @@ package com.goalkeepers.server.dto;
 import java.util.List;
 import java.util.Map;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.goalkeepers.server.entity.Goal;
 
@@ -28,6 +29,7 @@ public class GoalResponseDto {
     private int shareCnt;
     private Boolean isShare;
     private Boolean completed;
+    private LocalDateTime completeDate;
     private List<Map<String, Object>> joinMemberList;
 
     public static GoalResponseDto of(Goal goal, String imageUrl, Boolean isShare, List<Map<String, Object>> joinMemberList) {
@@ -42,6 +44,7 @@ public class GoalResponseDto {
                 .shareCnt(goal.getShareCnt())
                 .isShare(isShare)
                 .completed(goal.isCompleted())
+                .completeDate(goal.getCompleteDate())
                 .joinMemberList(joinMemberList)
                 .build();
     }

@@ -3,6 +3,7 @@ package com.goalkeepers.server.service;
 import java.util.List;
 import java.util.Objects;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.io.IOException;
 
 import org.springframework.context.annotation.DependsOn;
@@ -141,10 +142,18 @@ public class GoalService extends CommonService{
         }
     }
 
-    public void completeMyGoal(Long goalId) {
+    public String completeMyGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
-        LocalDate today = LocalDate.now();
-        goal.setCompleted(true);
-        goal.setEndDate(today); // goal.setCompleteDate(today);
+        if(goal.isCompleted()) {
+            goal.setCompleted(false);
+            goal.setCompleteDate(null);
+            return goalId + " Goal 완료 취소하였습니다.";
+        } else {
+            LocalDateTime today = LocalDateTime.now();
+            goal.setCompleted(true);
+            goal.setCompleteDate(today);
+            return goalId + " Goal 완료하였습니다.";
+        }
+        
     }
 }

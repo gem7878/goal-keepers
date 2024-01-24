@@ -1,6 +1,7 @@
 package com.goalkeepers.server.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -57,6 +58,9 @@ public class Goal {
 
     @Column
     private LocalDate endDate;
+
+    @Column
+    private LocalDateTime completeDate;
 
     @Column
     private String imageUrl;

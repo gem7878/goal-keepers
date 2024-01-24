@@ -24,6 +24,8 @@ public class QGoal extends EntityPathBase<Goal> {
 
     public final BooleanPath completed = createBoolean("completed");
 
+    public final DateTimePath<java.time.LocalDateTime> completeDate = createDateTime("completeDate", java.time.LocalDateTime.class);
+
     public final StringPath description = createString("description");
 
     public final DatePath<java.time.LocalDate> endDate = createDate("endDate", java.time.LocalDate.class);
