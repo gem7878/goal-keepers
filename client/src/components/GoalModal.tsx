@@ -18,7 +18,7 @@ interface selectDataTypes {
   goalId: number;
 }
 
-const Modal: React.FC<{
+const GoalModal: React.FC<{
   setOpen: React.Dispatch<SetStateAction<boolean>>;
   selectData: selectDataTypes | null;
   setSelectGoalNum: React.Dispatch<SetStateAction<number | null>>;
@@ -207,4 +207,4 @@ const Modal: React.FC<{
   );
 };
 
-export default Modal;
+export default GoalModal;

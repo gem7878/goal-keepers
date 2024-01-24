@@ -3,9 +3,9 @@
 // import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Navbar } from '@/components/index.js';
+import { Layout, Navbar } from '@/components/index.js';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { handleConfirmToken } from './actions';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
@@ -52,6 +52,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
     <Provider store={store}>
       <html lang="en">
         <body className={`${inter.className} wrap`}>
+          {/* <body className={`${inter.className} h-full`}> */}
           <main className="h-[calc(100%-56px)] w-screen flex flex-col	items-center justify-center">
             {children}
           </main>
