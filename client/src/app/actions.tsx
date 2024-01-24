@@ -148,3 +148,23 @@ export const handleCompleteGoal = async (completeData: {
     });
   }
 };
+export const handleGetAGoal = async (getData: { goalId: number }) => {
+  const token = handleGetToken().token;
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/goal?id=${getData.goalId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
+};
