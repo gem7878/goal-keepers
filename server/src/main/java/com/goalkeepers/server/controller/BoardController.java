@@ -23,7 +23,6 @@ import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.service.BoardService;
 import com.goalkeepers.server.service.CommentService;
-import com.goalkeepers.server.service.GoalService;
 import com.goalkeepers.server.service.LikeShareService;
 
 import jakarta.validation.Valid;
@@ -37,7 +36,6 @@ public class BoardController {
     private final BoardService boardService;
     private final CommentService commentService;
     private final LikeShareService likeShareService;
-    private final GoalService goalService;
 
     /*
      * 모든 게시글 가져오기
@@ -100,8 +98,8 @@ public class BoardController {
     // 공유 취소하기 -> 골 삭제하기
     @DeleteMapping("/goal/share")
     public ResponseEntity<CommonResponseDto> deleteShare(@Valid @RequestBody GoalShareRequestDto requestDto) {
-        goalService.deleteMyGoal(requestDto.getGoalId());
-        return ResponseEntity.ok(new CommonResponseDto(true, "Goal " + requestDto.getGoalId() + " 삭제 성공하였습니다."));
+        likeShareService.disconnecteOriginGoal(requestDto.getGoalId());
+        return ResponseEntity.ok(new CommonResponseDto(true, "담기한 Goal에 대한 참여 리스트에서 제외됐습니다."));
     }
 
     /*

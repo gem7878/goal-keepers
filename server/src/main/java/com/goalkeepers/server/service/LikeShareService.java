@@ -105,6 +105,12 @@ public class LikeShareService extends CommonService {
         }
     }
 
+    // 공유 취소 - 참여 제외
+    public void disconnecteOriginGoal(Long goalId) {
+        Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
+        deleteShare(goal);
+    }
+
     // Goal Delete - Share 데이터 삭제
     public void deleteShare(Goal goal) {
         GoalShare share = goal.getShare();
