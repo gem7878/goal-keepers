@@ -7,6 +7,7 @@ import {
   faHome,
   faUsers,
   faUserCircle,
+  faBorderAll,
 } from '@fortawesome/free-solid-svg-icons';
 import { usePathname } from 'next/navigation';
 
@@ -36,6 +37,19 @@ const Navbar = () => {
         </li>
         <li className={listName}>
           <Link
+            href={'/post'}
+            className={`w-full h-full flex flex-col item-center justify-center text-center`}
+          >
+            <FontAwesomeIcon
+              icon={faBorderAll}
+              className={`${
+                pathname === '/post' ? 'text-orange-400' : 'text-gray-400'
+              } w-full h-full `}
+            />
+          </Link>
+        </li>
+        <li className={listName}>
+          <Link
             href={'/community'}
             className={`w-full h-full flex flex-col item-center justify-center text-center`}
           >
@@ -49,14 +63,6 @@ const Navbar = () => {
             />
           </Link>
         </li>
-        {/* <li className={listName}>
-          <Link href={"/goal-list"}>
-            골<br></br>리스트
-          </Link>
-        </li>
-        <li className={listName}>
-          <Link href={"/game"}>게임</Link>
-        </li> */}
         <li className={listName}>
           <Link
             href={'/my-page'}

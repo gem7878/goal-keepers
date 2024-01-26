@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
-import { handleDeletePost, handlePutPost } from '@/app/community/actions';
+import { handleDeletePost, handlePutPost } from '@/app/post/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
 import { CommentBox } from './index';
@@ -141,14 +141,14 @@ const PostBoxDetail: React.FC<{
           </div>
         )}
         <h3 className="text-center px-1  mx-4	text-white	font-bold absolute top-1/4 -translate-y-1/3 z-10 text-ellipsis	">
-          {data.goalTitle.length > 18
+          {/* {data.goalTitle.length > 18
             ? data.goalTitle.slice(0, 18) + '...'
-            : data.goalTitle}
+            : data.goalTitle} */}
         </h3>
         <p className="text-white w-5/6 absolute top-1/3 text-xs mt-2 mx-4">
-          {data.goalDescription.length > 65
+          {/* {data.goalDescription.length > 65
             ? data.goalDescription.slice(0, 65) + '...'
-            : data.goalDescription}
+            : data.goalDescription} */}
         </p>
         <ul
           ref={likeRef}
@@ -205,10 +205,10 @@ const PostBoxDetail: React.FC<{
       ) : (
         <div className="w-full h-[40%]	pt-2 flex flex-col">
           <h3 className="font-bold">
-            {postTitle.length > 20 ? postTitle.slice(0, 20) + '...' : postTitle}
+            {/* {postTitle.length > 20 ? postTitle.slice(0, 20) + '...' : postTitle} */}
           </h3>
           <h5 className="text-xs	w-full text-right	">
-            {data.updatedAt.slice(0, 10)}
+            {/* {data.updatedAt.slice(0, 10)} */}
           </h5>
           <p className="text-sm	">{postContent}</p>
         </div>

@@ -78,3 +78,6 @@ body {
   font-family: 'MoiraiOne';
   src: url('../../public/assets/font/MoiraiOne-Regular.ttf');
 }
+.alarm-menu::-webkit-scrollbar {
+  display: none;
+}

@@ -12,7 +12,7 @@ import {
   handleDeleteComment,
   handleGetComment,
   handleUpdateComment,
-} from '@/app/community/comment/actions';
+} from '@/app/post/comment/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStateComment } from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

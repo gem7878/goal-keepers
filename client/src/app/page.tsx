@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectRender } from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
 
 export default function Home() {
   const [isMyGoals, setIsMyGoals] = useState(true);
@@ -57,7 +58,9 @@ export default function Home() {
     >
       <PullToRefresh el={containerEl} />
       <header className="w-full flex flex-col items-end mr-5 mb-6">
-        <FontAwesomeIcon icon={faBell} className="w-5 h-5 text-gray-500" />
+        <Link href={'/alarm'}>
+          <FontAwesomeIcon icon={faBell} className="w-5 h-5 text-gray-500" />
+        </Link>
       </header>
       <section className="w-11/12 h-5/6 text-white">
         <nav className="w-full h-10">
