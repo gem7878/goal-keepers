@@ -39,6 +39,8 @@ const PostBox: React.FC<{
   onShareGoal,
   onGetShareData,
 }) => {
+  console.log(data);
+
   const likeRef = useRef<HTMLUListElement>(null);
 
   const handleFocus = (e: { target: any }) => {
@@ -80,8 +82,8 @@ const PostBox: React.FC<{
         </div>
 
         <h3 className="text-center px-1 max-w-fit mx-4	text-white	font-bold absolute top-1/3 -translate-y-1/3 z-10 bg-black text-ellipsis	">
-          {data.goalTitle}
-          {data.goalTitle.length > 22 && '...'}
+          {/* {data.goalTitle}
+          {data.goalTitle.length > 22 && '...'} */}
         </h3>
         <ul ref={likeRef} className="flex w-full justify-center	gap-2">
           <li className="flex items-center gap-1">
@@ -122,7 +124,7 @@ const PostBox: React.FC<{
           <p className="text-sm	">{data.content}</p>
         </div>
         <label className="text-xs	w-full text-right	">
-          {data.updatedAt.slice(0, 10)}
+          {/* {data.updatedAt.slice(0, 10)} */}
         </label>
       </div>
     </article>
