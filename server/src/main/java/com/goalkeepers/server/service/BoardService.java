@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.dto.CommunityResponseDto;
 import com.goalkeepers.server.dto.PostContentUpdateRequestDto;
 import com.goalkeepers.server.dto.PostMyResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
@@ -30,77 +31,36 @@ import lombok.RequiredArgsConstructor;
 @DependsOn("firebaseStorageService")
 public class BoardService extends CommonService {
     
-    private final PostRepository postRepository;
-    private final GoalRepository goalRepository;
-    private final MemberRepository memberRepository;
     private final PostContentRepository contentRepository;
-    private final LikeShareService likeShareService;
+    private final GoalRepository goalRepository;
+
+    /*
+     * 커뮤니티 최신순 가져오기
+     * 커뮤니티 인기순 가져오기
+     */
+
+    public Page<CommunityResponseDto> getAllNewGoal(int pageNumber) {
+        return goalRepository.getAllNewGoal(PageRequest.of(pageNumber - 1, 10));
+    }
+
+    public Page<CommunityResponseDto> getAllPopularGoal(int pageNumber) {
+        return goalRepository.getAllPopularGoal(PageRequest.of(pageNumber - 1, 10));
+    }
     
-
     /*
-     * 모든 게시글 가져오기*
-     * 나의 모든 게시글 가져오기*
-     * 하나의 게시글 가져오기*
-     * 검색하기*
+     * Post Menu 검색
+     * Community Menu 검색
      */
 
-    public Page<PostResponseDto> getAllPostList(int pageNumber) {
-        return postRepository.getAll(PageRequest.of(pageNumber - 1, 10));
+    public Page<PostResponseDto> searchPost(int pageNumber, String query, String sort) {
+        return contentRepository.searchPost(PageRequest.of(pageNumber - 1, 10), query, sort);
     }
 
-    public Page<PostMyResponseDto> getMyAllPostList(int pageNumber) {
-        Member member = isMemberCurrent(memberRepository);
-        return postRepository.getMyAllPost(PageRequest.of(pageNumber - 1, 10), member);
-    }
-
-    public PostResponseDto getOnePost(Long postId) {
-        // 하나의 포스트에서 일단 최신 20개만 보여줌
-        return postRepository.getOnePost(PageRequest.of(0, 20), isPost(postRepository, postId));
-    }
-
-    public Page<PostResponseDto> searchGoalAndPost(int pageNumber, String query, String sort) {
-        return postRepository.searchAll(PageRequest.of(pageNumber - 1, 10), query, sort);
-    }
-
-    /*
-     * 게시글 쓰기*
-     * 게시글 수정하기*
-     * 게시글 삭제하기*
-     */
-
-    public Long createMyPostContent(PostRequestDto requestDto) {
-        Member member = isMemberCurrent(memberRepository);
-        Goal goal = isMyGoal(memberRepository, goalRepository, requestDto.getGoalId());
-        Goal originalGoal = Objects.nonNull(goal.getShare()) ? goal.getShare().getGoal() : goal;
-        
-        Post post = null;
-        if(Objects.nonNull(originalGoal)) {
-            post = postRepository.findByOriginalGoal(originalGoal).orElse(null);
-            if(Objects.isNull(post)) {
-                post = postRepository.save(new Post(originalGoal));
-            }
-        } else {
-            throw new CustomException("원본 goal을 찾을 수 없습니다.");
-        } 
-
-        PostContent content = contentRepository.save(requestDto.toPostContent(member, goal, post));
-        return content.getId();
-    }
-
-    public void updateMyPostContent(PostContentUpdateRequestDto requestDto, Long contentId) {
-        PostContent.postUpdate(isMyPostContent(memberRepository, contentRepository, contentId), requestDto);
-        // Goal goal = post.getGoal();
-        // return PostResponseDto.of(post, getGoalImageUrl(goal));
-    }
-
-    public void deleteMyPostContent(Long contentId) {
-        PostContent content = isMyPostContent(memberRepository, contentRepository, contentId);
-        likeShareService.deleteLike(content);
-        contentRepository.delete(content);
-    }
-
-    public List<PostContent> getMyPostContentWithGoal(Goal goal) {
-        return contentRepository.findAllByShareGoal(goal);
+    public Page<CommunityResponseDto> searchCommunity(int pageNumber, String query, String sort) {
+        if(sort.equals("popular")) {
+            return contentRepository.searchCommunity(PageRequest.of(pageNumber - 1, 10), query, sort);
+        }
+        return goalRepository.searchCommunity(PageRequest.of(pageNumber - 1, 10), query, sort);
     }
 }
 

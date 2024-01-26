@@ -2,6 +2,8 @@ package com.goalkeepers.server.entity;
 
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,7 +37,10 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id", nullable = true)
-    private Goal originalGoal;
+    private Goal goal;
+
+    @ColumnDefault("0")
+    private int likeCnt;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostContent> contentList;
@@ -43,7 +48,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostComment> comments;
    
-    public Post(Goal originalGoal) {
-        this.originalGoal = originalGoal;
+    public Post(Goal goal) {
+        this.goal = goal;
     }
 }

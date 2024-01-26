@@ -28,6 +28,8 @@ public class QPost extends EntityPathBase<Post> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final NumberPath<Integer> likeCnt = createNumber("likeCnt", Integer.class);
+
     public final QGoal originalGoal;
 
     public QPost(String variable) {

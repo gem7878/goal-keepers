@@ -64,7 +64,7 @@ public class PostContent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id", nullable = true)
-    private Goal shareGoal;
+    private Goal goal;
 
     public static PostContent postUpdate(PostContent postContent, PostContentUpdateRequestDto requestDto) {
         postContent.content = requestDto.getContent();
