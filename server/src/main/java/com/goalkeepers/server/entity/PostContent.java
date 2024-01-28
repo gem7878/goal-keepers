@@ -1,6 +1,7 @@
 package com.goalkeepers.server.entity;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.goalkeepers.server.dto.PostContentUpdateRequestDto;
@@ -44,6 +45,9 @@ public class PostContent {
     @NotNull
     private String content;
 
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+    
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
@@ -64,7 +68,7 @@ public class PostContent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id", nullable = true)
-    private Goal goal;
+    private Goal shareGoal;
 
     public static PostContent postUpdate(PostContent postContent, PostContentUpdateRequestDto requestDto) {
         postContent.content = requestDto.getContent();
