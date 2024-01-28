@@ -26,11 +26,11 @@ public class QPost extends EntityPathBase<Post> {
 
     public final ListPath<PostContent, QPostContent> contentList = this.<PostContent, QPostContent>createList("contentList", PostContent.class, QPostContent.class, PathInits.DIRECT2);
 
+    public final QGoal goal;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final NumberPath<Integer> likeCnt = createNumber("likeCnt", Integer.class);
-
-    public final QGoal originalGoal;
 
     public QPost(String variable) {
         this(Post.class, forVariable(variable), INITS);
@@ -50,7 +50,7 @@ public class QPost extends EntityPathBase<Post> {
 
     public QPost(Class<? extends Post> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.originalGoal = inits.isInitialized("originalGoal") ? new QGoal(forProperty("originalGoal"), inits.get("originalGoal")) : null;
+        this.goal = inits.isInitialized("goal") ? new QGoal(forProperty("goal"), inits.get("goal")) : null;
     }
 
 }

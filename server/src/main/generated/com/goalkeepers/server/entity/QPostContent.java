@@ -24,6 +24,8 @@ public class QPostContent extends EntityPathBase<PostContent> {
 
     public final StringPath content = createString("content");
 
+    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final NumberPath<Integer> likeCnt = createNumber("likeCnt", Integer.class);
