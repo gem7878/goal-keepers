@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,24 +14,20 @@ import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.CommunityResponseDto;
-import com.goalkeepers.server.dto.PostMyResponseDto;
 import com.goalkeepers.server.dto.PostResponseDto;
+import com.goalkeepers.server.entity.SORT;
 import com.goalkeepers.server.service.BoardService;
 import com.goalkeepers.server.service.CommentService;
 import com.goalkeepers.server.service.ContentService;
-import com.goalkeepers.server.service.LikeShareService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/board")
 public class BoardController {
 
     private final BoardService boardService;
     private final CommentService commentService;
-    private final LikeShareService likeShareService;
     private final ContentService contentService;
 
     
@@ -41,17 +36,17 @@ public class BoardController {
      * 나의 모든 포스트 가져오기
      */
 
-    @GetMapping("/all")
+    @GetMapping("post/all")
     public ResponseEntity<CommonResponseDto> getAllPost(@RequestParam(name = "page") int pageNumber,
-                                                        @RequestParam(name = "sort") String sort) {
+                                                        @RequestParam(name = "sort") SORT sort) {
         Page<PostResponseDto> response = contentService.getAllPost(pageNumber, sort);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
-    @GetMapping("/all/me")
+    @GetMapping("post/all/me")
     public ResponseEntity<CommonResponseDto> getMyAllPost(@RequestParam(name = "page") int pageNumber,
-                                                        @RequestParam(name = "sort") String sort) {
-        Page<PostMyResponseDto> response = contentService.getMyAllPost(pageNumber, sort);
+                                                        @RequestParam(name = "sort") SORT sort) {
+        Page<PostResponseDto> response = contentService.getMyAllPost(pageNumber, sort);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
@@ -73,35 +68,25 @@ public class BoardController {
     }
 
     /*
-     * Post Menu 검색
-     * Community Menu 검색
+     * 포스트 검색
+     * 커뮤니티 검색
      */
 
-    @GetMapping("/search")
+    @GetMapping("/post/search")
     public ResponseEntity<CommonResponseDto> searchPost(@RequestParam(name = "page", required = true) int pageNumber,
                                                                 @RequestParam(name = "query", required = true) String query,
-                                                                @RequestParam(name = "sort", required = false) String sort) {
+                                                                @RequestParam(name = "sort", required = false) SORT sort) {
         Page<PostResponseDto> response = boardService.searchPost(pageNumber, query, sort);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
-    @GetMapping("/search")
+    @GetMapping("/community/search")
     public ResponseEntity<CommonResponseDto> searchCommunity(@RequestParam(name = "page", required = true) int pageNumber,
                                                                 @RequestParam(name = "query", required = true) String query,
-                                                                @RequestParam(name = "sort", required = false) String sort) {
+                                                                @RequestParam(name = "sort", required = false) SORT sort) {
         Page<CommunityResponseDto> response = boardService.searchCommunity(pageNumber, query, sort);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
-    }    
-
-    /*
-     * 포스트 응원해요
-     */
-
-    // @PostMapping("/post/like")
-    // public ResponseEntity<CommonResponseDto> postlike(@Valid @RequestBody PostLikeRequestDto requestDto) {
-    //     String response = likeShareService.addLike(requestDto);
-    //     return ResponseEntity.ok(new CommonResponseDto(true, "Post Content " + requestDto.getContentId() + response));
-    // }
+    }
 
     /*
      *  전체 댓글 보기

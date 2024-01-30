@@ -27,7 +27,7 @@ public class PostRequestDto {
     public PostContent toPostContent(Member member, Goal goal, Post post) {
         return PostContent.builder()
                 .content(content)
-                .goal(goal)
+                .shareGoal(goal)
                 .post(post)
                 .member(member)
                 .build();

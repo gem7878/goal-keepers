@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	protected ResponseEntity<ErrorResponseDto> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST);
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST, "enum binding error");
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 

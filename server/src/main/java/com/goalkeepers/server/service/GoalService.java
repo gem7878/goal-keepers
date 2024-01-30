@@ -2,7 +2,6 @@ package com.goalkeepers.server.service;
 
 import java.util.List;
 import java.util.Objects;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.io.IOException;
 
@@ -39,7 +38,7 @@ public class GoalService extends CommonService{
     private final LikeShareService shareService;
     private final GoalShareRepository shareRepository;
     private final FirebaseStorageService firebaseStorageService;
-    private final BoardService boardService;
+    private final ContentService contentService;
     
 
     /*
@@ -123,9 +122,9 @@ public class GoalService extends CommonService{
             firebaseStorageService.deleteFile(imageUrl);
         }
         // 포스트 지우기
-        List<PostContent> contents = boardService.getMyPostContentWithGoal(goal);
+        List<PostContent> contents = contentService.getMyPostContentWithGoal(goal);
         for (PostContent content : contents) {
-            boardService.deleteMyPostContent(content.getId());
+            contentService.deleteMyPostContent(content.getId());
         }
         if(goal.getShareCnt() == 0 && !shareRepository.existsByMemberAndGoal(member, goal)) {
             if(Objects.isNull(goal.getShare())) {

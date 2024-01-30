@@ -11,7 +11,7 @@ import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.PostContent;
 
 @Repository
-public interface PostContentRepository extends JpaRepository<PostContent, Long>{
+public interface PostContentRepository extends JpaRepository<PostContent, Long>, PostContentRepositoryCustom {
     Optional<PostContent> findByIdAndMember(Long id, Member member);
     List<PostContent> findAllByShareGoal(Goal goal);
 }

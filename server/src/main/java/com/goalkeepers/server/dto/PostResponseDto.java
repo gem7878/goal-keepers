@@ -14,14 +14,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostResponseDto {
-    private Long postId; // Post
-	private Long goalId; // Goal : origianl goal id
-    private String goalTitle; // Goal : origianl goal title
-    private String goalDescription; // Goal : origianl goal description
-    private String goalImageUrl; // Goal : origianl goal image_url
-    private int goalshareCnt; // Goal : original goal share_cnt
-    private boolean isShare; // Goal : original goal, Member
-    private PostContentResponseDto content; // PostContent
+    private Long postId;
+	private Long goalId;
+    private String goalTitle;
+    private String goalDescription;
+    private String goalImageUrl;
+    private int goalshareCnt;
+    private boolean isShare;
+    private PostContentResponseDto content;
     
     public static PostResponseDto of(Long postId, Goal goal, 
                             String goalImageUrl, 

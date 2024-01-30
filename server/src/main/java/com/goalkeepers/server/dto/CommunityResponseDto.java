@@ -20,10 +20,17 @@ public class CommunityResponseDto {
     private String originalGoalImageUrl; // Goal : origianl goal image_url
     private int originalGoalshareCnt; // Goal : original goal share_cnt
     private boolean isShare; // Goal : original goal, Member
+    private List<Map<String, Object>> joinMemberList;
+    private List<PostContentResponseDto> contentList;
+    private Long count;
+
     
-    public static CommunityResponseDto of(Long postId, Goal goal, 
+    public static CommunityResponseDto of(Goal goal, 
                             String originalGoalImageUrl, 
-                            boolean isShare) {
+                            boolean isShare,
+                            List<Map<String, Object>> joinMemberList,
+                            List<PostContentResponseDto> contentList,
+                            Long count) {
 
         return CommunityResponseDto.builder()
             .originalGoalId(goal.getId())
@@ -32,6 +39,9 @@ public class CommunityResponseDto {
             .originalGoalImageUrl(originalGoalImageUrl)
             .originalGoalshareCnt(goal.getShareCnt())
             .isShare(isShare)
+            .joinMemberList(joinMemberList)
+            .contentList(contentList)
+            .count(count)
             .build();
     }
 }

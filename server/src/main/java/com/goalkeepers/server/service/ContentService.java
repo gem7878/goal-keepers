@@ -10,15 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.goalkeepers.server.dto.PostContentResponseDto;
-import com.goalkeepers.server.dto.PostContentUpdateRequestDto;
-import com.goalkeepers.server.dto.PostMyResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostContent;
-import com.goalkeepers.server.exception.CustomException;
+import com.goalkeepers.server.entity.SORT;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostContentRepository;
@@ -46,7 +44,12 @@ public class ContentService extends CommonService {
 
     public Long createMyPostContent(PostRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
+
         Goal goal = isMyGoal(memberRepository, goalRepository, requestDto.getGoalId());
+        // 담기한 Goal이면 shareGoal로 바꾸기
+        if(Objects.nonNull(goal.getShare()) && Objects.nonNull(goal.getShare().getGoal())) {
+            goal = goal.getShare().getGoal();
+        }
         
         Post post = postRepository.findByGoal(goal).orElse(null);
         // 처음 컨텐트 작성할 때 postId 생성
@@ -70,12 +73,12 @@ public class ContentService extends CommonService {
      * 나의 모든 포스트 가져오기
      */
 
-    public Page<PostResponseDto> getAllPost(int pageNumber, String sort) {
-        return contentRepository.getAllContentAndGoal(PageRequest.of(pageNumber - 1, 20));
+    public Page<PostResponseDto> getAllPost(int pageNumber, SORT sort) {
+        return contentRepository.getAllContentAndGoal(PageRequest.of(pageNumber - 1, 20), sort);
     }
 
-    public Page<PostMyResponseDto> getMyAllPost(int pageNumber, String sort) {
-        return contentRepository.getMyAllContentAndGoal(PageRequest.of(pageNumber - 1, 20));
+    public Page<PostResponseDto> getMyAllPost(int pageNumber, SORT sort) {
+        return contentRepository.getMyAllContentAndGoal(PageRequest.of(pageNumber - 1, 20), isMemberCurrent(memberRepository), sort);
     }
 
     /*
@@ -83,7 +86,7 @@ public class ContentService extends CommonService {
      */
 
     public Page<PostContentResponseDto> getPostContents(Long postId, int pageNumber) {
-        return contentRepository.getPostContents(PageRequest.of(pageNumber, 10), isPost(postRepository, postId));
+        return contentRepository.getPostContents(PageRequest.of(pageNumber - 1, 10), isPost(postRepository, postId));
     }
 
     public List<PostContent> getMyPostContentWithGoal(Goal goal) {
