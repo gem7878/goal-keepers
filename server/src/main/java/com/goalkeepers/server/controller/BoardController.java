@@ -15,11 +15,14 @@ import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.CommunityResponseDto;
+import com.goalkeepers.server.dto.PostCheerRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.entity.SORT;
 import com.goalkeepers.server.service.BoardService;
 import com.goalkeepers.server.service.CommentService;
 import com.goalkeepers.server.service.ContentService;
+import com.goalkeepers.server.service.LikeShareService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +33,7 @@ public class BoardController {
     private final BoardService boardService;
     private final CommentService commentService;
     private final ContentService contentService;
+    private final LikeShareService likeShareService;
 
     
     /*
@@ -119,5 +123,15 @@ public class BoardController {
     public ResponseEntity<?> deleteMyComment(@RequestParam(name = "comment-id") Long commentId) {
         commentService.deleteMyComment(commentId);
         return ResponseEntity.ok(new CommonResponseDto(true, commentId + " 댓글을 삭제하였습니다."));
+    }
+
+    /*
+     * 포스트 응원해요
+     */
+
+    @PostMapping("/post/cheer")
+    public ResponseEntity<CommonResponseDto> cheerPost(@Valid @RequestBody PostCheerRequestDto requestDto) {
+        String response = likeShareService.addPostCheer(requestDto);
+        return ResponseEntity.ok(new CommonResponseDto(true, "Post " + requestDto.getPostId() + response));
     }
 }

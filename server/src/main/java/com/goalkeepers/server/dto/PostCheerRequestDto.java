@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostLikeRequestDto {
-
-    @NotNull(message = "contentId 값이 필요합니다.")
-    private Long contentId;
+public class PostCheerRequestDto {
+    @NotNull(message = "post id 값이 필요합니다.")
+    private Long postId;
 }

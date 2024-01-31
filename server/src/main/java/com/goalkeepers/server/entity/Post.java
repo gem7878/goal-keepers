@@ -1,6 +1,7 @@
 package com.goalkeepers.server.entity;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -42,11 +43,17 @@ public class Post {
     @ColumnDefault("0")
     private int likeCnt;
 
+    @ColumnDefault("0")
+    private int cheerCnt;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostContent> contentList;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostComment> comments;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PostCheer> cheerList;
    
     public Post(Goal goal) {
         this.goal = goal;

@@ -22,6 +22,10 @@ public class QPost extends EntityPathBase<Post> {
 
     public static final QPost post = new QPost("post");
 
+    public final NumberPath<Integer> cheerCnt = createNumber("cheerCnt", Integer.class);
+
+    public final SetPath<PostCheer, QPostCheer> cheerList = this.<PostCheer, QPostCheer>createSet("cheerList", PostCheer.class, QPostCheer.class, PathInits.DIRECT2);
+
     public final ListPath<PostComment, QPostComment> comments = this.<PostComment, QPostComment>createList("comments", PostComment.class, QPostComment.class, PathInits.DIRECT2);
 
     public final ListPath<PostContent, QPostContent> contentList = this.<PostContent, QPostContent>createList("contentList", PostContent.class, QPostContent.class, PathInits.DIRECT2);

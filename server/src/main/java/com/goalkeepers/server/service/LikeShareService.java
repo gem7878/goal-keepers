@@ -9,18 +9,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalShareRequestDto;
-import com.goalkeepers.server.dto.PostLikeRequestDto;
+import com.goalkeepers.server.dto.PostCheerRequestDto;
+import com.goalkeepers.server.dto.ContentLikeRequestDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.entity.Post;
+import com.goalkeepers.server.entity.PostCheer;
 import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.entity.PostLike;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+import com.goalkeepers.server.repository.PostCheerRepository;
 import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostLikeRepository;
+import com.goalkeepers.server.repository.PostRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,23 +39,43 @@ public class LikeShareService extends CommonService {
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;
     private final PostContentRepository contentRepository;
+    private final PostRepository postRepository;
+    private final PostCheerRepository cheerRepository;
     private final FirebaseStorageService firebaseStorageService;
 
-    // 좋아요*
-    public String addLike(PostLikeRequestDto requestDto) {
+    // 컨텐트 좋아요
+    public String addLike(ContentLikeRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
         PostContent content = isPostContent(contentRepository, requestDto.getContentId());
         
         if(likeRepository.existsByMemberAndPostContent(member, content)) {
             // 좋아요 취소
-            content.setLikeCnt(content.getLikeCnt()-1);
+            content.setLikeCnt(content.getLikeCnt() - 1);
             likeRepository.deleteByMemberAndPostContent(member, content);
             return " 좋아요 취소";
         } else {
             // 좋아요
-            content.setLikeCnt(content.getLikeCnt()+1);
+            content.setLikeCnt(content.getLikeCnt() + 1);
             likeRepository.save(new PostLike(member, content));
             return " 좋아요";
+        }
+    }
+
+    // 포스트 응원해요
+    public String addPostCheer(PostCheerRequestDto requestDto) {
+        Member member = isMemberCurrent(memberRepository);
+        Post post = isPost(postRepository, requestDto.getPostId());
+        PostCheer cheer = cheerRepository.findByMemberAndPost(member, post).orElse(null);
+        if(Objects.nonNull(cheer)) {
+            // 응원해요 취소
+            post.setCheerCnt(post.getCheerCnt() - 1);
+            cheerRepository.delete(cheer);
+            return " 응원해요 취소";
+        } else {
+            // 응원해요
+            post.setCheerCnt(post.getCheerCnt() + 1);
+            cheerRepository.save(new PostCheer(member, post));
+            return " 응원해요";
         }
     }
 

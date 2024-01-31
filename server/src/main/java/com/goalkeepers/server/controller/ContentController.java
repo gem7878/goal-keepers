@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.PostContentResponseDto;
-import com.goalkeepers.server.dto.PostLikeRequestDto;
+import com.goalkeepers.server.dto.ContentLikeRequestDto;
 import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.service.ContentService;
 import com.goalkeepers.server.service.LikeShareService;
@@ -71,8 +71,8 @@ public class ContentController {
      * 컨텐트 좋아요
      */
 
-    @PostMapping("/post/like")
-    public ResponseEntity<CommonResponseDto> postlike(@Valid @RequestBody PostLikeRequestDto requestDto) {
+    @PostMapping("/content/like")
+    public ResponseEntity<CommonResponseDto> likeContent(@Valid @RequestBody ContentLikeRequestDto requestDto) {
         String response = likeShareService.addLike(requestDto);
         return ResponseEntity.ok(new CommonResponseDto(true, "Post Content " + requestDto.getContentId() + response));
     }
