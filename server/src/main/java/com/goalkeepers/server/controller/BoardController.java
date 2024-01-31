@@ -41,14 +41,14 @@ public class BoardController {
      * 나의 모든 포스트 가져오기
      */
 
-    @GetMapping("post/all")
+    @GetMapping("/post/all")
     public ResponseEntity<CommonResponseDto> getAllPost(@RequestParam(name = "page") int pageNumber,
                                                         @RequestParam(name = "sort") SORT sort) {
         Page<PostResponseDto> response = contentService.getAllPost(pageNumber, sort);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
-    @GetMapping("post/all/me")
+    @GetMapping("/post/all/me")
     public ResponseEntity<CommonResponseDto> getMyAllPost(@RequestParam(name = "page") int pageNumber,
                                                         @RequestParam(name = "sort") SORT sort) {
         Page<PostResponseDto> response = contentService.getMyAllPost(pageNumber, sort);
@@ -101,7 +101,7 @@ public class BoardController {
         댓글 수정
      */
 
-    @GetMapping("/all-comment")
+    @GetMapping("/comment/all")
     public ResponseEntity<CommonResponseDto> getAllComment(@RequestParam(name = "page") int pageNumber, @RequestParam(name = "post-id") Long postId) {
         Page<CommentResponseDto> response = commentService.getSelectedPost(postId, pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
