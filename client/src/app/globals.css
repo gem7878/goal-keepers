@@ -81,3 +81,20 @@ body {
 .alarm-menu::-webkit-scrollbar {
   display: none;
 }
+
+/* input[type='radio'],
+input[type='radio']:checked {
+  appearance: none;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 100%;
+  margin-right: 0.1rem;
+}
+
+input[type='radio'] {
+  background-color: white;
+  border: 2px solid orange;
+}
+input[type='radio']:checked {
+  background-color: orange;
+} */
