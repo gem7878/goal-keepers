@@ -24,6 +24,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/react-table": "^7.7.19",
     "@types/shortid": "^0.0.32",
+    "@use-gesture/react": "^10.3.0",
     "axios": "^1.6.2",
     "cookie": "^0.6.0",
     "date-fns": "^3.0.6",

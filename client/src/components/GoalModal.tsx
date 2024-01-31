@@ -3,7 +3,11 @@
 import Image, { StaticImageData } from 'next/image';
 import React, { SetStateAction, useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
-import { handleDeleteGoal, handleUpdateGoal } from '@/app/actions';
+import {
+  handleDeleteGoal,
+  handleUpdateGoal,
+  handleCompleteGoal,
+} from '@/app/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStateGoal } from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -76,10 +80,12 @@ const GoalModal: React.FC<{
     const deleteData = {
       goalId: selectData?.goalId,
     };
+    // console.log('호호호호호호호', deleteData);
     const confirm = window.confirm('목표를 삭제하시겠습니까?');
     if (confirm) {
       await handleDeleteGoal(deleteData)
         .then((response) => {
+          console.log(response);
           if (response.success === true) {
             dispatch(setStateGoal(!reduxGoalData.goalBoolean));
             setOpen(false);
@@ -104,6 +110,25 @@ const GoalModal: React.FC<{
       setIsEdit(false);
       setOpen(false);
       setSelectGoalNum(null);
+    }
+  };
+
+  const onCompleteGoal = async () => {
+    const completeData = {
+      goalId: selectData?.goalId,
+    };
+    const confirm = window.confirm('목표를 완료하시겠습니까?');
+    if (confirm) {
+      const response = await handleCompleteGoal(completeData);
+      console.log(response);
+
+      // if (response.success === true) {
+      //   console.log(response);
+
+      // dispatch(setStateGoal(!reduxGoalData.goalBoolean));
+      // setOpen(false);
+      // setSelectGoalNum(null);
+      // }
     }
   };
   return (
@@ -157,7 +182,13 @@ const GoalModal: React.FC<{
             ></input>
           )}
         </section>
-        <section className="h-3/5 w-full pt-8 px-8 flex flex-col justify-between">
+        <section className="h-3/5 w-full pt-4 px-8 flex flex-col justify-between">
+          <button
+            onClick={() => onCompleteGoal()}
+            className="top-3 right-3 bg-green-400 text-white text-sm py-1 px-2 rounded-xl font-bold"
+          >
+            COMPLETE
+          </button>
           <div className="w-full h-2/3">
             <textarea
               className="h-full"

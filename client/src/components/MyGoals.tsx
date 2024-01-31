@@ -24,6 +24,11 @@ interface myGoalListTypes {
   startDate: string;
   endDate: string;
   shareCnt: number;
+  completeDate: string;
+  completed: boolean;
+  isShare: boolean;
+  joinMemberList: string[];
+  nickname: string;
 }
 const MyGoals: React.FC<{
   myGoalList: myGoalListTypes[];
@@ -36,6 +41,7 @@ const MyGoals: React.FC<{
   });
   const [more, setMore] = useState<boolean>(false);
   const containerRef = useRef<any>(null);
+  const [goalDoing, setGoalDoing] = useState('doing');
 
   const dispatch = useDispatch();
   const reduxGoalData = useSelector(selectRender);
@@ -124,32 +130,63 @@ const MyGoals: React.FC<{
       handleFetchGoalListAll(pageNumber);
     }
   };
+
   return (
     <div className="w-full h-[calc(100%-40px)] border-x border-b border-orange-300">
+      <div>
+        <input
+          type="radio"
+          id="doing"
+          name="goal"
+          value="doing"
+          checked={goalDoing === 'doing'}
+          onChange={() => setGoalDoing('doing')}
+        ></input>
+        <label className="text-black" htmlFor="doing">
+          진행 중
+        </label>
+        <input
+          type="radio"
+          id="done"
+          name="goal"
+          value="done"
+          checked={goalDoing === 'done'}
+          onChange={() => setGoalDoing('done')}
+        ></input>
+        <label className="text-black" htmlFor="done">
+          완료
+        </label>
+        <label></label>
+      </div>
       <ul
         className="w-full max-h-full flex flex-wrap pr-2 pl-4 py-6 overflow-y-scroll gap-2"
         ref={containerRef}
       >
         {myGoalList.map((list, index) => {
-          return (
-            <li
-              key={index}
-              className="w-[calc(33%-8px)] aspect-square bg-white relative flex items-center justify-center goal-element"
-              onClick={() => handleSelectGoalClick(index)}
-            >
-              <Image
-                src={list.imageUrl === null ? Image1 : list.imageUrl}
-                alt=""
-                fill
-                style={{
-                  objectFit: 'cover',
-                  position: 'absolute',
-                }}
-              ></Image>
-              <div className="w-full h-full bg-black opacity-50 absolute"></div>
-              <h3 className="text-white absolute">{list.title}</h3>
-            </li>
-          );
+          if (
+            (goalDoing === 'doing' && !list.completed) ||
+            (goalDoing === 'done' && list.completed)
+          ) {
+            return (
+              <li
+                key={index}
+                className="w-[calc(33%-8px)] aspect-square bg-white relative flex items-center justify-center goal-element"
+                onClick={() => handleSelectGoalClick(index)}
+              >
+                <Image
+                  src={list.imageUrl === null ? Image1 : list.imageUrl}
+                  alt=""
+                  fill
+                  style={{
+                    objectFit: 'cover',
+                    position: 'absolute',
+                  }}
+                ></Image>
+                <div className="w-full h-full bg-black opacity-50 absolute"></div>
+                <h3 className="text-white absolute">{list.title}</h3>
+              </li>
+            );
+          }
         })}
       </ul>
     </div>
