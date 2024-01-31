@@ -20,13 +20,19 @@ interface selectDataTypes {
   endDate: string;
   shareCnt: number;
   goalId: number;
+  completeDate: string | null;
+  completed: boolean;
+  isShare: boolean;
+  joinMemberList: string[];
+  nickname: string;
 }
 
 const GoalModal: React.FC<{
   setOpen: React.Dispatch<SetStateAction<boolean>>;
   selectData: selectDataTypes | null;
   setSelectGoalNum: React.Dispatch<SetStateAction<number | null>>;
-}> = ({ setOpen, selectData, setSelectGoalNum }) => {
+  goalDoing: string;
+}> = ({ setOpen, selectData, setSelectGoalNum, goalDoing }) => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState(selectData?.title);
   const [editDescription, setEditDescription] = useState(
@@ -80,14 +86,12 @@ const GoalModal: React.FC<{
     const deleteData = {
       goalId: selectData?.goalId,
     };
-    // console.log('호호호호호호호', deleteData);
     const confirm = window.confirm('목표를 삭제하시겠습니까?');
     if (confirm) {
       await handleDeleteGoal(deleteData)
         .then((response) => {
-          console.log(response);
           if (response.success === true) {
-            dispatch(setStateGoal(!reduxGoalData.goalBoolean));
+            dispatch(setStateGoal(true));
             setOpen(false);
             setSelectGoalNum(null);
           }
@@ -116,19 +120,21 @@ const GoalModal: React.FC<{
   const onCompleteGoal = async () => {
     const completeData = {
       goalId: selectData?.goalId,
+      completed: !selectData?.completed,
     };
-    const confirm = window.confirm('목표를 완료하시겠습니까?');
+
+    const confirm =
+      goalDoing === 'doing'
+        ? window.confirm('목표를 완료하시겠습니까?')
+        : window.confirm('목표 완료를 취소하시겠습니까?');
     if (confirm) {
       const response = await handleCompleteGoal(completeData);
-      console.log(response);
 
-      // if (response.success === true) {
-      //   console.log(response);
-
-      // dispatch(setStateGoal(!reduxGoalData.goalBoolean));
-      // setOpen(false);
-      // setSelectGoalNum(null);
-      // }
+      if (response.success === true) {
+        dispatch(setStateGoal(true));
+        setOpen(false);
+        setSelectGoalNum(null);
+      }
     }
   };
   return (
@@ -158,36 +164,39 @@ const GoalModal: React.FC<{
               )}
             </h2>
           </div>
-          {!isEdit ? (
-            <>
-              <FontAwesomeIcon
-                className="absolute text-white text-xs bottom-2 right-6"
-                onClick={() => setIsEdit(true)}
-                icon={faEdit}
-              />
+          {goalDoing === 'doing' &&
+            (!isEdit ? (
+              <>
+                <FontAwesomeIcon
+                  className="absolute text-white text-xs bottom-2 right-6"
+                  onClick={() => setIsEdit(true)}
+                  icon={faEdit}
+                />
 
-              <FontAwesomeIcon
-                className="absolute text-white text-xs bottom-2 right-2"
-                onClick={() => handleRemoveGoal()}
-                icon={faTrash}
-              />
-            </>
-          ) : (
-            <input
-              type="file"
-              className="absolute text-white text-xs bottom-2 right-2 w-[150px]"
-              onChange={(e) => {
-                setImageFile((e.target.files?.[0] as File) || null);
-              }}
-            ></input>
-          )}
+                <FontAwesomeIcon
+                  className="absolute text-white text-xs bottom-2 right-2"
+                  onClick={() => handleRemoveGoal()}
+                  icon={faTrash}
+                />
+              </>
+            ) : (
+              <input
+                type="file"
+                className="absolute text-white text-xs bottom-2 right-2 w-[150px]"
+                onChange={(e) => {
+                  setImageFile((e.target.files?.[0] as File) || null);
+                }}
+              ></input>
+            ))}
         </section>
         <section className="h-3/5 w-full pt-4 px-8 flex flex-col justify-between">
           <button
             onClick={() => onCompleteGoal()}
-            className="top-3 right-3 bg-green-400 text-white text-sm py-1 px-2 rounded-xl font-bold"
+            className={`top-3 right-3  text-white text-sm py-1 px-2 rounded-xl font-bold ${
+              goalDoing === 'doing' ? 'bg-green-400' : 'bg-red-400'
+            }`}
           >
-            COMPLETE
+            {goalDoing === 'doing' ? 'COMPLETE' : 'CANCEL'}
           </button>
           <div className="w-full h-2/3">
             <textarea

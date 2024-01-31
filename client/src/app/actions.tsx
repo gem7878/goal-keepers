@@ -104,11 +104,9 @@ export const handleDeleteGoal = async (deleteData: {
   goalId: number | undefined;
 }) => {
   const token = handleGetToken().token;
-  console.log('오오오오오옹!', deleteData);
 
   try {
     const response = await axios.delete(
-      // `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${deleteData.goalId}`,
       `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${deleteData.goalId}`,
       {
         headers: {
@@ -127,14 +125,14 @@ export const handleDeleteGoal = async (deleteData: {
 };
 export const handleCompleteGoal = async (completeData: {
   goalId: number | undefined;
+  completed: boolean;
 }) => {
   const token = handleGetToken().token;
-  console.log(token);
 
   try {
     const response = await axios.patch(
-      // `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal/completed?id=${completeData.goalId}`,
-      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal/completed?id=42`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal/completed?id=${completeData.goalId}`,
+      { completed: completeData.completed },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -142,11 +140,10 @@ export const handleCompleteGoal = async (completeData: {
         withCredentials: true,
       },
     );
-    // console.log(response);
 
-    // return response.data;
+    return response.data;
   } catch (error) {
-    // console.log('error', error);
+    console.log('error', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
     });

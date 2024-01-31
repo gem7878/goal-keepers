@@ -28,9 +28,15 @@ export default function Home() {
     endDate: string;
     shareCnt: number;
     goalId: number;
+    completeDate: string | null;
+    completed: boolean;
+    isShare: boolean;
+    joinMemberList: string[];
+    nickname: string;
   } | null>(null);
   const [myGoalList, setMyGoalList] = useState<any[]>([]);
   const containerEl = useRef<any>();
+  const [goalDoing, setGoalDoing] = useState<string>('doing');
 
   useEffect(() => {
     selectGoalNum !== null ? setOpen(true) : setOpen(false);
@@ -99,6 +105,8 @@ export default function Home() {
             myGoalList={myGoalList}
             setSelectGoalNum={setSelectGoalNum}
             setMyGoalList={setMyGoalList}
+            goalDoing={goalDoing}
+            setGoalDoing={setGoalDoing}
           ></MyGoals>
         ) : (
           <MyPosts
@@ -115,6 +123,7 @@ export default function Home() {
               setOpen={setOpen}
               selectData={selectData}
               setSelectGoalNum={setSelectGoalNum}
+              goalDoing={goalDoing}
             />,
             portalElement,
           )
