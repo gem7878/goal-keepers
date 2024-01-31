@@ -149,7 +149,7 @@ const Register = () => {
               render={({ field }) => (
                 <input
                   type="email"
-                  className="w-[calc(100%-52px)]"
+                  className="w-[calc(100%-72px)]"
                   {...field}
                   placeholder="이메일을 입력하세요"
                 ></input>
@@ -160,14 +160,14 @@ const Register = () => {
                 !isCheckingDuplicate.email && !errors?.email
                   ? 'text-orange-400'
                   : 'text-gray-400'
-              } text-sm text-center w-14`}
+              } text-sm text-center w-18`}
               type="button"
               onClick={() => handleConfirmDuplicationEmail()}
               disabled={
                 isCheckingDuplicate.email || errors?.email?.type === 'pattern'
               }
             >
-              중복확인
+              이메일 인증
             </button>
           </div>
         </li>

@@ -5,7 +5,6 @@ import {
   GoalModal,
   MyGoals,
   MyPosts,
-  PullToRefresh,
 } from '@/components/index.js';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -51,12 +50,12 @@ export default function Home() {
   const handleTab = (boolean: boolean) => {
     setIsMyGoals(boolean);
   };
+
   return (
     <div
       className="flex flex-col	w-full h-full items-center justify-center"
       ref={containerEl}
     >
-      <PullToRefresh el={containerEl} />
       <header className="w-full flex flex-col items-end mr-5 mb-6">
         <Link href={'/alarm'}>
           <FontAwesomeIcon icon={faBell} className="w-5 h-5 text-gray-500" />
