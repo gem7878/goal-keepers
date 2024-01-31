@@ -34,14 +34,21 @@ const MyGoals: React.FC<{
   myGoalList: myGoalListTypes[];
   setSelectGoalNum: React.Dispatch<SetStateAction<number | null>>;
   setMyGoalList: any;
-}> = ({ myGoalList, setSelectGoalNum, setMyGoalList }) => {
+  goalDoing: string;
+  setGoalDoing: React.Dispatch<SetStateAction<string>>;
+}> = ({
+  myGoalList,
+  setSelectGoalNum,
+  setMyGoalList,
+  goalDoing,
+  setGoalDoing,
+}) => {
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
   });
   const [more, setMore] = useState<boolean>(false);
   const containerRef = useRef<any>(null);
-  const [goalDoing, setGoalDoing] = useState('doing');
 
   const dispatch = useDispatch();
   const reduxGoalData = useSelector(selectRender);
@@ -133,33 +140,44 @@ const MyGoals: React.FC<{
 
   return (
     <div className="w-full h-[calc(100%-40px)] border-x border-b border-orange-300">
-      <div>
-        <input
-          type="radio"
-          id="doing"
-          name="goal"
-          value="doing"
-          checked={goalDoing === 'doing'}
-          onChange={() => setGoalDoing('doing')}
-        ></input>
-        <label className="text-black" htmlFor="doing">
-          진행 중
-        </label>
-        <input
-          type="radio"
-          id="done"
-          name="goal"
-          value="done"
-          checked={goalDoing === 'done'}
-          onChange={() => setGoalDoing('done')}
-        ></input>
-        <label className="text-black" htmlFor="done">
-          완료
-        </label>
-        <label></label>
+      <div className="flex gap-4 justify-end mt-2 mr-4">
+        <div className="flex items-center">
+          <input
+            type="radio"
+            id="doing"
+            name="goal"
+            value="doing"
+            checked={goalDoing === 'doing'}
+            onChange={() => setGoalDoing('doing')}
+            className="bg-white border-2 border-orange-300 appearance-none w-3.5 h-3.5	rounded-full checked:bg-orange-300"
+          ></input>
+          <label
+            className="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300"
+            htmlFor="doing"
+          >
+            진행 중
+          </label>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="radio"
+            id="done"
+            name="goal"
+            value="done"
+            checked={goalDoing === 'done'}
+            onChange={() => setGoalDoing('done')}
+            className="bg-white border-2 border-orange-300 appearance-none w-3.5 h-3.5	rounded-full checked:bg-orange-300"
+          ></input>
+          <label
+            className="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300"
+            htmlFor="done"
+          >
+            완료
+          </label>
+        </div>
       </div>
       <ul
-        className="w-full max-h-full flex flex-wrap pr-2 pl-4 py-6 overflow-y-scroll gap-2"
+        className="w-full max-h-full flex flex-wrap pr-2 pl-4 py-5 overflow-y-scroll gap-2"
         ref={containerRef}
       >
         {myGoalList.map((list, index) => {
