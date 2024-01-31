@@ -58,7 +58,7 @@ public class AuthService extends CommonService {
         return memberRepository.findByEmail(email);
     }
 
-    // 지울 예정
+    // 이메일 중복 확인
     public void confirmDuplicateEmail(String email) {
         Boolean isExistsEmail = memberRepository.existsByEmail(email);
         if (isExistsEmail) {
