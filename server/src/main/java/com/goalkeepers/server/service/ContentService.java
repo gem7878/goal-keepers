@@ -89,6 +89,10 @@ public class ContentService extends CommonService {
         return contentRepository.getPostContents(PageRequest.of(pageNumber - 1, 10), isPost(postRepository, postId));
     }
 
+    public Page<PostContentResponseDto> getCommunityContents(Long goalId, int pageNumber) {
+        return contentRepository.getCommunityContents(PageRequest.of(pageNumber - 1, 10), isGoal(goalRepository, goalId));
+    }
+
     public List<PostContent> getMyPostContentWithGoal(Goal goal) {
         return contentRepository.findAllByShareGoal(goal);
     }

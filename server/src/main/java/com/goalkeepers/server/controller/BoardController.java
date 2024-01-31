@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
@@ -51,19 +52,20 @@ public class BoardController {
     }
 
     /*
-     * 커뮤니티 최신순 가져오기
-     * 커뮤니티 인기순 가져오기
+     * 커뮤니티 가져오기
      */
 
-    @GetMapping("/community/new")
-    public ResponseEntity<CommonResponseDto> getAllNewGoal(@RequestParam(name = "page", required = true) int pageNumber) {
-        Page<CommunityResponseDto> response = boardService.getAllNewGoal(pageNumber);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
-    }
-
-    @GetMapping("/community/popular")
-    public ResponseEntity<CommonResponseDto> getAllPopularGoal(@RequestParam(name = "page", required = true) int pageNumber) {
-        Page<CommunityResponseDto> response = boardService.getAllPopularGoal(pageNumber);
+    @GetMapping("/community")
+    public ResponseEntity<CommonResponseDto> getAllNewGoal(@RequestParam(name = "page") int pageNumber,
+                                                        @RequestParam(name = "sort") SORT sort) {                                            
+        Page<CommunityResponseDto> response = null;
+        if(SORT.NEW.equals(sort)) {
+            response = boardService.getAllNewGoal(pageNumber);
+        } else if(SORT.POPULAR.equals(sort)) {
+            response = boardService.getAllPopularGoal(pageNumber);
+        } else {
+            throw new MethodArgumentTypeMismatchException(null, null, null, null, null);
+        }
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 

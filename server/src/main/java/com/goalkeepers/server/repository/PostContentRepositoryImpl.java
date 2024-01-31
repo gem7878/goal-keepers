@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.goalkeepers.server.common.CommonUtils;
-import com.goalkeepers.server.dto.CommunityResponseDto;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.entity.Goal;
@@ -207,16 +206,32 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         return new PageImpl<>(page, pageable, totalSize);
     }
     @Override
-    public Page<CommunityResponseDto> searchCommunity(Pageable pageable, String query, SORT sort) {
+    public Page<PostContentResponseDto> getCommunityContents(Pageable pageable, Goal goal) {
+        List<PostContent> contents = queryFactory
+                                    .selectFrom(postContent)
+                                    .where(postContent.shareGoal.eq(goal))
+                                    .orderBy(postContent.updatedAt.desc())
+                                    .offset(pageable.getOffset())
+                                    .limit(pageable.getPageSize())
+                                    .fetch();
         
-        List<CommunityResponseDto> page = null;
+        Member member = CommonUtils.MemberOrNull(memberRepository);
+        List<PostContentResponseDto> page = contents
+            .stream()
+            .map(content -> PostContentResponseDto.of(
+                            content, 
+                            content.getPost().getGoal(), 
+                            content.getMember().getNickname(), 
+                            CommonUtils.isLikeContent(content, member, likeRepository), 
+                            null))
+            .collect(Collectors.toList());
 
         int totalSize = queryFactory
                         .selectFrom(postContent)
-                        .where(postContent.post.eq(post))
+                        .where(postContent.shareGoal.eq(goal))
                         .fetch()
                         .size();
-        
+
         return new PageImpl<>(page, pageable, totalSize);
     }
 }
