@@ -138,7 +138,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
                                                 .where(postContent.shareGoal.eq(goal))
-                                                .orderBy(postContent.updatedAt.desc())
+                                                .orderBy(postContent.createdAt.desc())
                                                 .offset(contentPageable.getOffset())
                                                 .limit(contentPageable.getPageSize())
                                                 .fetch();
@@ -171,7 +171,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
 		List<Tuple> popularGoalAndCountList = queryFactory
                             .select(postContent.shareGoal, postContent.count())
                             .from(postContent)
-                            .where(postContent.updatedAt.after(sixHoursAgo))
+                            .where(postContent.createdAt.after(sixHoursAgo))
                             .groupBy(postContent.shareGoal)
                             .orderBy(postContent.count().desc())
                             .fetch();
@@ -191,7 +191,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
                                                 .where(postContent.shareGoal.eq(goal))
-                                                .orderBy(postContent.updatedAt.desc())
+                                                .orderBy(postContent.createdAt.desc())
                                                 .offset(contentPageable.getOffset())
                                                 .limit(contentPageable.getPageSize())
                                                 .fetch();
@@ -244,7 +244,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                             JPAExpressions
                                     .select(postContent.shareGoal.id)
                                     .from(postContent)
-                                    .where(postContent.updatedAt.after(LocalDateTime.now().minusHours(6))
+                                    .where(postContent.createdAt.after(LocalDateTime.now().minusHours(6))
                                         .and(postContent.content.contains(query)
                                             .or(postContent.shareGoal.title.contains(query)
                                             .or(postContent.shareGoal.description.contains(query)))))
@@ -267,7 +267,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
                                                 .where(postContent.shareGoal.eq(goal))
-                                                .orderBy(postContent.updatedAt.desc())
+                                                .orderBy(postContent.createdAt.desc())
                                                 .offset(contentPageable.getOffset())
                                                 .limit(contentPageable.getPageSize())
                                                 .fetch();

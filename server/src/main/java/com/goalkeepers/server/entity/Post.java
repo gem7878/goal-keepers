@@ -41,9 +41,6 @@ public class Post {
     private Goal goal;
 
     @ColumnDefault("0")
-    private int likeCnt;
-
-    @ColumnDefault("0")
     private int cheerCnt;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

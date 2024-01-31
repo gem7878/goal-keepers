@@ -7,7 +7,6 @@ import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository

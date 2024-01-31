@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class PostContentResponseDto {
     private String nickname; // Member
     private String content; // PostContent
-    private LocalDateTime updatedAt; // PostContent
+    private LocalDateTime createdAt; // PostContent
     private int likeCnt; // PostContent
     private boolean isLike; // PostContent, Member
     private Long goalId; // Goal : share goal id
@@ -31,7 +31,7 @@ public class PostContentResponseDto {
         return PostContentResponseDto.builder()
             .nickname(nickname)
             .content(postContent.getContent())
-            .updatedAt(postContent.getUpdatedAt())
+            .createdAt(postContent.getCreatedAt())
             .likeCnt(postContent.getLikeCnt())
             .isLike(isLike)
             .goalId(isGoal ? goal.getId() : null)

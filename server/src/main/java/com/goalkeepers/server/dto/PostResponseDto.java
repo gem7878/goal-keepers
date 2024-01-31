@@ -1,8 +1,5 @@
 package com.goalkeepers.server.dto;
 
-import java.util.List;
-import java.util.Map;
-
 import com.goalkeepers.server.entity.Goal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

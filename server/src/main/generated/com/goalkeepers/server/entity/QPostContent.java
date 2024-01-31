@@ -38,8 +38,6 @@ public class QPostContent extends EntityPathBase<PostContent> {
 
     public final QGoal shareGoal;
 
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
-
     public QPostContent(String variable) {
         this(PostContent.class, forVariable(variable), INITS);
     }

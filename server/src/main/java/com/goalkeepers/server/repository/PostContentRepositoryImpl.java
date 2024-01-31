@@ -43,8 +43,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
         List<PostContent> contents = queryFactory
                                     .selectFrom(postContent)
-                                    .orderBy(isNewSort ? postContent.updatedAt.desc() : postContent.likeCnt.desc())
-                                    .orderBy(isNewSort ? postContent.likeCnt.desc() : postContent.updatedAt.desc())
+                                    .orderBy(isNewSort ? postContent.createdAt.desc() : postContent.likeCnt.desc())
+                                    .orderBy(isNewSort ? postContent.likeCnt.desc() : postContent.createdAt.desc())
                                     .offset(pageable.getOffset())
                                     .limit(pageable.getPageSize())
                                     .fetch();
@@ -122,7 +122,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         List<PostContent> contents = queryFactory
                                     .selectFrom(postContent)
                                     .where(postContent.post.eq(post))
-                                    .orderBy(postContent.updatedAt.desc())
+                                    .orderBy(postContent.createdAt.desc())
                                     .offset(pageable.getOffset())
                                     .limit(pageable.getPageSize())
                                     .fetch();
@@ -210,7 +210,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         List<PostContent> contents = queryFactory
                                     .selectFrom(postContent)
                                     .where(postContent.shareGoal.eq(goal))
-                                    .orderBy(postContent.updatedAt.desc())
+                                    .orderBy(postContent.createdAt.desc())
                                     .offset(pageable.getOffset())
                                     .limit(pageable.getPageSize())
                                     .fetch();

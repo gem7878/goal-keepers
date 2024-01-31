@@ -2,7 +2,6 @@ package com.goalkeepers.server.entity;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import com.goalkeepers.server.dto.PostContentUpdateRequestDto;
 
@@ -47,9 +46,6 @@ public class PostContent {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
-    
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
     @ColumnDefault("0")
     private int likeCnt;

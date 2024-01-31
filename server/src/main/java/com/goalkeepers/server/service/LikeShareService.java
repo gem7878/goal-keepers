@@ -119,7 +119,7 @@ public class LikeShareService extends CommonService {
                 copyImageName = firebaseStorageService.copyAndRenameFile(originImageUrl, "images");
             }
             LocalDate startDate = LocalDate.now();
-            Goal newGoal = goalRepository.save(new Goal(
+            goalRepository.save(new Goal(
                                 share,
                                 goal.getTitle(),
                                 goal.getDescription(),

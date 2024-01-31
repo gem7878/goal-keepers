@@ -34,8 +34,6 @@ public class QPost extends EntityPathBase<Post> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final NumberPath<Integer> likeCnt = createNumber("likeCnt", Integer.class);
-
     public QPost(String variable) {
         this(Post.class, forVariable(variable), INITS);
     }
