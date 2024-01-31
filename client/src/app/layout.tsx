@@ -39,11 +39,20 @@ function RootLayout({ children }: { children: React.ReactNode }) {
     fetchData();
   }, [pathname]);
 
+  useEffect(() => {
+    setScreenSize();
+  }, []);
+
+  function setScreenSize() {
+    const wrapElement: any = document.querySelector('.wrap');
+    wrapElement.style.height = window.innerHeight + 'px';
+  }
+
   return (
     <Provider store={store}>
       <html lang="en">
-        <body className={inter.className}>
-          <main className="h-[calc(100vh-56px)] w-screen flex flex-col	items-center justify-center">
+        <body className={`${inter.className} wrap`}>
+          <main className="h-[calc(100%-56px)] w-screen flex flex-col	items-center justify-center">
             {children}
           </main>
           {loginPath.includes(pathname) || <Navbar></Navbar>}
