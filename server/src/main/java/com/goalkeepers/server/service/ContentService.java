@@ -77,8 +77,8 @@ public class ContentService extends CommonService {
         return contentRepository.getAllContentAndGoal(PageRequest.of(pageNumber - 1, 20), sort);
     }
 
-    public Page<PostResponseDto> getMyAllPost(int pageNumber, SORT sort) {
-        return contentRepository.getMyAllContentAndGoal(PageRequest.of(pageNumber - 1, 20), isMemberCurrent(memberRepository), sort);
+    public Page<PostResponseDto> getMyAllPost(int pageNumber) {
+        return contentRepository.getMyAllContentAndGoal(PageRequest.of(pageNumber - 1, 20), isMemberCurrent(memberRepository));
     }
 
     /*

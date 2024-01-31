@@ -73,9 +73,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         return new PageImpl<>(page, pageable, totalSize);
     }
     @Override
-    public Page<PostResponseDto> getMyAllContentAndGoal(Pageable pageable, Member member, SORT sort) {
-
-        // boolean isNewSort = SORT.NEW.equals(sort); // LIKE OR NEW
+    public Page<PostResponseDto> getMyAllContentAndGoal(Pageable pageable, Member member) {
 
         List<Tuple> tuples = queryFactory
                         .select(postContent.post, postContent.id.max())

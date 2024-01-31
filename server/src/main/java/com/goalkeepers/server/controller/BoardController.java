@@ -49,9 +49,8 @@ public class BoardController {
     }
 
     @GetMapping("/post/all/me")
-    public ResponseEntity<CommonResponseDto> getMyAllPost(@RequestParam(name = "page") int pageNumber,
-                                                        @RequestParam(name = "sort") SORT sort) {
-        Page<PostResponseDto> response = contentService.getMyAllPost(pageNumber, sort);
+    public ResponseEntity<CommonResponseDto> getMyAllPost(@RequestParam(name = "page") int pageNumber) {
+        Page<PostResponseDto> response = contentService.getMyAllPost(pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 

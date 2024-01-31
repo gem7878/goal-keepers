@@ -12,7 +12,7 @@ import com.goalkeepers.server.entity.SORT;
 
 public interface PostContentRepositoryCustom {
     Page<PostResponseDto> getAllContentAndGoal(Pageable pageable, SORT sort);
-    Page<PostResponseDto> getMyAllContentAndGoal(Pageable pageable, Member member, SORT sort);
+    Page<PostResponseDto> getMyAllContentAndGoal(Pageable pageable, Member member);
     Page<PostContentResponseDto> getPostContents(Pageable pageable, Post post);
     Page<PostContentResponseDto> getCommunityContents(Pageable pageable, Goal goal);
     Page<PostResponseDto> searchPost(Pageable pageable, String query, SORT sort);
