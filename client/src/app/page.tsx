@@ -53,6 +53,17 @@ export default function Home() {
     setPortalElement(document.getElementById('portal'));
   }, [isOpen]);
 
+  // useEffect(() => {
+  //   // date 키값을 string에서 Date로 변환
+  //   const updatedList = myGoalList.map((item) => ({
+  //     ...item,
+  //     completeDate: new Date(item.completeDate),
+  //   }));
+
+  //   // 상태 업데이트
+  //   setMyGoalList(updatedList);
+  // }, []);
+
   const handleTab = (boolean: boolean) => {
     setIsMyGoals(boolean);
   };
