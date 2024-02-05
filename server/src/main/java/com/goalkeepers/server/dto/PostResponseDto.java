@@ -1,6 +1,8 @@
 package com.goalkeepers.server.dto;
 
 import com.goalkeepers.server.entity.Goal;
+import com.goalkeepers.server.entity.Post;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PostResponseDto {
     private Long postId;
+    private int postCheerCnt;
 	private Long goalId;
     private String goalTitle;
     private String goalDescription;
@@ -20,13 +23,14 @@ public class PostResponseDto {
     private boolean isShare;
     private PostContentResponseDto content;
     
-    public static PostResponseDto of(Long postId, Goal goal, 
+    public static PostResponseDto of(Post post, Goal goal, 
                             String goalImageUrl, 
                             boolean isShare, 
                             PostContentResponseDto content) {
 
         return PostResponseDto.builder()
-            .postId(postId)
+            .postId(post.getId())
+            .postCheerCnt(post.getCheerCnt())
             .goalId(goal.getId())
             .goalTitle(goal.getTitle())
             .goalDescription(goal.getDescription())
