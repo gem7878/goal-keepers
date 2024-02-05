@@ -39,36 +39,79 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
     @Override
     public Page<PostResponseDto> getAllContentAndGoal(Pageable pageable, SORT sort) {
 
-        boolean isNewSort = SORT.NEW.equals(sort); // LIKE OR NEW
-
-        List<PostContent> contents = queryFactory
-                                    .selectFrom(postContent)
-                                    .orderBy(isNewSort ? postContent.createdAt.desc() : postContent.likeCnt.desc())
-                                    .orderBy(isNewSort ? postContent.likeCnt.desc() : postContent.createdAt.desc())
-                                    .offset(pageable.getOffset())
-                                    .limit(pageable.getPageSize())
-                                    .fetch();
+        boolean isPopularSort = SORT.POPULAR.equals(sort);
         
-        List<PostResponseDto> page = contents
-            .stream()
-            .map(content -> {
-                Member member = CommonUtils.MemberOrNull(memberRepository);
-                Goal goal = content.getPost().getGoal();
-                PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
-                                                            content,
-                                                            null, 
-                                                            content.getMember().getNickname(), 
-                                                            CommonUtils.isLikeContent(content, member, likeRepository), 
-                                                            null);
-                String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                return PostResponseDto.of(content.getPost().getId(), goal, imageUrl, isShare, contentResponseDto);
-            }).collect(Collectors.toList());
+        List<PostResponseDto> page = null;
+        int totalSize = 0;
 
-        int totalSize = queryFactory
-                        .selectFrom(postContent)
+        if(isPopularSort) {
+            List<Post> posts = queryFactory
+                                .selectFrom(post)
+                                .orderBy(post.cheerCnt.desc(), post.id.desc())
+                                .offset(pageable.getOffset())
+                                .limit(pageable.getPageSize())
+                                .fetch();
+
+            page = posts
+                .stream()
+                .map(post -> {
+                    Member member = CommonUtils.MemberOrNull(memberRepository);
+                    Goal goal = post.getGoal();
+                    PostContent content = queryFactory
+                                            .selectFrom(postContent)
+                                            .where(postContent.post.eq(post))
+                                            .orderBy(postContent.createdAt.desc())
+                                            .limit(1)
+                                            .fetchOne();
+
+                    String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
+                    boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
+                    PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
+                                                                content, 
+                                                                null, 
+                                                                member.getNickname(), 
+                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                null);
+                                                                
+                    return PostResponseDto.of(post, goal, imageUrl, isShare, contentResponseDto);
+                }).collect(Collectors.toList());
+
+            totalSize = queryFactory
+                        .selectFrom(post)
                         .fetch()
                         .size();
+        } else {
+            boolean isNewSort = SORT.NEW.equals(sort); // LIKE OR NEW
+
+            List<PostContent> contents = queryFactory
+                                        .selectFrom(postContent)
+                                        .orderBy(isNewSort ? postContent.createdAt.desc() : postContent.likeCnt.desc())
+                                        .orderBy(isNewSort ? postContent.likeCnt.desc() : postContent.createdAt.desc())
+                                        .offset(pageable.getOffset())
+                                        .limit(pageable.getPageSize())
+                                        .fetch();
+            
+            page = contents
+                .stream()
+                .map(content -> {
+                    Member member = CommonUtils.MemberOrNull(memberRepository);
+                    Goal goal = content.getPost().getGoal();
+                    PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
+                                                                content,
+                                                                null, 
+                                                                content.getMember().getNickname(), 
+                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                null);
+                    String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
+                    boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
+                    return PostResponseDto.of(content.getPost(), goal, imageUrl, isShare, contentResponseDto);
+                }).collect(Collectors.toList());
+
+            totalSize = queryFactory
+                            .selectFrom(postContent)
+                            .fetch()
+                            .size();
+        }
         
         return new PageImpl<>(page, pageable, totalSize);
     }
@@ -104,7 +147,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                                             CommonUtils.isLikeContent(content, member, likeRepository), 
                                                             null);
 
-                return PostResponseDto.of(post.getId(), goal, imageUrl, false, contentResponseDto);
+                return PostResponseDto.of(post, goal, imageUrl, false, contentResponseDto);
             }).collect(Collectors.toList());
 
         int totalSize = queryFactory
@@ -185,9 +228,13 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                                             content.getMember().getNickname(), 
                                                             CommonUtils.isLikeContent(content, member, likeRepository), 
                                                             null);
+                Post onePost = queryFactory
+                            .selectFrom(post)
+                            .where(post.id.eq(tuple.get(post.id)))
+                            .fetchFirst();
 
                 return PostResponseDto.of(
-                    tuple.get(post.id), 
+                    onePost, 
                     oneGoal, 
                     CommonUtils.getImageUrl(oneGoal, firebaseStorageService), 
                     CommonUtils.isShareGoal(oneGoal, member, shareRepository), 
