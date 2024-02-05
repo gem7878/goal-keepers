@@ -39,12 +39,12 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
     @Override
     public Page<PostResponseDto> getAllContentAndGoal(Pageable pageable, SORT sort) {
 
-        boolean isPopularSort = SORT.POPULAR.equals(sort);
+        boolean isCheerSort = SORT.CHEER.equals(sort);
         
         List<PostResponseDto> page = null;
         int totalSize = 0;
 
-        if(isPopularSort) {
+        if(isCheerSort) {
             List<Post> posts = queryFactory
                                 .selectFrom(post)
                                 .orderBy(post.cheerCnt.desc(), post.id.desc())

@@ -1,5 +1,5 @@
 package com.goalkeepers.server.entity;
 
 public enum SORT {
-    NEW, LIKE, POPULAR
+    NEW, LIKE, POPULAR, CHEER
 }
