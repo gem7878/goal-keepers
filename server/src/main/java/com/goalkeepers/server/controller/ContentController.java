@@ -51,6 +51,7 @@ public class ContentController {
 
     /*
      * 포스트의 모든 컨텐트 가져오기
+     * 커뮤니티 골의 모든 컨텐트 가져오기
      */
     
     @GetMapping("/post/contents")

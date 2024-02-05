@@ -10,6 +10,8 @@ import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostComment;
+import com.goalkeepers.server.entity.TYPE;
+import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.CommentRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostRepository;
@@ -24,7 +26,7 @@ public class CommentService extends CommonService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-
+    private final NotificationService notificationService;
     /*
      *  게시글 상세보기 (전체 댓글 보기)
         댓글 쓰기
@@ -43,8 +45,11 @@ public class CommentService extends CommonService {
         Member member = isMemberCurrent(memberRepository);
         Post post = isPost(postRepository, postId);
         
-        PostComment comment = requestDto.toComment(member, post);
-        return CommentResponseDto.of(commentRepository.save(comment), true); 
+        PostComment comment = commentRepository.save(requestDto.toComment(member, post));
+        
+        Member receiver = memberRepository.findById(post.getGoal().getMember().getId()).orElseThrow(() -> new CustomException("post.getGoal.getMember.getId를 찾지 못하였습니다."));
+        notificationService.send(receiver, TYPE.COMMENT, member.getNickname() + "님이 댓글을 작성하였습니다.", comment.getId());
+        return CommentResponseDto.of(comment, true); 
     }
 
     public CommentResponseDto updateMyComment(CommentRequestDto requestDto, Long commentId) {
