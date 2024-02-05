@@ -12,4 +12,5 @@ import com.goalkeepers.server.entity.PostCheer;
 @Repository
 public interface PostCheerRepository extends JpaRepository<PostCheer, Long>{
     Optional<PostCheer> findByMemberAndPost(Member member, Post post);
+    boolean existsByMemberAndPost(Member member, Post post);
 }
