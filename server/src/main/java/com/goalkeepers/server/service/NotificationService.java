@@ -18,7 +18,9 @@ import com.goalkeepers.server.repository.EmitterRepository;
 import com.goalkeepers.server.repository.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class NotificationService {
@@ -61,8 +63,9 @@ public class NotificationService {
                                     .name("sse")
                                     .data(data));
         } catch (IOException e) {
-            emitterRepository.deleteById(emitterId);
-            throw new RuntimeException("연결 오류");
+            // emitterRepository.deleteById(emitterId);
+            // throw new RuntimeException("연결 오류");
+            log.error("SSE 연결 닫힘: " + emitterId , e.getCause());
         }
     }
 
