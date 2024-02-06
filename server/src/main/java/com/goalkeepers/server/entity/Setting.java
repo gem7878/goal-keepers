@@ -1,6 +1,9 @@
 package com.goalkeepers.server.entity;
 
-import jakarta.persistence.CascadeType;
+import java.util.Objects;
+
+import com.goalkeepers.server.dto.SettingUpdateRequestDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +31,7 @@ public class Setting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "setting", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     @NotNull
     private Member member;
@@ -50,5 +53,28 @@ public class Setting {
 
     // @Column(columnDefinition = "boolean default true")
     // private boolean todayAlarm;
+
+    public Setting(Member member) {
+        this.member = member;
+    }
+
+    public static Setting settingUpdate(Setting setting, SettingUpdateRequestDto requestDto) {
+        if(Objects.isNull(requestDto)) {
+            return setting;
+        }
+        if (setting.isCommentAlarm() != requestDto.isCommentAlarm()) {
+            setting.commentAlarm = requestDto.isCommentAlarm();
+        }
+        if (setting.isContentLikeAlarm() != requestDto.isContentLikeAlarm()) {
+            setting.contentLikeAlarm = requestDto.isContentLikeAlarm();
+        }
+        if (setting.isGoalShareAlarm() != requestDto.isGoalShareAlarm()) {
+            setting.goalShareAlarm = requestDto.isGoalShareAlarm();
+        }
+        if (setting.isPostCheerAlarm() != requestDto.isPostCheerAlarm()) {
+            setting.postCheerAlarm = requestDto.isPostCheerAlarm();
+        }
+        return setting;
+    }
 
 }
