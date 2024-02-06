@@ -10,9 +10,11 @@ import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+import com.goalkeepers.server.repository.PostCheerRepository;
 import com.goalkeepers.server.repository.PostLikeRepository;
 import com.goalkeepers.server.service.FirebaseStorageService;
 
@@ -62,5 +64,14 @@ public class CommonUtils {
             }
         }
         return joinMemberList;
+    }
+
+    // 응원해요 했는지
+    public static boolean isCheerPost(Post post, Member member, PostCheerRepository cheerRepository) {
+        boolean isCheer = false;
+        if(Objects.nonNull(member)) {
+            isCheer = cheerRepository.existsByMemberAndPost(member, post);
+        }
+        return isCheer;
     }
 }

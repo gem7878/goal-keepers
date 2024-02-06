@@ -35,6 +35,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
     private final GoalShareRepository shareRepository;
     private final MemberRepository memberRepository;
     private final PostLikeRepository likeRepository;
+    private final PostCheerRepository cheerRepository;
 
     @Override
     public Page<PostResponseDto> getAllContentAndGoal(Pageable pageable, SORT sort) {
@@ -66,6 +67,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
                     String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
                     boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
+                    boolean isCheer = CommonUtils.isCheerPost(post, member, cheerRepository);
                     PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
                                                                 content, 
                                                                 null, 
@@ -73,7 +75,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                                                 CommonUtils.isLikeContent(content, member, likeRepository), 
                                                                 null);
                                                                 
-                    return PostResponseDto.of(post, goal, imageUrl, isShare, contentResponseDto);
+                    return PostResponseDto.of(post, isCheer, goal, imageUrl, isShare, contentResponseDto);
                 }).collect(Collectors.toList());
 
             totalSize = queryFactory
@@ -104,7 +106,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                                                 null);
                     String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
                     boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                    return PostResponseDto.of(content.getPost(), goal, imageUrl, isShare, contentResponseDto);
+                    boolean isCheer = CommonUtils.isCheerPost(content.getPost(), member, cheerRepository);
+                    return PostResponseDto.of(content.getPost(), isCheer, goal, imageUrl, isShare, contentResponseDto);
                 }).collect(Collectors.toList());
 
             totalSize = queryFactory
@@ -146,8 +149,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                                             content.getMember().getNickname(), 
                                                             CommonUtils.isLikeContent(content, member, likeRepository), 
                                                             null);
-
-                return PostResponseDto.of(post, goal, imageUrl, false, contentResponseDto);
+                boolean isCheer = CommonUtils.isCheerPost(post, member, cheerRepository);
+                return PostResponseDto.of(post, isCheer, goal, imageUrl, false, contentResponseDto);
             }).collect(Collectors.toList());
 
         int totalSize = queryFactory
@@ -234,7 +237,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                             .fetchFirst();
 
                 return PostResponseDto.of(
-                    onePost, 
+                    onePost,
+                    CommonUtils.isCheerPost(onePost, member, cheerRepository),
                     oneGoal, 
                     CommonUtils.getImageUrl(oneGoal, firebaseStorageService), 
                     CommonUtils.isShareGoal(oneGoal, member, shareRepository), 
