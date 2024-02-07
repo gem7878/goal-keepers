@@ -22,11 +22,13 @@ public class QNotification extends EntityPathBase<Notification> {
 
     public static final QNotification notification = new QNotification("notification");
 
+    public final NumberPath<Long> commentId = createNumber("commentId", Long.class);
+
+    public final QMember giver;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final BooleanPath isRead = createBoolean("isRead");
-
-    public final StringPath message = createString("message");
 
     public final QMember receiver;
 
@@ -52,6 +54,7 @@ public class QNotification extends EntityPathBase<Notification> {
 
     public QNotification(Class<? extends Notification> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.giver = inits.isInitialized("giver") ? new QMember(forProperty("giver"), inits.get("giver")) : null;
         this.receiver = inits.isInitialized("receiver") ? new QMember(forProperty("receiver"), inits.get("receiver")) : null;
     }
 

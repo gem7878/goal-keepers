@@ -41,20 +41,23 @@ public class CommentService extends CommonService {
                     pageNumber - 1, 20), postId);
     }
 
-    public CommentResponseDto createMyComment(CommentRequestDto requestDto, Long postId) {
+    public Long createMyComment(CommentRequestDto requestDto, Long postId) {
         Member member = isMemberCurrent(memberRepository);
         Post post = isPost(postRepository, postId);
         
         PostComment comment = commentRepository.save(requestDto.toComment(member, post));
         
+        // 알림 보내기
         Member receiver = memberRepository.findById(post.getGoal().getMember().getId()).orElseThrow(() -> new CustomException("post.getGoal.getMember.getId를 찾지 못하였습니다."));
-        notificationService.send(receiver, TYPE.COMMENT, member.getNickname() + "님이 댓글을 작성하였습니다.", comment.getId());
-        return CommentResponseDto.of(comment, true); 
+        if(!member.equals(receiver)) {
+            notificationService.send(receiver, member, TYPE.COMMENT, post.getId(), post.getGoal().getTitle(), comment.getId());
+        }
+        return comment.getId();
     }
 
-    public CommentResponseDto updateMyComment(CommentRequestDto requestDto, Long commentId) {
+    public void updateMyComment(CommentRequestDto requestDto, Long commentId) {
         PostComment comment = isMyComment(memberRepository, commentRepository, commentId);
-        return CommentResponseDto.of(PostComment.commentUpdate(comment, requestDto), true);
+        PostComment.commentUpdate(comment, requestDto);
     }
 
     public void deleteMyComment(Long commentId) {

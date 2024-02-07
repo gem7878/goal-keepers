@@ -108,14 +108,14 @@ public class BoardController {
 
     @PostMapping("/comment")
     public ResponseEntity<CommonResponseDto> createMyComment(@RequestParam(name = "post-id") Long postId, @Valid @RequestBody CommentRequestDto requestDto) {
-        CommentResponseDto response = commentService.createMyComment(requestDto, postId);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
+        Long commentId = commentService.createMyComment(requestDto, postId);
+        return ResponseEntity.ok(new CommonResponseDto(true, commentId + " 댓글을 생성하였습니다."));
     }
 
     @PutMapping("/comment")
     public ResponseEntity<CommonResponseDto> updateMyComment(@RequestParam(name = "comment-id") Long commentId, @Valid @RequestBody CommentRequestDto requestDto) {
-        CommentResponseDto response = commentService.updateMyComment(requestDto, commentId);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
+        commentService.updateMyComment(requestDto, commentId);
+        return ResponseEntity.ok(new CommonResponseDto(true, commentId + " 댓글을 수정하였습니다."));
     }
 
     @DeleteMapping("/comment")

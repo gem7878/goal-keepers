@@ -16,18 +16,23 @@ import lombok.Setter;
 @Builder
 public class NotificationResponseDto {
     private Long notificationId;
-    private Long memberId;
+    private Long receiverId;
+    private Long giverId;
     private TYPE type;
-    private String message;
     private Long targetId;
+    private String targetTitle;
+    private Long commentId;
+    
 
-    public static NotificationResponseDto of(Notification notification) {
+    public static NotificationResponseDto of(Notification notification, String title, Long commentId) {
         return NotificationResponseDto.builder()
                     .notificationId(notification.getId())
-                    .memberId(notification.getReceiver().getId())
+                    .receiverId(notification.getReceiver().getId())
+                    .giverId(notification.getGiver().getId())
                     .type(notification.getType())
-                    .message(notification.getMessage())
                     .targetId(notification.getTargetId())
+                    .targetTitle(title)
+                    .commentId(commentId)
                     .build();
     }
 }

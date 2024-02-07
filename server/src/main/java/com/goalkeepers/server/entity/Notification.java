@@ -31,22 +31,27 @@ public class Notification {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "receiver_id")
     private Member receiver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "giver_id")
+    private Member giver;
 
     private TYPE type;
 
-    private String message;
-
     private Long targetId;
+
+    private Long commentId;
 
     @Column(columnDefinition = "boolean default false")
     private Boolean isRead;
 
-    public Notification(Member member, TYPE type, String message, Long targetId) {
-        this.receiver = member;
+    public Notification(Member receiver, Member giver, TYPE type, Long targetId, Long commentId) {
+        this.receiver = receiver;
+        this.giver = giver;
         this.type = type;
-        this.message = message;
         this.targetId = targetId;
+        this.commentId = commentId;
     }
 }

@@ -47,10 +47,12 @@ public class NotificationService {
         sendToClient(emitter, eventId, emitterId, "EventStream Created. [memberId=" + memberId + "]");
 
         if(!lastEventId.isEmpty()) {
+            System.out.println("!lastEventId.isEmpty()");
             Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
+            System.out.println(events);
             events.entrySet().stream()
                     .filter((entry) -> lastEventId.compareTo(entry.getKey()) < 0)
-                    .forEach((entry) -> sendToClient(emitter, entry.getKey(), emitterId, entry.getValue()));
+                    .forEachOrdered((entry) -> sendToClient(emitter, entry.getKey(), emitterId, entry.getValue()));
         }
 
         return emitter;
@@ -58,28 +60,33 @@ public class NotificationService {
 
     private void sendToClient(SseEmitter emitter, String eventId, String emitterId, Object data) {
         try {
+            System.out.println(eventId);
             emitter.send(SseEmitter.event()
                                     .id(eventId)
                                     .name("sse")
                                     .data(data));
         } catch (IOException e) {
-            // emitterRepository.deleteById(emitterId);
-            // throw new RuntimeException("연결 오류");
-            log.error("SSE 연결 닫힘: " + emitterId , e.getCause());
+            log.error("SSE 연결 닫힘: " + emitterId + " / " + eventId);
+        } catch (IllegalStateException e) {
+            log.error("IllegalStateException");
         }
     }
 
-    public void send(Member member, TYPE type, String message, Long targetId) {
-        Notification notification = notificationRepository.save(new Notification(member, type, message, targetId));
+    public void send(Member receiver, Member giver, TYPE type, Long targetId, String targetTitle, Long commentId) {
+        Notification notification = notificationRepository.findByReceiverAndGiverAndTypeAndTargetIdAndCommentId(receiver, giver, type, targetId, commentId)
+                                        .orElseGet(() -> {
+                                            return notificationRepository.save(new Notification(receiver, giver, type, targetId, commentId));
+                                        });
         
-        String receiverId = String.valueOf(member.getId());
+        String receiverId = String.valueOf(receiver.getId());
         String eventId = receiverId + "_" + System.currentTimeMillis();
 
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithByMemberId(receiverId);
         sseEmitters.forEach(
             (key, emitter) -> {
-                emitterRepository.saveEventCache(key, notification);
-                sendToClient(emitter, eventId, key, NotificationResponseDto.of(notification));
+                NotificationResponseDto notificationResponseDto = NotificationResponseDto.of(notification, targetTitle, commentId);
+                emitterRepository.saveEventCache(eventId, notificationResponseDto);
+                sendToClient(emitter, eventId, key, notificationResponseDto);
             }
         );
     }
