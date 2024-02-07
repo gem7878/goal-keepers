@@ -29,7 +29,7 @@ public class QNotification extends EntityPathBase<Notification> {
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final BooleanPath isRead = createBoolean("isRead");
-
+    
     public final StringPath message = createString("message");
 
     public final QMember receiver;
