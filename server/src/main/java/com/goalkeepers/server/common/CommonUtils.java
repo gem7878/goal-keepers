@@ -32,6 +32,9 @@ public class CommonUtils {
     // 담기했는지
     public static boolean isShareGoal(Goal goal, Member member, GoalShareRepository shareRepository) {
         boolean isShare = false;
+        if(Objects.nonNull(goal.getShare())) {
+            goal = goal.getShare().getGoal();
+        }
         if(Objects.nonNull(member)) {
             isShare = shareRepository.existsByMemberAndGoal(member, goal);
         }
@@ -73,5 +76,9 @@ public class CommonUtils {
             isCheer = cheerRepository.existsByMemberAndPost(member, post);
         }
         return isCheer;
+    }
+
+    public static int getOriginalGoalShareCnt(Goal goal) {
+        return Objects.nonNull(goal.getShare()) ? goal.getShare().getGoal().getShareCnt() : goal.getShareCnt();
     }
 }

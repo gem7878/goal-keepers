@@ -68,6 +68,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                     String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
                     boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
                     boolean isCheer = CommonUtils.isCheerPost(post, member, cheerRepository);
+                    boolean isMyPost = goal.getMember().equals(member);
+                    int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(goal);
                     PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
                                                                 content, 
                                                                 null, 
@@ -75,7 +77,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                                                 CommonUtils.isLikeContent(content, member, likeRepository), 
                                                                 null);
                                                                 
-                    return PostResponseDto.of(post, isCheer, goal, imageUrl, isShare, contentResponseDto);
+                    return PostResponseDto.of(post, member, isCheer, isMyPost, goal, imageUrl, isShare, goalShareCnt, contentResponseDto);
                 }).collect(Collectors.toList());
 
             totalSize = queryFactory
@@ -107,7 +109,9 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                     String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
                     boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
                     boolean isCheer = CommonUtils.isCheerPost(content.getPost(), member, cheerRepository);
-                    return PostResponseDto.of(content.getPost(), isCheer, goal, imageUrl, isShare, contentResponseDto);
+                    boolean isMyPost = goal.getMember().equals(member);
+                    int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(goal);
+                    return PostResponseDto.of(content.getPost(), member, isCheer, isMyPost, goal, imageUrl, isShare, goalShareCnt, contentResponseDto);
                 }).collect(Collectors.toList());
 
             totalSize = queryFactory
@@ -150,7 +154,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                                             CommonUtils.isLikeContent(content, member, likeRepository), 
                                                             null);
                 boolean isCheer = CommonUtils.isCheerPost(post, member, cheerRepository);
-                return PostResponseDto.of(post, isCheer, goal, imageUrl, false, contentResponseDto);
+                int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(goal);
+                return PostResponseDto.of(post, member, isCheer, true, goal, imageUrl, false, goalShareCnt, contentResponseDto);
             }).collect(Collectors.toList());
 
         int totalSize = queryFactory
@@ -235,13 +240,17 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                             .selectFrom(post)
                             .where(post.id.eq(tuple.get(post.id)))
                             .fetchFirst();
-
+                boolean isMyPost = oneGoal.getMember().equals(member);
+                int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(oneGoal);
                 return PostResponseDto.of(
                     onePost,
+                    member,
                     CommonUtils.isCheerPost(onePost, member, cheerRepository),
+                    isMyPost,
                     oneGoal, 
                     CommonUtils.getImageUrl(oneGoal, firebaseStorageService), 
                     CommonUtils.isShareGoal(oneGoal, member, shareRepository), 
+                    goalShareCnt,
                     contentResponseDto);
 
             }).collect(Collectors.toList());
