@@ -3,6 +3,8 @@ package com.goalkeepers.server.service;
 import java.util.List;
 import java.util.Objects;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.io.IOException;
 
 import org.springframework.context.annotation.DependsOn;
@@ -19,6 +21,7 @@ import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.PostContent;
+import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
@@ -39,6 +42,7 @@ public class GoalService extends CommonService{
     private final GoalShareRepository shareRepository;
     private final FirebaseStorageService firebaseStorageService;
     private final ContentService contentService;
+    private final NotificationService notificationService;
     
 
     /*
@@ -154,5 +158,33 @@ public class GoalService extends CommonService{
             return goalId + " Goal 완료하였습니다.";
         }
         
+    }
+
+    /*
+     * 알림
+     */
+    public void notifyOneWeekLeftGoal() {
+        List<Goal> goals = goalRepository.findAllByEndDate(LocalDate.now().plusWeeks(1));
+        for (Goal goal : goals) {
+            notificationService.send(goal.getMember(), null, TYPE.WEEKLEFT, goal.getId(), goal.getTitle(), null, null);
+        }
+    }
+
+    public void notifyOneDayLeftGoal() {
+        List<Goal> goals = goalRepository.findAllByEndDate(LocalDate.now().plusDays(1));
+        for (Goal goal : goals) {
+            notificationService.send(goal.getMember(), null, TYPE.DAYLEFT, goal.getId(), goal.getTitle(), null, null);
+        }
+    }
+
+    public void notifyCompletedGoalNumber() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime yesterdayStart = LocalDateTime.of(now.minusDays(1).toLocalDate(), LocalTime.MIN);
+        LocalDateTime yesterdayEnd = LocalDateTime.of(now.minusDays(1).toLocalDate(), LocalTime.MAX);
+        List<Goal> goals = goalRepository.findAllByCompleteDateBetween(yesterdayStart, yesterdayEnd);
+        int completedGoalNumber = goals.size();
+        for (Member member : memberRepository.findAll()) {
+            notificationService.send(member, null, TYPE.TODAY, null, null, "어제 완료된 목표는 " + completedGoalNumber + "개 입니다.", null);
+        }
     }
 }

@@ -1,7 +1,5 @@
 package com.goalkeepers.server.entity;
 
-import com.google.auto.value.AutoValue.Builder;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,12 +12,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "NOTIFICATION_TB")
@@ -42,16 +37,20 @@ public class Notification {
 
     private Long targetId;
 
+    private String message;
+
     private Long commentId;
 
-    @Column(columnDefinition = "boolean default false")
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private Boolean isRead;
 
-    public Notification(Member receiver, Member giver, TYPE type, Long targetId, Long commentId) {
+    public Notification(Member receiver, Member giver, TYPE type, Long targetId, String message, Long commentId) {
         this.receiver = receiver;
         this.giver = giver;
         this.type = type;
         this.targetId = targetId;
+        this.message = message;
         this.commentId = commentId;
+        this.isRead = false;
     }
 }

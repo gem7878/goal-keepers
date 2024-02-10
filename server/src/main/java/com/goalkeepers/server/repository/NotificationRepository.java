@@ -10,6 +10,6 @@ import com.goalkeepers.server.entity.Notification;
 import com.goalkeepers.server.entity.TYPE;
 
 @Repository
-public interface NotificationRepository extends JpaRepository<Notification, Long> {
+public interface NotificationRepository extends JpaRepository<Notification, Long> , NotificationRepositoryCustom{
     Optional<Notification> findByReceiverAndGiverAndTypeAndTargetIdAndCommentId(Member receiver, Member giver, TYPE type, Long targetId, Long commentId);
 }

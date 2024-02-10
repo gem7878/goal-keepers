@@ -50,7 +50,7 @@ public class CommentService extends CommonService {
         // 알림 보내기
         Member receiver = memberRepository.findById(post.getGoal().getMember().getId()).orElseThrow(() -> new CustomException("post.getGoal.getMember.getId를 찾지 못하였습니다."));
         if(!member.equals(receiver)) {
-            notificationService.send(receiver, member, TYPE.COMMENT, post.getId(), post.getGoal().getTitle(), comment.getId());
+            notificationService.send(receiver, member, TYPE.COMMENT, post.getId(), post.getGoal().getTitle(), null, comment.getId());
         }
         return comment.getId();
     }

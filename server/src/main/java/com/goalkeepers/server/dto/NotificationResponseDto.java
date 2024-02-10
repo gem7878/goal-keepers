@@ -3,6 +3,8 @@ package com.goalkeepers.server.dto;
 import com.goalkeepers.server.entity.Notification;
 import com.goalkeepers.server.entity.TYPE;
 
+import java.util.Objects;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,18 +23,20 @@ public class NotificationResponseDto {
     private TYPE type;
     private Long targetId;
     private String targetTitle;
+    private String message;
     private Long commentId;
     
 
-    public static NotificationResponseDto of(Notification notification, String title, Long commentId) {
+    public static NotificationResponseDto of(Notification notification, String title) {
         return NotificationResponseDto.builder()
                     .notificationId(notification.getId())
                     .receiverId(notification.getReceiver().getId())
-                    .giverId(notification.getGiver().getId())
+                    .giverId(Objects.nonNull(notification.getGiver()) ? notification.getGiver().getId() : null)
                     .type(notification.getType())
                     .targetId(notification.getTargetId())
                     .targetTitle(title)
-                    .commentId(commentId)
+                    .message(notification.getMessage())
+                    .commentId(notification.getCommentId())
                     .build();
     }
 }

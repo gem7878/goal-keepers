@@ -1,6 +1,7 @@
 package com.goalkeepers.server.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.Object;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostRepository;
 
 
+@Transactional
 @Service
 public class CommonService {
     
