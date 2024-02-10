@@ -26,6 +26,7 @@ import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+import com.goalkeepers.server.repository.SettingRepository;
 import com.google.firebase.FirebaseException;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class GoalService extends CommonService{
     private final MemberRepository memberRepository;
     private final LikeShareService shareService;
     private final GoalShareRepository shareRepository;
+    private final SettingRepository settingRepository;
     private final FirebaseStorageService firebaseStorageService;
     private final ContentService contentService;
     private final NotificationService notificationService;
@@ -166,14 +168,20 @@ public class GoalService extends CommonService{
     public void notifyOneWeekLeftGoal() {
         List<Goal> goals = goalRepository.findAllByEndDate(LocalDate.now().plusWeeks(1));
         for (Goal goal : goals) {
-            notificationService.send(goal.getMember(), null, TYPE.WEEKLEFT, goal.getId(), goal.getTitle(), null, null);
+            Member receiver = alarmTrueReceiver(settingRepository, goal.getMember(), TYPE.WEEKLEFT);
+            if(Objects.nonNull(receiver)) {
+                notificationService.send(receiver, null, TYPE.WEEKLEFT, goal.getId(), goal.getTitle(), null, null);
+            }
         }
     }
 
     public void notifyOneDayLeftGoal() {
         List<Goal> goals = goalRepository.findAllByEndDate(LocalDate.now().plusDays(1));
         for (Goal goal : goals) {
-            notificationService.send(goal.getMember(), null, TYPE.DAYLEFT, goal.getId(), goal.getTitle(), null, null);
+            Member receiver = alarmTrueReceiver(settingRepository, goal.getMember(), TYPE.DAYLEFT);
+            if(Objects.nonNull(receiver)) {
+                notificationService.send(receiver, null, TYPE.DAYLEFT, goal.getId(), goal.getTitle(), null, null);
+            }
         }
     }
 
@@ -184,7 +192,10 @@ public class GoalService extends CommonService{
         List<Goal> goals = goalRepository.findAllByCompleteDateBetween(yesterdayStart, yesterdayEnd);
         int completedGoalNumber = goals.size();
         for (Member member : memberRepository.findAll()) {
-            notificationService.send(member, null, TYPE.TODAY, null, null, "어제 완료된 목표는 " + completedGoalNumber + "개 입니다.", null);
+            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.TODAY);
+            if(Objects.nonNull(receiver)) {
+                notificationService.send(receiver, null, TYPE.TODAY, null, null, "어제 완료된 목표는 " + completedGoalNumber + "개 입니다.", null);
+            }
         }
     }
 }

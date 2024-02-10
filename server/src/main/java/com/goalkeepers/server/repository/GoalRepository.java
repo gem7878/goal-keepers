@@ -8,9 +8,6 @@ import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
 
 import java.util.Optional;
-import java.util.List;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Repository
 public interface GoalRepository extends JpaRepository<Goal, Long>, GoalRepositoryCustom {
@@ -18,6 +15,4 @@ public interface GoalRepository extends JpaRepository<Goal, Long>, GoalRepositor
     Optional<Goal> findByShare(GoalShare share);
     Optional<Goal> findByIdAndMember(Long id, Member member);
     boolean existsByShare(GoalShare share);
-    List<Goal> findAllByEndDate(LocalDate endDate);
-    List<Goal> findAllByCompleteDateBetween(LocalDateTime startTime, LocalDateTime endTime);
 }

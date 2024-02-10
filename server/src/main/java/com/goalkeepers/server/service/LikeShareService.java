@@ -27,6 +27,7 @@ import com.goalkeepers.server.repository.PostCheerRepository;
 import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostLikeRepository;
 import com.goalkeepers.server.repository.PostRepository;
+import com.goalkeepers.server.repository.SettingRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,6 +43,7 @@ public class LikeShareService extends CommonService {
     private final PostContentRepository contentRepository;
     private final PostRepository postRepository;
     private final PostCheerRepository cheerRepository;
+    private final SettingRepository settingRepository;
     private final FirebaseStorageService firebaseStorageService;
     private final NotificationService notificationService;
 
@@ -61,8 +63,8 @@ public class LikeShareService extends CommonService {
             likeRepository.save(new PostLike(member, content));
 
             // 알림 보내기
-            Member receiver = memberRepository.findById(content.getMember().getId()).orElseThrow(() -> new CustomException("content.getMember().getId()를 찾지 못하였습니다."));
-            if(!member.equals(receiver)) {
+            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.LIKE);
+            if(Objects.nonNull(receiver) && !member.equals(receiver)) {
                 Post post = content.getPost();
                 notificationService.send(receiver, member, TYPE.LIKE, post.getId(), post.getGoal().getTitle(), null, null);
             }
@@ -86,8 +88,8 @@ public class LikeShareService extends CommonService {
             cheerRepository.save(new PostCheer(member, post));
 
             // 알림 보내기
-            Member receiver = memberRepository.findById(post.getGoal().getMember().getId()).orElseThrow(() -> new CustomException("post.getGoal().getMember().getId()를 찾지 못하였습니다."));
-            if(!member.equals(receiver)) {
+            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.CHEER);
+            if(Objects.nonNull(receiver) && !member.equals(receiver)) {
                 notificationService.send(receiver, member, TYPE.CHEER, post.getId(), post.getGoal().getTitle(), null, null);
             }
             return " 응원해요";
@@ -144,9 +146,10 @@ public class LikeShareService extends CommonService {
                                 member));
 
             // 알림 보내기
-            Member receiver = memberRepository.findById(goal.getMember().getId()).orElseThrow(() -> new CustomException("goal.getMember().getId()를 찾지 못하였습니다."));
-            notificationService.send(receiver, member, TYPE.SHARE, goal.getId(), goal.getTitle(), null, null);
-            
+            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.SHARE);
+            if(Objects.nonNull(receiver) && !member.equals(receiver)) {
+                notificationService.send(receiver, member, TYPE.SHARE, goal.getId(), goal.getTitle(), null, null);
+            }            
             //return GoalResponseDto.of(newGoal, null);
         }
     }

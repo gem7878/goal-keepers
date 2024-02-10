@@ -1,6 +1,7 @@
 package com.goalkeepers.server.repository;
 
 import java.lang.Object;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -36,6 +37,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import static com.goalkeepers.server.entity.QGoal.goal;
 import static com.goalkeepers.server.entity.QMember.member;
 import static com.goalkeepers.server.entity.QPostContent.postContent;
+import static com.goalkeepers.server.entity.QSetting.setting;
 
 @Repository
 public class GoalRepositoryImpl implements GoalRepositoryCustom {
@@ -294,4 +296,24 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
 	}
+
+    @Override
+    public List<Goal> findAllByEndDate(LocalDate endDate) {
+        return queryFactory
+            .selectFrom(goal)
+            .join(goal.member, member).fetchJoin()
+            .join(member.setting, setting).on(setting.ddayAlarm.eq(true)).fetchJoin()
+            .where(goal.endDate.eq(endDate))
+            .fetch();
+    }
+
+    @Override
+    public List<Goal> findAllByCompleteDateBetween(LocalDateTime startTime, LocalDateTime endTime) {
+        return queryFactory
+                .selectFrom(goal)
+                .join(goal.member, member).fetchJoin()
+                .join(member.setting, setting).on(setting.todayAlarm.eq(true)).fetchJoin()
+                .where(goal.completeDate.between(startTime, endTime))
+                .fetch();
+    }
 }

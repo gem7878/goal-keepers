@@ -12,4 +12,6 @@ public class SettingUpdateRequestDto {
     private boolean contentLikeAlarm;
     private boolean postCheerAlarm;
     private boolean goalShareAlarm;
+    private boolean ddayAlarm;
+    private boolean todayAlarm;
 }

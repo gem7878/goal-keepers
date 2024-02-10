@@ -48,11 +48,11 @@ public class Setting {
     @Column(columnDefinition = "boolean default true")
     private boolean goalShareAlarm;
 
-    // @Column(columnDefinition = "boolean default true")
-    // private boolean ddayAlarm;
+    @Column(columnDefinition = "boolean default true")
+    private boolean ddayAlarm;
 
-    // @Column(columnDefinition = "boolean default true")
-    // private boolean todayAlarm;
+    @Column(columnDefinition = "boolean default true")
+    private boolean todayAlarm;
 
     public Setting(Member member) {
         this.member = member;
@@ -73,6 +73,12 @@ public class Setting {
         }
         if (setting.isPostCheerAlarm() != requestDto.isPostCheerAlarm()) {
             setting.postCheerAlarm = requestDto.isPostCheerAlarm();
+        }
+        if (setting.isDdayAlarm() != requestDto.isDdayAlarm()) {
+            setting.ddayAlarm = requestDto.isDdayAlarm();
+        }
+        if (setting.isTodayAlarm() != requestDto.isTodayAlarm()) {
+            setting.todayAlarm = requestDto.isTodayAlarm();
         }
         return setting;
     }

@@ -26,6 +26,8 @@ public class QSetting extends EntityPathBase<Setting> {
 
     public final BooleanPath contentLikeAlarm = createBoolean("contentLikeAlarm");
 
+    public final BooleanPath ddayAlarm = createBoolean("ddayAlarm");
+
     public final BooleanPath goalShareAlarm = createBoolean("goalShareAlarm");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
@@ -33,6 +35,8 @@ public class QSetting extends EntityPathBase<Setting> {
     public final QMember member;
 
     public final BooleanPath postCheerAlarm = createBoolean("postCheerAlarm");
+
+    public final BooleanPath todayAlarm = createBoolean("todayAlarm");
 
     public QSetting(String variable) {
         this(Setting.class, forVariable(variable), INITS);

@@ -18,12 +18,15 @@ import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostComment;
 import com.goalkeepers.server.entity.PostContent;
+import com.goalkeepers.server.entity.Setting;
+import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.CommentRepository;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostRepository;
+import com.goalkeepers.server.repository.SettingRepository;
 
 
 @Transactional
@@ -95,5 +98,42 @@ public class CommonService {
             joinMemberList.add(member);
         }
         return joinMemberList;
+    }
+    public Member alarmTrueReceiver(SettingRepository settingRepository, Member member, TYPE type) {
+        if (Objects.isNull(member)) {
+            return null;
+        }
+        Setting setting = settingRepository.findByMember(member).orElseThrow(() -> new CustomException(member + "의 setting 데이터를 찾지 못하였습니다."));
+        boolean alarmIsTrue = false;
+        switch (type) {
+            case SHARE:
+                alarmIsTrue = setting.isGoalShareAlarm();
+                break;
+            case LIKE:
+                alarmIsTrue = setting.isContentLikeAlarm();
+                break;
+            case COMMENT:
+                alarmIsTrue = setting.isCommentAlarm();
+                break;
+            case CHEER:
+                alarmIsTrue = setting.isPostCheerAlarm();
+                break;
+            case TODAY:
+                alarmIsTrue = setting.isTodayAlarm();
+                break;
+            case WEEKLEFT:
+            case DAYLEFT:
+            case DDAY:
+                alarmIsTrue = setting.isDdayAlarm();
+                break;
+            default:
+                break;
+        }
+        
+        if(alarmIsTrue) {
+            return member;
+        } else {
+            return null;
+        }
     }
 }
