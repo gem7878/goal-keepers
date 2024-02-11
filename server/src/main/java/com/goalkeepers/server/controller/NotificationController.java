@@ -20,6 +20,7 @@ import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.DeleteAlarmRequestDto;
 import com.goalkeepers.server.dto.NotificationResponseDto;
 import com.goalkeepers.server.dto.TargetRequestDto;
+import com.goalkeepers.server.dto.TargetResponseDto;
 import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.service.GoalService;
 import com.goalkeepers.server.service.NotificationService;
@@ -55,8 +56,8 @@ public class NotificationController {
 
     @PostMapping(value = "/alarm/target")
     public ResponseEntity<CommonResponseDto> findTarget(@RequestBody TargetRequestDto requestDto) {
-        notificationService.findTarget(requestDto);
-        return ResponseEntity.ok(new CommonResponseDto(true, ""));
+        TargetResponseDto response = notificationService.findTarget(requestDto);
+        return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
     /*

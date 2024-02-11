@@ -5,6 +5,7 @@ import static com.goalkeepers.server.entity.QGoal.goal;
 import static com.goalkeepers.server.entity.QPost.post;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.goalkeepers.server.common.CommonUtils;
+import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.dto.TargetResponseDto;
@@ -301,7 +303,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
     @SuppressWarnings("unchecked")
     @Override
     public TargetResponseDto findTarget(TYPE type, Long targetId, Long commentId) {
-        Long memberId = 
+        Long memberId = SecurityUtil.getCurrentMemberId();
         Integer targetPage = null;
         Integer commentPage = null;
         String targetQuery = null;
@@ -309,12 +311,12 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
         switch (type) {
             case COMMENT:
-                targetQuery = postQuery(targetId, );
-                commentQuery = commentQuery();
+                targetQuery = postQuery(targetId, memberId);
+                commentQuery = commentQuery(targetId, commentId);
                 break;
             case LIKE:
             case CHEER:
-                targetQuery = postQuery();
+                targetQuery = postQuery(targetId, memberId);
                 break;
             case SHARE:
                 targetQuery = null;
@@ -325,20 +327,23 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                 break;
         }
 
-        Query targetResult = entityManager.createNativeQuery(targetQuery);
-        targetResult.setMaxResults(1); // 한 개의 결과만 가져오도록 설정
-        List<Integer> targetResultList = targetResult.getResultList();
-        Integer index = targetResultList.isEmpty() ? null : targetResultList.get(0);
-        targetPage = (index / 20) + 1;
+        if(Objects.nonNull(targetQuery)) {
+            Query targetResult = entityManager.createNativeQuery(targetQuery);
+            targetResult.setMaxResults(1);
+            List<Integer> targetResultList = targetResult.getResultList();
+            Integer index = targetResultList.isEmpty() ? null : targetResultList.get(0);
+            targetPage = (index / 20) + 1;
+        }
         
-        if(type.equals(TYPE.COMMENT)) {
-            commentQuery = 
-            Query result = entityManager.createNativeQuery(commentQuery);
-            result.setMaxResults(1);
-            List<Integer> results = result.getResultList();
-            Integer commentIndex = results.isEmpty() ? null : results.get(0);
+        
+        if(Objects.nonNull(commentQuery)) {
+            Query commentResult = entityManager.createNativeQuery(commentQuery);
+            commentResult.setMaxResults(1);
+            List<Integer> commentResultList = commentResult.getResultList();
+            Integer commentIndex = commentResultList.isEmpty() ? null : commentResultList.get(0);
             commentPage = (commentIndex / 20) + 1;
         }
+
         return TargetResponseDto.of(targetId, targetPage, commentId, commentPage);
 
     }

@@ -136,10 +136,7 @@ public class NotificationService extends CommonService {
      * 타겟 포스트 (or 골) 찾기
      */
     public TargetResponseDto findTarget(TargetRequestDto requestDto) {
-        // postId의 최신순 page 찾기
-        postContentRepository.findTarget(requestDto.getType(), requestDto.getTargetId(), requestDto.getCommentId());
-        // commentId of postId의 오래된순 page 찾기
-        // post page, comment page, postId, comment Id 보내기
+        return postContentRepository.findTarget(requestDto.getType(), requestDto.getTargetId(), requestDto.getCommentId());
     }
 
 }
