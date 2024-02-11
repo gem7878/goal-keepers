@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
-import { handleDeletePost, handlePutPost } from '@/app/post/actions';
+import { handleCreatePostContent, handleDeletePost } from '@/app/post/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
 import { CommentBox } from './index';
@@ -16,24 +16,53 @@ import {
   faCheckSquare,
   faCheck,
 } from '@fortawesome/free-solid-svg-icons';
-interface postDataTypes {
+interface postContentContentTypes {
   content: string;
-  goalDescription: string;
-
-  goalId: number;
-  goalImageUrl: string;
-  goalTitle: string;
+  createdAt: string;
+  goalDescription: null | string;
+  goalId: null | number;
+  goalImageUrl: null | string;
+  goalTitle: null | string;
   like: boolean;
   likeCnt: number;
   nickname: string;
+}
+
+
+interface postContentTypes {
+  content: postContentContentTypes[];
+  goalDescription: string;
+  goalId: number;
+  goalImageUrl: null | string;
+  goalTitle: string;
+  goalshareCnt: number;
   postId: number;
   share: boolean;
-  shareCnt: number;
-  title: string;
-  updatedAt: string;
+  isCheer: boolean;
+  postCheerCnt: number;
+}
+interface postDataTypes {
+  content: postContentTypes[];
+  empty: boolean;
+  first: boolean;
+  last: boolean;
+  number: number;
+  numberOfElements: number;
+  pageable: {
+    offset: number;
+    pageNumber: number;
+    pageSize: number;
+    paged: boolean;
+    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+    unpaged: boolean;
+  };
+  size: number;
+  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+  totalElements: number;
+  totalPages: number;
 }
 const PostBoxDetail: React.FC<{
-  data: postDataTypes;
+  data: postContentTypes;
   myNickname: string;
   index: number;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
@@ -49,34 +78,12 @@ const PostBoxDetail: React.FC<{
   onShareGoal,
   onGetShareData,
 }) => {
-  const [isPostEdit, setIsPostEdit] = useState(false);
-  const [postTitle, setPostTitle] = useState(data.title);
-  const [postContent, setPostContent] = useState(data.content);
+  const [createPostContent, setCreatePostContent] = useState('');
+  const [postContent, setPostContent] = useState([]);
   const likeRef = useRef<HTMLUListElement>(null);
   const reduxPostData = useSelector(selectRender);
   const dispatch = useDispatch();
-  const onUpdatePost = async () => {
-    const postData = {
-      title: postTitle,
-      content: postContent,
-      goalId: data.goalId,
-      postId: data.postId,
-    };
-    const confirm = window.confirm('포스트 수정을 완료하시겠습니까?');
-    if (confirm) {
-      await handlePutPost(postData)
-        .then((response) => {
-          if (response.success) {
-            setIsPostEdit(false);
-            dispatch(setStatePost(data.postId));
-          }
-        })
-        .catch((error) => console.log(error));
-    }
-  };
-  const test =
-    '차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차';
-  console.log(test.length);
+
   const onDeletePost = async () => {
     const postData = {
       postId: data.postId,
@@ -91,16 +98,29 @@ const PostBoxDetail: React.FC<{
         .catch((error) => console.log(error));
     }
   };
+
+  const onCreatePostContent = async (goalId: number, postId: number) => {
+    console.log(goalId, postId);
+
+    // const formData = {
+    //   content: '',
+    //   goalId: 1,
+    // };
+    // const response = await handleCreatePostContent(formData);
+    // console.log(response);
+  };
+
   return (
     <article
-      className="h-3/4 flex-col p-3 mb-4 border rounded-md duration-100	
+      className="h-[450px] flex-col p-3 mb-4 border rounded-md duration-100	
       w-11/12
       inset-x-0
       mx-auto"
     >
-      <div className="w-full h-1/4 relative z-0 flex rounded-md	">
+      <div className="w-full h-1/4 relative z-0 flex rounded-md">
         <Image
           src={data.goalImageUrl === null ? Image1 : data.goalImageUrl}
+          // src={Image1}
           alt=""
           fill
           style={{
@@ -113,42 +133,22 @@ const PostBoxDetail: React.FC<{
           }}
         ></Image>
         <div className="w-full h-full bg-black absolute opacity-50"></div>
-        {myNickname === data.nickname && (
+        {/* {myNickname === data.content.nickname && (
           <div className="flex text-white absolute top-0 right-0 text-xs gap-2 m-2">
-            {isPostEdit ? (
-              <>
-                <FontAwesomeIcon
-                  onClick={() => setIsPostEdit(false)}
-                  icon={faWindowClose}
-                />
-                <FontAwesomeIcon
-                  onClick={() => onUpdatePost()}
-                  icon={faCheck}
-                />
-              </>
-            ) : (
-              <>
-                <FontAwesomeIcon
-                  onClick={() => setIsPostEdit(true)}
-                  icon={faEdit}
-                />
-                <FontAwesomeIcon
-                  onClick={() => onDeletePost()}
-                  icon={faTrash}
-                />
-              </>
-            )}
+            <>
+              <FontAwesomeIcon onClick={() => onDeletePost()} icon={faTrash} />
+            </>
           </div>
-        )}
+        )} */}
         <h3 className="text-center px-1  mx-4	text-white	font-bold absolute top-1/4 -translate-y-1/3 z-10 text-ellipsis	">
-          {/* {data.goalTitle.length > 18
+          {data.goalTitle.length > 18
             ? data.goalTitle.slice(0, 18) + '...'
-            : data.goalTitle} */}
+            : data.goalTitle}
         </h3>
         <p className="text-white w-5/6 absolute top-1/3 text-xs mt-2 mx-4">
-          {/* {data.goalDescription.length > 65
+          {data.goalDescription.length > 65
             ? data.goalDescription.slice(0, 65) + '...'
-            : data.goalDescription} */}
+            : data.goalDescription}
         </p>
         <ul
           ref={likeRef}
@@ -160,13 +160,13 @@ const PostBoxDetail: React.FC<{
               onClick={() => onLikePost(index)}
               className="text-orange-500"
             />
-            <label
+            {/* <label
               className={`text-xs	${
-                data.like ? 'text-orange-400' : 'text-gray-300'
+                data.isCheer ? 'text-orange-400' : 'text-gray-300'
               }`}
             >
-              {data.likeCnt}
-            </label>
+              {data.postCheerCnt}
+            </label> */}
           </li>
           <li className="flex items-center gap-1">
             <FontAwesomeIcon
@@ -181,38 +181,23 @@ const PostBoxDetail: React.FC<{
                 data.share ? 'text-orange-400' : 'text-gray-300'
               }`}
             >
-              {data.shareCnt}
+              {data.goalshareCnt}
             </label>
           </li>
         </ul>
       </div>
-      {isPostEdit ? (
-        <div className="w-full h-[40%]	pt-2 flex flex-col">
-          <input
-            className="font-bold"
-            value={postTitle}
-            onChange={(e) => setPostTitle(e.target.value)}
-          ></input>
-          <h5 className="text-xs	w-full text-right	">
-            {data.updatedAt.slice(0, 10)}
-          </h5>
-          <textarea
-            className="text-sm h-3/5"
-            defaultValue={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
-          ></textarea>
-        </div>
-      ) : (
-        <div className="w-full h-[40%]	pt-2 flex flex-col">
-          <h3 className="font-bold">
-            {/* {postTitle.length > 20 ? postTitle.slice(0, 20) + '...' : postTitle} */}
-          </h3>
-          <h5 className="text-xs	w-full text-right	">
-            {/* {data.updatedAt.slice(0, 10)} */}
-          </h5>
-          <p className="text-sm	">{postContent}</p>
-        </div>
-      )}
+
+      <div className="w-full h-[45%]	mt-2 flex flex-col">
+        <ul className="flex-1 overflow-y-auto"></ul>
+        {/* {myNickname === data.isMyPost && (
+          <button
+            onClick={() => onCreatePostContent(data.goalId, data.postId)}
+            className="h-[13%] w-full bg-orange-400 rounded-xl text-sm text-white"
+          >
+            기록하기
+          </button>
+        )} */}
+      </div>
       <CommentBox postId={data.postId} myNickname={myNickname}></CommentBox>
     </article>
   );

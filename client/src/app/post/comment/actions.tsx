@@ -10,7 +10,7 @@ export const handleGetComment = async (getData: {
   const token = handleGetToken().token;
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/all-comment?post-id=${getData.postId}&page=${getData.page}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/comment/all?post-id=${getData.postId}&page=${getData.page}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -19,7 +19,6 @@ export const handleGetComment = async (getData: {
         withCredentials: true,
       },
     );
-
     return response.data;
   } catch (error) {
     console.log('error', error);

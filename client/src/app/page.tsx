@@ -15,6 +15,48 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
+interface postContentTypes {
+  content: {
+    content: string;
+    createdAt: string;
+    goalDescription: null | string;
+    goalId: null | number;
+    goalImageUrl: null | string;
+    goalTitle: null | string;
+    like: boolean;
+    likeCnt: number;
+    nickname: string;
+  };
+  goalDescription: string;
+  goalId: number;
+  goalImageUrl: null | string;
+  goalTitle: string;
+  goalshareCnt: number;
+  postId: number;
+  share: boolean;
+}
+
+interface myPostListTypes {
+  content: postContentTypes[];
+  empty: boolean;
+  first: boolean;
+  last: boolean;
+  number: number;
+  numberOfElements: number;
+  pageable: {
+    offset: number;
+    pageNumber: number;
+    pageSize: number;
+    paged: boolean;
+    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+    unpaged: boolean;
+  };
+  size: number;
+  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+  totalElements: number;
+  totalPages: number;
+}
+
 export default function Home() {
   const [isMyGoals, setIsMyGoals] = useState(true);
   const [isOpen, setOpen] = useState(false);
@@ -35,6 +77,7 @@ export default function Home() {
     nickname: string;
   } | null>(null);
   const [myGoalList, setMyGoalList] = useState<any[]>([]);
+  const [myPostList, setMyPostList] = useState<myPostListTypes[]>([]);
   const containerEl = useRef<any>();
   const [goalDoing, setGoalDoing] = useState<string>('doing');
 
@@ -121,9 +164,8 @@ export default function Home() {
           ></MyGoals>
         ) : (
           <MyPosts
-            myGoalList={myGoalList}
-            setSelectGoalNum={setSelectGoalNum}
-            setMyGoalList={setMyGoalList}
+            myPostList={myPostList}
+            setMyPostList={setMyPostList}
           ></MyPosts>
         )}
       </section>

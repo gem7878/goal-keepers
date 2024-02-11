@@ -6,24 +6,54 @@ import Image1 from '../../public/assets/images/goalKeepers.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faShare } from '@fortawesome/free-solid-svg-icons';
 
-interface postDataTypes {
+interface postContentContentTypes {
   content: string;
-  goalDescription: string;
-  goalId: number;
-  goalImageUrl: string;
-  goalTitle: string;
+  createdAt: string;
+  goalDescription: null | string;
+  goalId: null | number;
+  goalImageUrl: null | string;
+  goalTitle: null | string;
   like: boolean;
   likeCnt: number;
   nickname: string;
+}
+
+interface postContentTypes {
+  content: postContentContentTypes[];
+  goalDescription: string;
+  goalId: number;
+  goalImageUrl: null | string;
+  goalTitle: string;
+  goalshareCnt: number;
   postId: number;
   share: boolean;
-  shareCnt: number;
-  title: string;
-  updatedAt: string;
+  isCheer: boolean;
+  postCheerCnt: number;
+}
+
+interface myPostListTypes {
+  content: postContentTypes[];
+  empty: boolean;
+  first: boolean;
+  last: boolean;
+  number: number;
+  numberOfElements: number;
+  pageable: {
+    offset: number;
+    pageNumber: number;
+    pageSize: number;
+    paged: boolean;
+    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+    unpaged: boolean;
+  };
+  size: number;
+  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+  totalElements: number;
+  totalPages: number;
 }
 
 const PostBox: React.FC<{
-  data: postDataTypes;
+  data: postContentTypes;
   index: number;
   focusNum: number | null;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
@@ -39,7 +69,6 @@ const PostBox: React.FC<{
   onShareGoal,
   onGetShareData,
 }) => {
-  console.log(data);
 
   const likeRef = useRef<HTMLUListElement>(null);
 
@@ -82,8 +111,8 @@ const PostBox: React.FC<{
         </div>
 
         <h3 className="text-center px-1 max-w-fit mx-4	text-white	font-bold absolute top-1/3 -translate-y-1/3 z-10 bg-black text-ellipsis	">
-          {/* {data.goalTitle}
-          {data.goalTitle.length > 22 && '...'} */}
+          {data.goalTitle}
+          {data.goalTitle.length > 22 && '...'}
         </h3>
         <ul ref={likeRef} className="flex w-full justify-center	gap-2">
           <li className="flex items-center gap-1">
@@ -92,13 +121,15 @@ const PostBox: React.FC<{
               onClick={() => onLikePost(index)}
               className="text-orange-500"
             />
-            <label
-              className={`text-xs	${
-                data.like ? 'text-orange-400' : 'text-gray-500'
-              }`}
+            {/* <label
+              className={`text-xs	
+              ${
+                data.isCheer ? 'text-orange-400' : 'text-gray-500'
+                }
+              `}
             >
-              {data.likeCnt}
-            </label>
+              {data.postCheerCnt}
+            </label> */}
           </li>
           <li className="flex items-center gap-1">
             <FontAwesomeIcon
@@ -113,19 +144,16 @@ const PostBox: React.FC<{
                 data.share ? 'text-orange-400' : 'text-gray-500'
               }`}
             >
-              {data.shareCnt}
+              {data.goalshareCnt}
             </label>
           </li>
         </ul>
       </div>
       <div className="w-1/2	flex flex-col justify-between">
         <div className="mt-2">
-          <h3 className="font-bold	">{data.title}</h3>
-          <p className="text-sm	">{data.content}</p>
+          <h3 className="font-bold	">{data.goalTitle}</h3>
+          <p className="text-sm	">{data.goalDescription}</p>
         </div>
-        <label className="text-xs	w-full text-right	">
-          {/* {data.updatedAt.slice(0, 10)} */}
-        </label>
       </div>
     </article>
   );
