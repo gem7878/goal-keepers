@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostContentResponseDto {
+    private Long contentId;
     private String nickname; // Member
     private String content; // PostContent
     private LocalDateTime createdAt; // PostContent
@@ -29,6 +30,7 @@ public class PostContentResponseDto {
     public static PostContentResponseDto of(PostContent postContent, Goal goal, String nickname, boolean isLike, String imageUrl) {
         boolean isGoal = Objects.nonNull(goal);
         return PostContentResponseDto.builder()
+            .contentId(postContent.getId())
             .nickname(nickname)
             .content(postContent.getContent())
             .createdAt(postContent.getCreatedAt())
