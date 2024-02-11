@@ -20,6 +20,7 @@ public class NotificationResponseDto {
     private Long notificationId;
     private Long receiverId;
     private Long giverId;
+    private String giverNickname;
     private TYPE type;
     private Long targetId;
     private String targetTitle;
@@ -32,6 +33,7 @@ public class NotificationResponseDto {
                     .notificationId(notification.getId())
                     .receiverId(notification.getReceiver().getId())
                     .giverId(Objects.nonNull(notification.getGiver()) ? notification.getGiver().getId() : null)
+                    .giverNickname(Objects.nonNull(notification.getGiver()) ? notification.getGiver().getNickname() : null)
                     .type(notification.getType())
                     .targetId(notification.getTargetId())
                     .targetTitle(title)

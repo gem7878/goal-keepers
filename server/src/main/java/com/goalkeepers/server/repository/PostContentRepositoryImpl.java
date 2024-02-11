@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
     private final FirebaseStorageService firebaseStorageService;
     private final GoalShareRepository shareRepository;
     private final MemberRepository memberRepository;
@@ -329,19 +329,17 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
         if(Objects.nonNull(targetQuery)) {
             Query targetResult = entityManager.createNativeQuery(targetQuery);
-            targetResult.setMaxResults(1);
-            List<Integer> targetResultList = targetResult.getResultList();
-            Integer index = targetResultList.isEmpty() ? null : targetResultList.get(0);
-            targetPage = (index / 20) + 1;
+            List<Long> targetResultList = targetResult.getResultList();
+            Long index = targetResultList.isEmpty() ? null : targetResultList.get(0);
+            targetPage = (int) ((index / 20) + 1);
         }
         
         
         if(Objects.nonNull(commentQuery)) {
             Query commentResult = entityManager.createNativeQuery(commentQuery);
-            commentResult.setMaxResults(1);
-            List<Integer> commentResultList = commentResult.getResultList();
-            Integer commentIndex = commentResultList.isEmpty() ? null : commentResultList.get(0);
-            commentPage = (commentIndex / 20) + 1;
+            List<Long> commentResultList = commentResult.getResultList();
+            Long commentIndex = commentResultList.isEmpty() ? null : commentResultList.get(0);
+            commentPage = (int) ((commentIndex / 20) + 1);
         }
 
         return TargetResponseDto.of(targetId, targetPage, commentId, commentPage);
@@ -356,10 +354,10 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
             "JOIN post_tb ON post_tb.post_id = content_tb.post_id " +
             "JOIN goal_tb ON post_tb.goal_id = goal_tb.goal_id " +
             "WHERE content_tb.member_id = " + memberId +
-            "GROUP BY content_tb.post_id, post_tb.goal_id " +
+            " GROUP BY content_tb.post_id, post_tb.goal_id " +
             "ORDER BY MAX(content_tb.content_id) DESC) AS foo) AS soo " +
             "WHERE soo.post_id = " + targetId +
-            "LIMIT 1";
+            " LIMIT 1";
     }
 
     private String commentQuery(Long targetId, Long commentId) {
@@ -367,8 +365,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                 "FROM (SELECT ROW_NUMBER() OVER () AS index, * " +
                 "FROM comment_tb " +
                 "WHERE post_id = " + targetId +
-                "ORDER BY comment_id asc) AS foo " +
+                " ORDER BY comment_id asc) AS foo " +
                 "WHERE comment_id = " + commentId +
-                "LIMIT 1";
+                " LIMIT 1";
     }
 }
