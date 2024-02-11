@@ -47,11 +47,11 @@ export const handleDeletePost = async (postData: { postId: number }) => {
   }
 };
 
-export const handleLikePost = async (postId: number) => {
+export const handleCheerPost = async (postId: number) => {
   const token = handleGetToken().token;
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/post/like`,
+      `${process.env.NEXT_PUBLIC_API_URL}/post/cheer`,
       {
         postId: postId,
       },
@@ -105,6 +105,55 @@ export const handleCreatePostContent = async (formData: {
       {
         content: formData.content,
         goalId: formData.goalId,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error during request setup:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
+  }
+};
+
+export const handleGetAllPostContent = async (getData: {
+  pageNum: number;
+  postId: number;
+}) => {
+  const token = handleGetToken().token;
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/post/contents?page=${getData.pageNum}&post-id=${getData.postId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
+};
+
+export const handleLikeContent = async (contentId: number) => {
+  const token = handleGetToken().token;
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/content/like`,
+      {
+        contentId: contentId,
       },
       {
         headers: {

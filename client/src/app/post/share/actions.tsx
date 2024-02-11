@@ -10,7 +10,7 @@ export const handleGetShare = async (goalId: number) => {
   };
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/goal/share?goal-id=${formData.goalId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/share?goal-id=${formData.goalId}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ export const handleCreateShare = async (goalId: number) => {
   };
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/goal/share`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/share`,
       {
         goalId: formData.goalId,
       },
@@ -64,7 +64,7 @@ export const handleDeleteShare = async (goalId: number) => {
   };
   try {
     const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/goal/share`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/share`,
       {
         data: {
           goalId: formData.goalId,

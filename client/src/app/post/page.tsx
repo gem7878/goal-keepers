@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { handleGetPostAll, handleLikePost } from './actions';
+import { handleGetPostAll, handleCheerPost } from './actions';
 import { handleGetUserInfo } from '../actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
@@ -23,18 +23,20 @@ import {
   faChevronCircleLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
+interface postContentContentTypes {
+  content: string;
+  createdAt: string;
+  goalDescription: null | string;
+  goalId: null | number;
+  goalImageUrl: null | string;
+  goalTitle: null | string;
+  like: boolean;
+  likeCnt: number;
+  nickname: string;
+}
+
 interface postContentTypes {
-  content: {
-    content: string;
-    createdAt: string;
-    goalDescription: null | string;
-    goalId: null | number;
-    goalImageUrl: null | string;
-    goalTitle: null | string;
-    like: boolean;
-    likeCnt: number;
-    nickname: string;
-  };
+  content: postContentContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -42,6 +44,10 @@ interface postContentTypes {
   goalshareCnt: number;
   postId: number;
   share: boolean;
+  cheer: boolean;
+  myPost: false;
+  nickname: string;
+  postCheerCnt: number;
 }
 
 interface myPostListTypes {
@@ -105,8 +111,8 @@ const Community = (props: any) => {
       })
       .catch((error) => console.log(error));
   };
-  const onLikePost = async (index: number) => {
-    await handleLikePost(postData[index].postId)
+  const onCheerPost = async (index: number) => {
+    await handleCheerPost(postData[index].postId)
       .then((response) => {
         if (response.success) {
           dispatch(setStatePost(!reduxPostData.postBoolean));
@@ -161,7 +167,7 @@ const Community = (props: any) => {
                 myNickname={nickname}
                 setFocusNum={setFocusNum}
                 index={index}
-                onLikePost={onLikePost}
+                onCheerPost={onCheerPost}
                 onShareGoal={onShareGoal}
                 onGetShareData={onGetShareData}
               ></PostBoxDetail>
@@ -174,7 +180,7 @@ const Community = (props: any) => {
                 index={index}
                 focusNum={focusNum}
                 setFocusNum={setFocusNum}
-                onLikePost={onLikePost}
+                onCheerPost={onCheerPost}
                 onShareGoal={onShareGoal}
                 onGetShareData={onGetShareData}
               ></PostBox>

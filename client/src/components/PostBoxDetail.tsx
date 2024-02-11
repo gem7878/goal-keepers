@@ -2,9 +2,18 @@
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
-import { handleCreatePostContent, handleDeletePost } from '@/app/post/actions';
+import {
+  handleCreatePostContent,
+  handleDeletePost,
+  handleGetAllPostContent,
+  handleLikeContent,
+} from '@/app/post/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setStatePost } from '@/redux/renderSlice';
+import {
+  selectRender,
+  setStateContentLike,
+  setStatePost,
+} from '@/redux/renderSlice';
 import { CommentBox } from './index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -15,6 +24,9 @@ import {
   faWindowClose,
   faCheckSquare,
   faCheck,
+  faTimes,
+  faThumbsUp,
+  faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
 interface postContentContentTypes {
   content: string;
@@ -28,9 +40,8 @@ interface postContentContentTypes {
   nickname: string;
 }
 
-
 interface postContentTypes {
-  content: postContentContentTypes[];
+  content: postContentContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -38,7 +49,9 @@ interface postContentTypes {
   goalshareCnt: number;
   postId: number;
   share: boolean;
-  isCheer: boolean;
+  cheer: boolean;
+  myPost: false;
+  nickname: string;
   postCheerCnt: number;
 }
 interface postDataTypes {
@@ -66,7 +79,7 @@ const PostBoxDetail: React.FC<{
   myNickname: string;
   index: number;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
-  onLikePost: (index: number) => void;
+  onCheerPost: (index: number) => void;
   onShareGoal: (index: number) => void;
   onGetShareData: (index: number) => void;
 }> = ({
@@ -74,15 +87,58 @@ const PostBoxDetail: React.FC<{
   myNickname,
   setFocusNum,
   index,
-  onLikePost,
+  onCheerPost,
   onShareGoal,
   onGetShareData,
 }) => {
   const [createPostContent, setCreatePostContent] = useState('');
   const [postContent, setPostContent] = useState([]);
+  const [addContent, setAddContent] = useState(false);
+  const [contentList, setContentList] = useState<postContentContentTypes[]>([]);
+  const [pageable, setPageable] = useState({
+    pageNumber: 1,
+    last: false,
+  });
+  const [more, setMore] = useState<boolean>(false);
+  const [focusContent, setFocusContent] = useState<null | number>(null);
+
   const likeRef = useRef<HTMLUListElement>(null);
+  const contentRef = useRef<any>(null);
   const reduxPostData = useSelector(selectRender);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    onGetAllPostContent(pageable.pageNumber);
+  }, []);
+
+  const onGetAllPostContent = async (pageNumber: number) => {
+    const formData = {
+      pageNum: pageNumber,
+      postId: data.postId,
+    };
+
+    const response = await handleGetAllPostContent(formData);
+
+    if (response.success) {
+      if (more) {
+        setContentList((prevPostData) => [
+          ...prevPostData,
+          ...response.data.content,
+        ]);
+        setPageable({
+          pageNumber: response.data.pageable.pageNumber + 1,
+          last: response.data.last,
+        });
+      } else {
+        setContentList(response.data.content);
+        setPageable({
+          pageNumber: response.data.pageable.pageNumber + 1,
+          last: response.data.last,
+        });
+      }
+      setMore(false);
+    }
+  };
 
   const onDeletePost = async () => {
     const postData = {
@@ -101,6 +157,8 @@ const PostBoxDetail: React.FC<{
 
   const onCreatePostContent = async (goalId: number, postId: number) => {
     console.log(goalId, postId);
+    contentRef.current.scrollTop = 0;
+    setAddContent(true);
 
     // const formData = {
     //   content: '',
@@ -110,17 +168,26 @@ const PostBoxDetail: React.FC<{
     // console.log(response);
   };
 
+  const onLikeContent = async (contentId: number) => {
+    const response = await handleLikeContent(contentId);
+    console.log(response.data);
+
+    if (response.success) {
+      dispatch(setStateContentLike(!reduxPostData.contentLikeBoolean));
+    }
+  };
+
   return (
     <article
-      className="h-[450px] flex-col p-3 mb-4 border rounded-md duration-100	
+      className="h-[450px] flex flex-col p-3 mb-4 border rounded-md duration-100	
       w-11/12
       inset-x-0
-      mx-auto"
+      mx-auto justify-between
+      "
     >
       <div className="w-full h-1/4 relative z-0 flex rounded-md">
         <Image
           src={data.goalImageUrl === null ? Image1 : data.goalImageUrl}
-          // src={Image1}
           alt=""
           fill
           style={{
@@ -133,13 +200,16 @@ const PostBoxDetail: React.FC<{
           }}
         ></Image>
         <div className="w-full h-full bg-black absolute opacity-50"></div>
-        {/* {myNickname === data.content.nickname && (
+        {data.myPost && (
           <div className="flex text-white absolute top-0 right-0 text-xs gap-2 m-2">
             <>
-              <FontAwesomeIcon onClick={() => onDeletePost()} icon={faTrash} />
+              <FontAwesomeIcon
+                onClick={() => onDeletePost()}
+                icon={faTrashAlt}
+              />
             </>
           </div>
-        )} */}
+        )}
         <h3 className="text-center px-1  mx-4	text-white	font-bold absolute top-1/4 -translate-y-1/3 z-10 text-ellipsis	">
           {data.goalTitle.length > 18
             ? data.goalTitle.slice(0, 18) + '...'
@@ -156,17 +226,15 @@ const PostBoxDetail: React.FC<{
         >
           <li className="flex items-center gap-1">
             <FontAwesomeIcon
-              icon={faHeart}
-              onClick={() => onLikePost(index)}
-              className="text-orange-500"
-            />
-            {/* <label
-              className={`text-xs	${
-                data.isCheer ? 'text-orange-400' : 'text-gray-300'
+              icon={faThumbsUp}
+              onClick={() => onCheerPost(index)}
+              className={`text-gray-400 ${
+                data.cheer ? 'text-orange-400' : 'text-gray-300'
               }`}
-            >
+            />
+            <label className={`text-xs 'text-gray-300'`}>
               {data.postCheerCnt}
-            </label> */}
+            </label>
           </li>
           <li className="flex items-center gap-1">
             <FontAwesomeIcon
@@ -174,29 +242,76 @@ const PostBoxDetail: React.FC<{
               onClick={() => {
                 data.share ? onGetShareData(data.goalId) : onShareGoal(index);
               }}
-              className="text-gray-400"
-            />
-            <label
-              className={`text-xs	${
+              className={`text-gray-400 ${
                 data.share ? 'text-orange-400' : 'text-gray-300'
               }`}
-            >
+            />
+            <label className={`text-xs 'text-gray-300'	`}>
               {data.goalshareCnt}
             </label>
           </li>
         </ul>
       </div>
 
-      <div className="w-full h-[45%]	mt-2 flex flex-col">
-        <ul className="flex-1 overflow-y-auto"></ul>
-        {/* {myNickname === data.isMyPost && (
+      <div className="w-full	mt-2 flex flex-col flex-1">
+        <ul className="flex-1 overflow-y-auto w-full p-2 " ref={contentRef}>
+          {addContent && (
+            <li className="w-full h-9 flex gap-2 items-center">
+              <input
+                className="w-11/12 text-sm border-b p-1"
+                type="text"
+                placeholder="목표의 현재 진행 상황을 기록하세요!"
+              ></input>
+              <button className="w-6 h-6" onClick={() => setAddContent(false)}>
+                <FontAwesomeIcon
+                  icon={faTimes}
+                  className="w-full text-gray-600 h-full"
+                />
+              </button>
+            </li>
+          )}
+          {contentList.map((list, index) => {
+            return (
+              <li
+                key={index}
+                onMouseEnter={() => setFocusContent(index)}
+                onMouseLeave={() => setFocusContent(null)}
+                className={`text-gray-600 text-sm ${
+                  focusContent === index ? 'bg-orange-200' : 'bg-orange-100'
+                } mt-3 py-1 rounded-md px-2 drop-shadow-md flex justify-between`}
+              >
+                <span>{list.content}</span>
+                <button>
+                  {focusContent === index ? (
+                    data.myPost ? (
+                      <FontAwesomeIcon
+                        // onClick={() => onDeletePost()}
+                        className={`text-white`}
+                        icon={faTrashAlt}
+                      />
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        className={`text-white`}
+                        // onClick={() => onLikeContent(list.contentId)}
+                      />
+                    )
+                  ) : (
+                    <></>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        {data.myPost && (
           <button
             onClick={() => onCreatePostContent(data.goalId, data.postId)}
             className="h-[13%] w-full bg-orange-400 rounded-xl text-sm text-white"
           >
             기록하기
           </button>
-        )} */}
+        )}
       </div>
       <CommentBox postId={data.postId} myNickname={myNickname}></CommentBox>
     </article>

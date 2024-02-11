@@ -170,9 +170,9 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
   };
 
   return (
-    <div className="w-full h-[30%] flex-col text-sm">
+    <div className="w-full max-h-[30%] min-h-[50px] flex-col text-sm">
       <div className="w-full h-[calc(100%-9px)] mt-2 border rounded-lg p-2">
-        <ul className="w-full h-3/4 overflow-y-scroll" ref={containerRef}>
+        <ul className="w-full h-[calc(100%-29px)] overflow-y-scroll mb-1" ref={containerRef}>
           {commentList.map((list, index) => {
             return (
               <li key={index} className={`flex-col w-full comment-element`}>
@@ -183,6 +183,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
                       CommentEditNum === list.commentId ? (
                         <div className="flex gap-1 mr-2">
                           <FontAwesomeIcon
+                            className="text-gray-600"
                             onClick={() => {
                               setCommentEditNum(null);
                               setInputContent('');
@@ -196,6 +197,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
                     ) : (
                       <div className="flex gap-1 mr-2">
                         <FontAwesomeIcon
+                          className="text-gray-600"
                           onClick={() => {
                             setCommentEditNum(list.commentId);
                             setInputContent(list.content);
@@ -203,6 +205,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
                           icon={faEdit}
                         />
                         <FontAwesomeIcon
+                          className="text-gray-600"
                           onClick={() => onDeleteComment(list.commentId)}
                           icon={faTrash}
                         />
@@ -220,7 +223,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
             );
           })}
         </ul>
-        <div className="w-full flex justify-between h-1/4">
+        <div className="w-full flex justify-between h-[25px]">
           <input
             type="text"
             className="border rounded-lg w-5/6 pl-2 text-xs"

@@ -10,6 +10,7 @@ export const handleGetComment = async (getData: {
   const token = handleGetToken().token;
   try {
     const response = await axios.get(
+      // `${process.env.NEXT_PUBLIC_API_URL}/board/all-comment?post-id=${getData.postId}&page=${getData.page}`,
       `${process.env.NEXT_PUBLIC_API_URL}/comment/all?post-id=${getData.postId}&page=${getData.page}`,
       {
         headers: {
@@ -36,7 +37,7 @@ export const handleCreateComment = async (formData: {
   try {
     const id = formData.postId;
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/comment?post-id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/comment?post-id=${id}`,
       {
         content: formData.content,
       },
@@ -66,7 +67,7 @@ export const handleUpdateComment = async (formData: {
   try {
     const id = formData.commentId;
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/comment?comment-id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/comment?comment-id=${id}`,
       {
         content: formData.content,
       },
@@ -93,7 +94,7 @@ export const handleDeleteComment = async (formData: { commentId: number }) => {
     const token = handleGetToken().token;
     const id = formData.commentId;
     const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/comment?comment-id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/comment?comment-id=${id}`,
       {
         headers: {
           'Content-Type': 'application/json',
