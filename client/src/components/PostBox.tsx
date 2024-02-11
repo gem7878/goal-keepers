@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faShare } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faShare, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 interface postContentContentTypes {
   content: string;
@@ -19,7 +19,7 @@ interface postContentContentTypes {
 }
 
 interface postContentTypes {
-  content: postContentContentTypes[];
+  content: postContentContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -27,7 +27,9 @@ interface postContentTypes {
   goalshareCnt: number;
   postId: number;
   share: boolean;
-  isCheer: boolean;
+  cheer: boolean;
+  myPost: false;
+  nickname: string;
   postCheerCnt: number;
 }
 
@@ -57,7 +59,7 @@ const PostBox: React.FC<{
   index: number;
   focusNum: number | null;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
-  onLikePost: (index: number) => void;
+  onCheerPost: (index: number) => void;
   onShareGoal: (index: number) => void;
   onGetShareData: (index: number) => void;
 }> = ({
@@ -65,11 +67,10 @@ const PostBox: React.FC<{
   index,
   focusNum,
   setFocusNum,
-  onLikePost,
+  onCheerPost,
   onShareGoal,
   onGetShareData,
 }) => {
-
   const likeRef = useRef<HTMLUListElement>(null);
 
   const handleFocus = (e: { target: any }) => {
@@ -81,6 +82,7 @@ const PostBox: React.FC<{
       }
     }
   };
+
   return (
     <article
       onClick={(e) => handleFocus(e)}
@@ -118,18 +120,16 @@ const PostBox: React.FC<{
           <li className="flex items-center gap-1">
             <FontAwesomeIcon
               icon={faHeart}
-              onClick={() => onLikePost(index)}
+              onClick={() => onCheerPost(index)}
               className="text-orange-500"
             />
-            {/* <label
+            <label
               className={`text-xs	
-              ${
-                data.isCheer ? 'text-orange-400' : 'text-gray-500'
-                }
+              ${data.cheer ? 'text-orange-400' : 'text-gray-500'}
               `}
             >
               {data.postCheerCnt}
-            </label> */}
+            </label>
           </li>
           <li className="flex items-center gap-1">
             <FontAwesomeIcon
@@ -149,11 +149,22 @@ const PostBox: React.FC<{
           </li>
         </ul>
       </div>
-      <div className="w-1/2	flex flex-col justify-between">
-        <div className="mt-2">
+      <div className="w-1/2	flex flex-col justify-center">
+        {/* <div className="mt-2">
           <h3 className="font-bold	">{data.goalTitle}</h3>
           <p className="text-sm	">{data.goalDescription}</p>
-        </div>
+        </div> */}
+        <li
+          className={`text-gray-600 text-sm bg-orange-100 my-2 py-1 rounded-md px-2 flex justify-between`}
+        >
+          <span>{data.content.content}</span>
+        </li>
+        <FontAwesomeIcon icon={faPlus} className='text-gray-600 mt-3' />
+        {/* <div className="flex flex-col">
+          <span className="text-center h-5">.</span>
+          <span className="text-center h-5">.</span>
+          <span className="text-center h-5">.</span>
+        </div> */}
       </div>
     </article>
   );
