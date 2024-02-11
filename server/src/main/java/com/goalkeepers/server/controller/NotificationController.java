@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.DeleteAlarmRequestDto;
 import com.goalkeepers.server.dto.NotificationResponseDto;
+import com.goalkeepers.server.dto.TargetRequestDto;
 import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.service.GoalService;
 import com.goalkeepers.server.service.NotificationService;
@@ -49,6 +51,12 @@ public class NotificationController {
     public ResponseEntity<CommonResponseDto> deleteAlarms(@Valid @RequestBody DeleteAlarmRequestDto requestDto) {
         Long number = notificationService.deleteAlarms(requestDto);
         return ResponseEntity.ok(new CommonResponseDto(true, number + "개의 알람이 삭제되었습니다."));
+    }
+
+    @PostMapping(value = "/alarm/target")
+    public ResponseEntity<CommonResponseDto> findTarget(@RequestBody TargetRequestDto requestDto) {
+        notificationService.findTarget(requestDto);
+        return ResponseEntity.ok(new CommonResponseDto(true, ""));
     }
 
     /*

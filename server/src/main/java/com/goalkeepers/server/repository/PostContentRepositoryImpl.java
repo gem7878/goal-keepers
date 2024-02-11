@@ -15,14 +15,19 @@ import org.springframework.stereotype.Repository;
 import com.goalkeepers.server.common.CommonUtils;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.PostResponseDto;
+import com.goalkeepers.server.dto.TargetResponseDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.entity.SORT;
+import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.service.FirebaseStorageService;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private EntityManager entityManager;
     private final FirebaseStorageService firebaseStorageService;
     private final GoalShareRepository shareRepository;
     private final MemberRepository memberRepository;
@@ -291,5 +297,73 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                         .size();
 
         return new PageImpl<>(page, pageable, totalSize);
+    }
+    @SuppressWarnings("unchecked")
+    @Override
+    public TargetResponseDto findTarget(TYPE type, Long targetId, Long commentId) {
+        Long memberId = 
+        Integer targetPage = null;
+        Integer commentPage = null;
+        String targetQuery = null;
+        String commentQuery = null;
+
+        switch (type) {
+            case COMMENT:
+                targetQuery = postQuery(targetId, );
+                commentQuery = commentQuery();
+                break;
+            case LIKE:
+            case CHEER:
+                targetQuery = postQuery();
+                break;
+            case SHARE:
+                targetQuery = null;
+                break;
+            case NOTIFY:
+                targetQuery = null;
+            default:
+                break;
+        }
+
+        Query targetResult = entityManager.createNativeQuery(targetQuery);
+        targetResult.setMaxResults(1); // 한 개의 결과만 가져오도록 설정
+        List<Integer> targetResultList = targetResult.getResultList();
+        Integer index = targetResultList.isEmpty() ? null : targetResultList.get(0);
+        targetPage = (index / 20) + 1;
+        
+        if(type.equals(TYPE.COMMENT)) {
+            commentQuery = 
+            Query result = entityManager.createNativeQuery(commentQuery);
+            result.setMaxResults(1);
+            List<Integer> results = result.getResultList();
+            Integer commentIndex = results.isEmpty() ? null : results.get(0);
+            commentPage = (commentIndex / 20) + 1;
+        }
+        return TargetResponseDto.of(targetId, targetPage, commentId, commentPage);
+
+    }
+    
+    private String postQuery(Long targetId, Long memberId) {
+        return "SELECT index " +
+            "FROM (SELECT *, ROW_NUMBER() OVER () AS index " +
+            "FROM (SELECT content_tb.post_id, post_tb.goal_id, MAX(content_tb.content_id) " +
+            "FROM content_tb " +
+            "JOIN post_tb ON post_tb.post_id = content_tb.post_id " +
+            "JOIN goal_tb ON post_tb.goal_id = goal_tb.goal_id " +
+            "WHERE content_tb.member_id = " + memberId +
+            "GROUP BY content_tb.post_id, post_tb.goal_id " +
+            "ORDER BY MAX(content_tb.content_id) DESC) AS foo) AS soo " +
+            "WHERE soo.post_id = " + targetId +
+            "LIMIT 1";
+    }
+
+    private String commentQuery(Long targetId, Long commentId) {
+        return "SELECT index " +
+                "FROM (SELECT ROW_NUMBER() OVER () AS index, * " +
+                "FROM comment_tb " +
+                "WHERE post_id = " + targetId +
+                "ORDER BY comment_id asc) AS foo " +
+                "WHERE comment_id = " + commentId +
+                "LIMIT 1";
     }
 }
