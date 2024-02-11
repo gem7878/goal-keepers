@@ -23,24 +23,50 @@ import {
   faChevronCircleLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
-interface postTypes {
-  postId: number;
-  nickname: string;
-  title: string;
-  content: string;
-  updatedAt: string;
-  likeCnt: number;
-  goalId: number;
-  goalTitle: string;
+interface postContentTypes {
+  content: {
+    content: string;
+    createdAt: string;
+    goalDescription: null | string;
+    goalId: null | number;
+    goalImageUrl: null | string;
+    goalTitle: null | string;
+    like: boolean;
+    likeCnt: number;
+    nickname: string;
+  };
   goalDescription: string;
-  goalImageUrl: string;
-  shareCnt: number;
-  like: boolean;
-  share: false;
+  goalId: number;
+  goalImageUrl: null | string;
+  goalTitle: string;
+  goalshareCnt: number;
+  postId: number;
+  share: boolean;
+}
+
+interface myPostListTypes {
+  content: postContentTypes[];
+  empty: boolean;
+  first: boolean;
+  last: boolean;
+  number: number;
+  numberOfElements: number;
+  pageable: {
+    offset: number;
+    pageNumber: number;
+    pageSize: number;
+    paged: boolean;
+    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+    unpaged: boolean;
+  };
+  size: number;
+  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+  totalElements: number;
+  totalPages: number;
 }
 const Community = (props: any) => {
   const [focusNum, setFocusNum] = useState<number | null>(null);
-  const [postData, setPostData] = useState<postTypes[]>([]);
+  const [postData, setPostData] = useState<postContentTypes[]>([]);
   const [nickname, setNickname] = useState('');
   const [pageable, setPageable] = useState({
     pageNumber: 1,
@@ -126,7 +152,7 @@ const Community = (props: any) => {
         />
       </header>
       <section className="z-0 h-full overflow-y-scroll w-full postList">
-        {postData.map((data, index) => {
+        {/* {postData.map((data, index) => {
           if (focusNum === index) {
             return (
               <PostBoxDetail
@@ -154,7 +180,7 @@ const Community = (props: any) => {
               ></PostBox>
             );
           }
-        })}
+        })} */}
 
         <section className="h-[30px] w-full flex justify-center gap-4 text-gray-600 ">
           <FontAwesomeIcon

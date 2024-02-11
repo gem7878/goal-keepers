@@ -56,10 +56,9 @@ export const handleGetUserInfo = async () => {
 };
 export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
   const token = handleGetToken().token;
-  // const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/all?page=${getData.pageNum}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/all/me?page=${getData.pageNum}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +79,7 @@ export const handleUpdateGoal = async (putData: any) => {
   try {
     const id = putData.goalId;
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal?id=${id}`,
       putData.formData,
       {
         headers: {
@@ -107,7 +106,7 @@ export const handleDeleteGoal = async (deleteData: {
 
   try {
     const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${deleteData.goalId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal?id=${deleteData.goalId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -131,7 +130,7 @@ export const handleCompleteGoal = async (completeData: {
 
   try {
     const response = await axios.patch(
-      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal/completed?id=${completeData.goalId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/completed?id=${completeData.goalId}`,
       { completed: completeData.completed },
       {
         headers: {

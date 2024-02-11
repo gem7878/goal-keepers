@@ -90,29 +90,28 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
       postId: postId,
       page: pageNumber,
     };
-    await handleGetComment(formData)
-      .then((response) => {
-        if (response.success) {
-          if (more) {
-            setCommentList((prevPostData) => [
-              ...prevPostData,
-              ...response.data.content,
-            ]);
-            setPageable({
-              pageNumber: response.data.pageable.pageNumber + 1,
-              last: response.last,
-            });
-          } else {
-            setCommentList(response.data.content);
-            setPageable({
-              pageNumber: response.data.pageable.pageNumber + 1,
-              last: response.last,
-            });
-          }
-          setMore(false);
-        }
-      })
-      .catch((error) => console.log(error));
+
+    const response = await handleGetComment(formData);
+
+    if (response.success) {
+      if (more) {
+        setCommentList((prevPostData) => [
+          ...prevPostData,
+          ...response.data.content,
+        ]);
+        setPageable({
+          pageNumber: response.data.pageable.pageNumber + 1,
+          last: response.last,
+        });
+      } else {
+        setCommentList(response.data.content);
+        setPageable({
+          pageNumber: response.data.pageable.pageNumber + 1,
+          last: response.last,
+        });
+      }
+      setMore(false);
+    }
   };
   const onCreateComment = async () => {
     const formData = {
@@ -171,9 +170,8 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
   };
 
   return (
-    <div className="w-full h-[35%] flex-col text-sm">
-      <h3 className="h-4 ml-1">댓글</h3>
-      <div className="w-full h-[calc(100%-20px)] mt-1 border rounded-lg p-2">
+    <div className="w-full h-[30%] flex-col text-sm">
+      <div className="w-full h-[calc(100%-9px)] mt-2 border rounded-lg p-2">
         <ul className="w-full h-3/4 overflow-y-scroll" ref={containerRef}>
           {commentList.map((list, index) => {
             return (

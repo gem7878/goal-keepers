@@ -147,7 +147,6 @@ const MyGoals: React.FC<{
   const onDoneGoal = () => {
     if (goalDoing === 'done') {
       // const doneGoalList = myGoalList.filter((item) => item.completed === true);
-      // console.log(doneGoalList);
 
       const test = [
         {
