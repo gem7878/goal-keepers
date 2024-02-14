@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -134,6 +135,15 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(value = { CustomException.class })
 	protected ResponseEntity<ErrorResponseDto> handleCustomException(CustomException e) {
 		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST, e.getMessage());
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/**
+	 * findById 조회 실패
+	 */
+	@ExceptionHandler(value = { EmptyResultDataAccessException.class })
+	protected ResponseEntity<ErrorResponseDto> handleEmptyResultDataAccessException(EmptyResultDataAccessException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.RESOURCE_NOT_FOUND);
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 	

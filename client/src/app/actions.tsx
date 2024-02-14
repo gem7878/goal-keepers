@@ -168,3 +168,7 @@ export const handleGetAGoal = async (getData: { goalId: number }) => {
     });
   }
 };
+
+export const closeEventSource = () => {
+  return console.log('close event source');
+};

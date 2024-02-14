@@ -114,7 +114,5 @@ export const handlePostCommentAlarm = async (formData: {
 export const tokenValue = async () => {
   const token = handleGetToken().token;
 
-  console.log(token);
-
   return token;
 };
