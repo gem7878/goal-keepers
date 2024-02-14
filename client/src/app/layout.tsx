@@ -84,7 +84,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
 
         eventSource.onerror = (e: any) => {
           // 종료 또는 에러 발생 시 할 일
-          console.log('SSE CLOSED 1');
+          console.log('SSE CLOSED 1!');
           // handleCloseEventSource();
           eventSource.close();
 
