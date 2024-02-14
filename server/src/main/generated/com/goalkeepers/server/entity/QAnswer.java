@@ -1,0 +1,58 @@
+package com.goalkeepers.server.entity;
+
+import static com.querydsl.core.types.PathMetadataFactory.*;
+
+import com.querydsl.core.types.dsl.*;
+
+import com.querydsl.core.types.PathMetadata;
+import javax.annotation.processing.Generated;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
+
+
+/**
+ * QAnswer is a Querydsl query type for Answer
+ */
+@Generated("com.querydsl.codegen.DefaultEntitySerializer")
+public class QAnswer extends EntityPathBase<Answer> {
+
+    private static final long serialVersionUID = -1984021429L;
+
+    private static final PathInits INITS = PathInits.DIRECT2;
+
+    public static final QAnswer answer = new QAnswer("answer");
+
+    public final StringPath content = createString("content");
+
+    public final ComparablePath<org.threeten.bp.LocalDateTime> createdAt = createComparable("createdAt", org.threeten.bp.LocalDateTime.class);
+
+    public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final QInquiry inquiry;
+
+    public final QMember member;
+
+    public QAnswer(String variable) {
+        this(Answer.class, forVariable(variable), INITS);
+    }
+
+    public QAnswer(Path<? extends Answer> path) {
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+    }
+
+    public QAnswer(PathMetadata metadata) {
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QAnswer(PathMetadata metadata, PathInits inits) {
+        this(Answer.class, metadata, inits);
+    }
+
+    public QAnswer(Class<? extends Answer> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.inquiry = inits.isInitialized("inquiry") ? new QInquiry(forProperty("inquiry"), inits.get("inquiry")) : null;
+        this.member = inits.isInitialized("member") ? new QMember(forProperty("member"), inits.get("member")) : null;
+    }
+
+}
+
