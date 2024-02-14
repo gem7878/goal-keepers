@@ -15,7 +15,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
-
 interface postContentTypes {
   content: {
     content: string;
@@ -82,6 +81,7 @@ export default function Home() {
   const containerEl = useRef<any>();
   const [goalDoing, setGoalDoing] = useState<string>('doing');
   const [token, setToken] = useState<string | undefined>(undefined);
+
   useEffect(() => {
     selectGoalNum !== null ? setOpen(true) : setOpen(false);
     if (selectGoalNum !== null) {
@@ -107,7 +107,6 @@ export default function Home() {
   //   // 상태 업데이트
   //   setMyGoalList(updatedList);
   // }, []);
-
   const handleTab = (boolean: boolean) => {
     setIsMyGoals(boolean);
   };

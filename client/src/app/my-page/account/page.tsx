@@ -10,6 +10,9 @@ import {
   handleRemoveMember,
 } from './actions';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { setStateLogOut } from '@/redux/renderSlice';
+
 interface IFormInput {
   email: string;
   exPassword: string;
@@ -41,6 +44,8 @@ const Account = () => {
   const router = useRouter();
 
   const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#])[\da-zA-Z!@#]{8,20}$/;
+
+  const dispatch = useDispatch();
 
   // 닉네임 중복 확인
   const handleConfirmDuplicationNickname = async () => {
@@ -134,13 +139,17 @@ const Account = () => {
 
     if (conform) {
       const response = await handleLogout();
+
       if (response.ok) {
+        dispatch(setStateLogOut(true));
         router.push('/login');
       }
     } else {
       return false;
     }
   };
+
+  
   return (
     <div className="w-10/12 h-3/4 flex flex-col items-center justify-between">
       <h2 className="font-bold text-2xl">계정 관리</h2>

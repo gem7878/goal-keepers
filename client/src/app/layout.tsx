@@ -6,11 +6,13 @@ import './globals.css';
 import { Navbar } from '@/components/index.js';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { handleConfirmToken } from './actions';
+import { handleCloseEventSource, handleConfirmToken } from './actions';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
 import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
 import { tokenValue } from './alarm/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectRender, setStateLogOut } from '@/redux/renderSlice';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +22,7 @@ const inter = Inter({ subsets: ['latin'] });
 // };
 
 function RootLayout({ children }: { children: React.ReactNode }) {
-  const [eventId, setEventId] = useState<string>("");
+  const [eventId, setEventId] = useState<string>('');
 
   const pathname = usePathname();
   const router = useRouter();
@@ -48,26 +50,17 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const getToken = async () => {
-      try {
-        const result = await tokenValue();
-        return result;
-      } catch (error) {
-        console.error('Error fetching token:', error);
-        return null;
-      }
-    };
-    
+    const EventSource = EventSourcePolyfill || NativeEventSource;
+    let eventSource: any;
+
     const initializeEventSource = async () => {
       const token = await getToken();
-
       if (!token) {
         console.error('Token is null');
         return;
       }
 
-      console.log("Last-Event-Id: " + eventId);
-      const EventSource = EventSourcePolyfill || NativeEventSource;
+      console.log('Last-Event-Id: ' + eventId);
       const eventSource = new EventSource(
         `${process.env.NEXT_PUBLIC_API_URL}/subscribe`,
         {
@@ -75,28 +68,103 @@ function RootLayout({ children }: { children: React.ReactNode }) {
             Authorization: `Bearer ${token}`,
             Connetction: 'keep-alive',
             Accept: 'text/event-stream',
-            'Last-Event-Id': eventId
+            'Last-Event-Id': eventId,
           },
           heartbeatTimeout: 86400000,
-        }
+        },
       );
+      try {
+        eventSource.addEventListener('sse', (event: any) => {
+          const { lastEventId: lastEventId, data: receivedConnectData } = event;
+          console.log('Current Event Id: ' + lastEventId);
+          console.log(receivedConnectData);
+          setEventId(lastEventId); // 임시로 해둔 것, 쿠키같은곳에 저장
+        });
 
-      // eslint-disable-next-line
-      eventSource.addEventListener('sse', (event: any) => {
-        const { lastEventId: lastEventId, data: receivedConnectData } = event;
-        console.log("Current Event Id: " + lastEventId)
-        console.log(receivedConnectData);
-        setEventId(lastEventId); // 임시로 해둔 것, 쿠키같은곳에 저장
-      });
+        eventSource.onerror = (e: any) => {
+          // 종료 또는 에러 발생 시 할 일
+          console.log('SSE CLOSED 1');
+          // handleCloseEventSource();
+          eventSource.close();
 
-      return () => {
-        eventSource.close(); // 로그아웃 될 때 eventId 삭제와 eventSource.close()도 실행되게 하기
-        console.log('SSE CLOSED');
-      };
-    }
+          if (e.error) {
+            // 에러 발생 시 할 일
+          }
+
+          if (e.target.readyState === EventSource.CLOSED) {
+            // 종료 시 할 일
+          }
+        };
+
+        // eventSource.addEventListener('error', (e: any) => {
+        //   // 종료 또는 에러 발생 시 할 일
+        //   console.log('SSE CLOSED');
+        //   handleCloseEventSource();
+        //   eventSource.close();
+
+        //   if (e.error) {
+        //     // 에러 발생 시 할 일
+        //   }
+
+        //   if (e.target.readyState === EventSource.CLOSED) {
+        //     // 종료 시 할 일
+        //   }
+        // });
+
+        return () => {
+          console.log('SSE CLOSED 1');
+          eventSource && eventSource.close();
+        };
+      } catch (error) {}
+    };
 
     initializeEventSource();
-  }, []);
+
+    return () => {
+      console.log('SSE CLOSED 2');
+
+      console.log(eventSource !== undefined);
+
+      eventSource !== undefined && eventSource.close();
+    };
+  }, [pathname]);
+
+  // useEffect(() => {
+
+  //   if (reduxLogoutRender.logOutBoolean === true) {
+  //     closeEventSource();
+  //     setStateLogOut(false);
+  //   }
+  // }, [reduxLogoutRender.logOutBoolean]);
+
+  const closeEventSource = async () => {
+    const token = await getToken();
+    const EventSource = EventSourcePolyfill || NativeEventSource;
+    const eventSource = new EventSource(
+      `${process.env.NEXT_PUBLIC_API_URL}/subscribe`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Connetction: 'keep-alive',
+          Accept: 'text/event-stream',
+          'Last-Event-Id': eventId,
+        },
+        heartbeatTimeout: 86400000,
+      },
+    );
+    eventSource.close(); // 로그아웃 될 때 eventId 삭제와 eventSource.close()도 실행되게 하기
+    console.log('SSE CLOSED');
+  };
+
+  const getToken = async () => {
+    try {
+      const result = await tokenValue();
+      return result;
+    } catch (error) {
+      console.error('Error fetching token:', error);
+      return null;
+    }
+  };
 
   function setScreenSize() {
     const wrapElement: any = document.querySelector('.wrap');

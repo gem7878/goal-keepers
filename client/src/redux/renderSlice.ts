@@ -9,6 +9,7 @@ const renderSlice = createSlice({
     commentBoolean: false,
     goalId: null,
     contentBoolean: false,
+    logOutBoolean: false,
   },
   reducers: {
     setStateGoal: (state, action) => {
@@ -32,6 +33,9 @@ const renderSlice = createSlice({
     setStateContent: (state, action) => {
       state.contentBoolean = action.payload;
     },
+    setStateLogOut: (state, action) => {
+      state.logOutBoolean = action.payload;
+    },
   },
 });
 
@@ -43,6 +47,7 @@ export const {
   setStateComment,
   setShareGoal,
   setStateContent,
+  setStateLogOut,
 } = renderSlice.actions;
 export const selectRender = (state: any) => state.render; // 선택자(selectors) 추가
 export default renderSlice.reducer;
