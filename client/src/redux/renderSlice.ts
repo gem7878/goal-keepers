@@ -7,7 +7,7 @@ const renderSlice = createSlice({
     postBoolean: null,
     commentBoolean: false,
     goalId: null,
-    contentLikeBoolean: false,
+    contentBoolean: false,
   },
   reducers: {
     setStateGoal: (state, action) => {
@@ -25,8 +25,8 @@ const renderSlice = createSlice({
     setShareGoal: (state, action) => {
       state.goalId = action.payload;
     },
-    setStateContentLike: (state, action) => {
-      state.contentLikeBoolean = action.payload;
+    setStateContent: (state, action) => {
+      state.contentBoolean = action.payload;
     },
   },
 });
@@ -37,7 +37,7 @@ export const {
   setStatePost,
   setStateComment,
   setShareGoal,
-  setStateContentLike,
+  setStateContent,
 } = renderSlice.actions;
 export const selectRender = (state: any) => state.render; // 선택자(selectors) 추가
 export default renderSlice.reducer;

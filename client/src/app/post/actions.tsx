@@ -94,14 +94,37 @@ export const handleGetMyPostAll = async (getData: { pageNum: number }) => {
   }
 };
 
-export const handleCreatePostContent = async (formData: {
-  content: string;
-  goalId: number;
+export const handleGetAllPostContent = async (getData: {
+  pageNum: number;
+  postId: number;
 }) => {
   const token = handleGetToken().token;
   try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/post/contents?page=${getData.pageNum}&post-id=${getData.postId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
+};
+
+export const handleCreatePostContent = async (formData: {
+  content: string;
+  goalId: number;
+}) => {  
+  const token = handleGetToken().token;
+  try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/post/like`,
+      `${process.env.NEXT_PUBLIC_API_URL}/post`,
       {
         content: formData.content,
         goalId: formData.goalId,
@@ -124,18 +147,17 @@ export const handleCreatePostContent = async (formData: {
   }
 };
 
-export const handleGetAllPostContent = async (getData: {
-  pageNum: number;
-  postId: number;
-}) => {
+export const handleDeletePostContent = async (contentId: number) => {
   const token = handleGetToken().token;
   try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/post/contents?page=${getData.pageNum}&post-id=${getData.postId}`,
+    const response = await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL}/post?content-id=${contentId}`,
       {
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
       },
     );
     return response.data;

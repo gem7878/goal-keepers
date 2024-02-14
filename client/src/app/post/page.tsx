@@ -33,6 +33,7 @@ interface postContentContentTypes {
   like: boolean;
   likeCnt: number;
   nickname: string;
+  contentId: number;
 }
 
 interface postContentTypes {

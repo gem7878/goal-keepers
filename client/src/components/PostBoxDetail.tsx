@@ -5,13 +5,14 @@ import Image1 from '../../public/assets/images/goalKeepers.png';
 import {
   handleCreatePostContent,
   handleDeletePost,
+  handleDeletePostContent,
   handleGetAllPostContent,
   handleLikeContent,
 } from '@/app/post/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectRender,
-  setStateContentLike,
+  setStateContent,
   setStatePost,
 } from '@/redux/renderSlice';
 import { CommentBox } from './index';
@@ -38,6 +39,7 @@ interface postContentContentTypes {
   like: boolean;
   likeCnt: number;
   nickname: string;
+  contentId: number;
 }
 
 interface postContentTypes {
@@ -101,6 +103,7 @@ const PostBoxDetail: React.FC<{
   });
   const [more, setMore] = useState<boolean>(false);
   const [focusContent, setFocusContent] = useState<null | number>(null);
+  const [contentValue, setContentValue] = useState('');
 
   const likeRef = useRef<HTMLUListElement>(null);
   const contentRef = useRef<any>(null);
@@ -109,7 +112,7 @@ const PostBoxDetail: React.FC<{
 
   useEffect(() => {
     onGetAllPostContent(pageable.pageNumber);
-  }, []);
+  }, [reduxPostData.contentBoolean]);
 
   const onGetAllPostContent = async (pageNumber: number) => {
     const formData = {
@@ -155,25 +158,31 @@ const PostBoxDetail: React.FC<{
     }
   };
 
-  const onCreatePostContent = async (goalId: number, postId: number) => {
-    console.log(goalId, postId);
-    contentRef.current.scrollTop = 0;
-    setAddContent(true);
+  const onCreatePostContent = async (goalId: number) => {
+    const formData = {
+      content: contentValue,
+      goalId: goalId,
+    };
+    const response = await handleCreatePostContent(formData);
 
-    // const formData = {
-    //   content: '',
-    //   goalId: 1,
-    // };
-    // const response = await handleCreatePostContent(formData);
-    // console.log(response);
+    if (response.success) {
+      setAddContent(false);
+      dispatch(setStateContent(!reduxPostData.contentBoolean));
+    }
   };
 
   const onLikeContent = async (contentId: number) => {
     const response = await handleLikeContent(contentId);
-    console.log(response.data);
 
     if (response.success) {
-      dispatch(setStateContentLike(!reduxPostData.contentLikeBoolean));
+      dispatch(setStateContent(!reduxPostData.contentBoolean));
+    }
+  };
+  const onDeleteContent = async (contentId: number) => {
+    const response = await handleDeletePostContent(contentId);
+
+    if (response.success) {
+      dispatch(setStateContent(!reduxPostData.contentBoolean));
     }
   };
 
@@ -258,9 +267,11 @@ const PostBoxDetail: React.FC<{
           {addContent && (
             <li className="w-full h-9 flex gap-2 items-center">
               <input
-                className="w-11/12 text-sm border-b p-1"
+                className="w-11/12 text-sm border-b p-1 text-gray-600"
                 type="text"
+                autoFocus
                 placeholder="목표의 현재 진행 상황을 기록하세요!"
+                onChange={(e) => setContentValue(e.target.value)}
               ></input>
               <button className="w-6 h-6" onClick={() => setAddContent(false)}>
                 <FontAwesomeIcon
@@ -285,15 +296,17 @@ const PostBoxDetail: React.FC<{
                   {focusContent === index ? (
                     data.myPost ? (
                       <FontAwesomeIcon
-                        // onClick={() => onDeletePost()}
+                        onClick={() => onDeleteContent(list.contentId)}
                         className={`text-white`}
                         icon={faTrashAlt}
                       />
                     ) : (
                       <FontAwesomeIcon
                         icon={faHeart}
-                        className={`text-white`}
-                        // onClick={() => onLikeContent(list.contentId)}
+                        className={` ${
+                          list.like ? 'text-orange-600' : 'text-white'
+                        }`}
+                        onClick={() => onLikeContent(list.contentId)}
                       />
                     )
                   ) : (
@@ -306,10 +319,17 @@ const PostBoxDetail: React.FC<{
         </ul>
         {data.myPost && (
           <button
-            onClick={() => onCreatePostContent(data.goalId, data.postId)}
+            onClick={() => {
+              if (addContent) {
+                onCreatePostContent(data.goalId);
+              } else {
+                contentRef.current.scrollTop = 0;
+                setAddContent(true);
+              }
+            }}
             className="h-[13%] w-full bg-orange-400 rounded-xl text-sm text-white"
           >
-            기록하기
+            {addContent ? '입력' : '기록하기'}
           </button>
         )}
       </div>
