@@ -81,4 +81,8 @@ public class CommonUtils {
     public static int getOriginalGoalShareCnt(Goal goal) {
         return Objects.nonNull(goal.getShare()) ? goal.getShare().getGoal().getShareCnt() : goal.getShareCnt();
     }
+
+    public static Member getWriter(PostContent content) {
+        return content.getMember();
+    }
 }
