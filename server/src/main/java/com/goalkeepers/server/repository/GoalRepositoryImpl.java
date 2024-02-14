@@ -116,6 +116,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
 		List<Goal> goals = queryFactory
                             .selectFrom(goal)
                             .orderBy(goal.id.desc())
+                            .where(goal.share.isNull())
                             .offset(pageable.getOffset())
                             .limit(pageable.getPageSize())
                             .fetch();
@@ -174,6 +175,8 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                             .where(postContent.createdAt.after(sixHoursAgo))
                             .groupBy(postContent.shareGoal)
                             .orderBy(postContent.count().desc())
+                            .offset(pageable.getOffset())
+                            .limit(pageable.getPageSize())
                             .fetch();
                                     
 
@@ -209,7 +212,10 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
             }).collect(Collectors.toList());
 
         int totalSize = queryFactory
-                        .selectFrom(goal)
+                        .select(postContent.shareGoal, postContent.count())
+                        .from(postContent)
+                        .where(postContent.createdAt.after(sixHoursAgo))
+                        .groupBy(postContent.shareGoal)
                         .fetch()
                         .size();
         
@@ -220,6 +226,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
 	public Page<CommunityResponseDto> searchCommunity(Pageable pageable, String query, SORT sort) {
 		
         List<Goal> goals = null;
+        int totalSize = 0;
         if(SORT.NEW.equals(sort)) {
             goals = queryFactory
                     .selectFrom(goal)
@@ -237,6 +244,20 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                     .offset(pageable.getOffset())
                     .limit(pageable.getPageSize())
                     .fetch();
+            totalSize = queryFactory
+                        .selectFrom(goal)
+                        .where(goal.share.isNull().and(
+                            goal.title.contains(query)
+                            .or(goal.description.contains(query))
+                            .or(goal.id.in(
+                                JPAExpressions
+                                    .select(postContent.shareGoal.id)
+                                    .from(postContent)
+                                    .where(postContent.content.contains(query))
+                            ))
+                        ))
+                        .fetch()
+                        .size();
         } else if (SORT.POPULAR.equals(sort)) {
             goals = queryFactory
                     .selectFrom(goal)
@@ -249,9 +270,24 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                                             .or(postContent.shareGoal.title.contains(query)
                                             .or(postContent.shareGoal.description.contains(query)))))
                                     .groupBy(postContent.shareGoal.id)
-                                    .orderBy(postContent.count().desc())
                     ))
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
                     .fetch();
+            totalSize = queryFactory
+                    .selectFrom(goal)
+                    .where(goal.id.in(
+                            JPAExpressions
+                                    .select(postContent.shareGoal.id)
+                                    .from(postContent)
+                                    .where(postContent.createdAt.after(LocalDateTime.now().minusHours(6))
+                                        .and(postContent.content.contains(query)
+                                            .or(postContent.shareGoal.title.contains(query)
+                                            .or(postContent.shareGoal.description.contains(query)))))
+                                    .groupBy(postContent.shareGoal.id)
+                    ))
+                    .fetch()
+                    .size();
         } else {
             throw new MethodArgumentTypeMismatchException(null, null, null, null, null);
         }
@@ -284,13 +320,6 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
 
                 return CommunityResponseDto.of(goal, originalGoalImageUrl, isShare, joinMemberList, contentList, null);
             }).collect(Collectors.toList());
-
-        int totalSize = queryFactory
-                        .selectFrom(goal)
-                        .where(goal.title.contains(query)
-                                .or(goal.description.contains(query)))
-                        .fetch()
-                        .size();
         
         return new PageImpl<>(page, pageable, totalSize);
 	}
