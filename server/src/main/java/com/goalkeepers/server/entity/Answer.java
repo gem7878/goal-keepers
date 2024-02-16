@@ -47,4 +47,9 @@ public class Answer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id")
     private Member member;
+
+    public Answer(String content, Inquiry inquiry) {
+        this.content = content;
+        this.inquiry = inquiry;
+    }
 }

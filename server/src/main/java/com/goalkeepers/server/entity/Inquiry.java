@@ -44,9 +44,15 @@ public class Inquiry {
     private LocalDateTime createdAt;
 
     @Column(columnDefinition = "boolean default false")
-    private boolean isAnswered;
+    private boolean answered;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public Inquiry(Member member, String title, String content) {
+        this.member = member;
+        this.title = title;
+        this.content = content;
+    }
 }

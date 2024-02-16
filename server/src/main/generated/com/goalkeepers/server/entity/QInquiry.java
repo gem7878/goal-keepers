@@ -22,13 +22,13 @@ public class QInquiry extends EntityPathBase<Inquiry> {
 
     public static final QInquiry inquiry = new QInquiry("inquiry");
 
+    public final BooleanPath answered = createBoolean("answered");
+
     public final StringPath content = createString("content");
 
     public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
-
-    public final BooleanPath isAnswered = createBoolean("isAnswered");
 
     public final QMember member;
 
