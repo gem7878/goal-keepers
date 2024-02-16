@@ -24,6 +24,39 @@ export const handleGetPostAll = async (getData: { pageNum: number }) => {
   }
 };
 
+export const handlePutPost = async (postData: {
+  title: string;
+  content: string;
+  goalId: number;
+  postId: number;
+}) => {
+  const token = handleGetToken().token;
+  try {
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_API_URL}/board/post?post-id=${postData.postId}`,
+      {
+        title: postData.title,
+        content: postData.content,
+        goalId: postData.goalId,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error during request setup:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
+  }
+};
+
 export const handleDeletePost = async (postData: { postId: number }) => {
   const token = handleGetToken().token;
   try {

@@ -5,6 +5,8 @@ export { default as MyPosts } from './MyPosts.tsx';
 export { default as CreateButton } from './CreateButton.tsx';
 export { default as PostBox } from './PostBox.tsx';
 export { default as PostBoxDetail } from './PostBoxDetail.tsx';
+export { default as CommunityBox } from './CommunityBox.tsx';
+export { default as CommunityBoxDetail } from './CommunityBoxDetail.tsx';
 export { default as CommentBox } from './CommentBox.tsx';
 export { default as PullToRefresh } from './PullToRefresh.tsx';
 export { default as Table } from './Table.tsx';

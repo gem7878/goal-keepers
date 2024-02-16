@@ -163,10 +163,7 @@ export default function Home() {
             setGoalDoing={setGoalDoing}
           ></MyGoals>
         ) : (
-          <MyPosts
-            myPostList={myPostList}
-            setMyPostList={setMyPostList}
-          ></MyPosts>
+          <MyPosts></MyPosts>
         )}
       </section>
       <CreateButton></CreateButton>

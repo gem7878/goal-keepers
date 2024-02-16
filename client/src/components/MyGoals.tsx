@@ -75,8 +75,12 @@ const MyGoals: React.FC<{
     onDoneGoal();
   }, [goalDoing]);
 
+  const [goalBoxSize, setGoalBoxSize] = useState<number>(0);
+
   useLayoutEffect(() => {
     if (containerRef.current) {
+      setGoalBoxSize((containerRef.current.offsetWidth - 40) * 0.33);
+
       containerRef.current.addEventListener('scroll', handleScroll);
       return () =>
         containerRef.current.removeEventListener('scroll', handleScroll);
@@ -146,139 +150,9 @@ const MyGoals: React.FC<{
 
   const onDoneGoal = () => {
     if (goalDoing === 'done') {
-      // const doneGoalList = myGoalList.filter((item) => item.completed === true);
+      const doneGoalList = myGoalList.filter((item) => item.completed === true);
 
-      const test = [
-        {
-          goalId: 37,
-          nickname: '밍밍밍1026',
-          title: 'dfs',
-          description: 'cxvxv',
-          startDate: '2024-01-15',
-          endDate: '2024-01-18',
-          imageUrl:
-            'https://storage.googleapis.com/goalkeepers-gem.appspot.com/images/827f86d8-08bb-401e-ad44-1d236c9ea366_BackIcon.png?GoogleAccessId=firebase-adminsdk-hl50e@goalkeepers-gem.iam.gserviceaccount.com&Expires=1707020304&Signature=TmzlHzzSkknvD97FKU1GkoPwTV%2B1VYz0QkAl6ICJFeUGN4cTpCh%2FA%2FyJLbQF%2FBo%2Fmosdh%2FcXc5lXj4OlaOcSUThyfyI13R0twk0sAuZRcJYCQ63Fjmlrm9Se7BXVWc49UAQjBVvyfHHsv9VptPzjkiulaTs4LFir2pCNOvYYVEudbQhzhpNIZg0pqhfu9BBdKDettl%2F33Y9ErXxd82z36X8GPRAhSGbGZjdsE03JIeiI%2BKJtEHyQt070H1LJ3lkLFLjalj4OprsZFSNS9SbJOx0KvtEwcR%2BGoE9wEt4%2B5ruLwZ3Gg8b9lUlnhRBzbg%2Fle%2FLCtl2wvuHkAyAkse%2F20Q%3D%3D',
-          shareCnt: 0,
-          isShare: false,
-          completed: true,
-          completeDate: '2024-01-31T08:38:17.353097',
-          joinMemberList: [],
-        },
-        {
-          goalId: 36,
-          nickname: '밍밍밍1026',
-          title: 'title100',
-          description: 'description100',
-          startDate: '2023-01-08',
-          endDate: '2023-08-09',
-          imageUrl: null,
-          shareCnt: 0,
-          isShare: false,
-          completed: true,
-          completeDate: '2024-01-31T09:25:42.901274',
-          joinMemberList: [],
-        },
-        {
-          goalId: 50,
-          nickname: '밍밍밍1026',
-          title: 'title100',
-          description: 'description100',
-          startDate: '2023-01-08',
-          endDate: '2023-08-09',
-          imageUrl: null,
-          shareCnt: 0,
-          isShare: false,
-          completed: true,
-          completeDate: '2024-01-31T09:25:42.901274',
-          joinMemberList: [],
-        },
-        {
-          goalId: 51,
-          nickname: '밍밍밍1026',
-          title: 'title100',
-          description: 'description100',
-          startDate: '2023-01-08',
-          endDate: '2023-08-09',
-          imageUrl: null,
-          shareCnt: 0,
-          isShare: false,
-          completed: true,
-          completeDate: '2024-01-31T09:25:42.901274',
-          joinMemberList: [],
-        },
-        {
-          goalId: 52,
-          nickname: '밍밍밍1026',
-          title: 'title100',
-          description: 'description100',
-          startDate: '2023-01-08',
-          endDate: '2023-08-09',
-          imageUrl: null,
-          shareCnt: 0,
-          isShare: false,
-          completed: true,
-          completeDate: '2024-01-31T09:25:42.901274',
-          joinMemberList: [],
-        },
-        {
-          goalId: 53,
-          nickname: '밍밍밍1026',
-          title: 'title100',
-          description: 'description100',
-          startDate: '2023-01-08',
-          endDate: '2023-08-09',
-          imageUrl: null,
-          shareCnt: 0,
-          isShare: false,
-          completed: true,
-          completeDate: '2024-01-31T09:25:42.901274',
-          joinMemberList: [],
-        },
-        {
-          goalId: 54,
-          nickname: '밍밍밍1026',
-          title: 'title100',
-          description: 'description100',
-          startDate: '2023-01-08',
-          endDate: '2023-08-09',
-          imageUrl: null,
-          shareCnt: 0,
-          isShare: false,
-          completed: true,
-          completeDate: '2024-01-31T09:25:42.901274',
-          joinMemberList: [],
-        },
-        {
-          goalId: 40,
-          nickname: '밍밍밍1026',
-          title: 'title100',
-          description: 'description100',
-          startDate: '2023-01-08',
-          endDate: '2023-08-09',
-          imageUrl: null,
-          shareCnt: 0,
-          isShare: false,
-          completed: true,
-          completeDate: '2023-01-31T09:25:42.901274',
-          joinMemberList: [],
-        },
-        {
-          goalId: 45,
-          nickname: '밍밍밍1026',
-          title: 'title100',
-          description: 'description100',
-          startDate: '2023-01-08',
-          endDate: '2023-08-09',
-          imageUrl: null,
-          shareCnt: 0,
-          isShare: false,
-          completed: true,
-          completeDate: '2025-01-31T09:25:42.901274',
-          joinMemberList: [],
-        },
-      ];
-
-      const groupedByYear: { [year: string]: any[] } = test.reduce(
+      const groupedByYear: { [year: string]: any[] } = doneGoalList.reduce(
         (result, goal) => {
           const year = new Date(goal.completeDate).getFullYear().toString();
 
@@ -302,6 +176,7 @@ const MyGoals: React.FC<{
       setDoneGoalList(groupedByYearArray);
     }
   };
+  useEffect(() => {}, []);
 
   return (
     <div className="w-full h-[calc(100%-40px)] border-x border-b border-orange-300">
@@ -342,10 +217,8 @@ const MyGoals: React.FC<{
         </div>
       </div>
       <ul
-        className={`w-full  flex pr-2 pl-4 py-5 overflow-y-scroll ${
-          goalDoing === 'doing'
-            ? 'flex-row flex-wrap gap-2 h-[calc(100%-24px)]'
-            : 'flex-col h-full'
+        className={`w-full  px-3  overflow-y-scroll h-[calc(100%-24px)] ${
+          goalDoing === 'doing' ? 'flex flex-row flex-wrap gap-2 py-5' : 'pb-5'
         }`}
         ref={containerRef}
       >
@@ -355,7 +228,7 @@ const MyGoals: React.FC<{
                 return (
                   <li
                     key={index}
-                    className="w-[calc(33%-8px)] aspect-square bg-white relative flex items-center justify-center goal-element"
+                    className={`w-[${goalBoxSize}px] h-[${goalBoxSize}px] bg-white relative flex items-center justify-center goal-element`}
                     onClick={() => handleSelectGoalClick(index)}
                   >
                     <Image
@@ -375,14 +248,20 @@ const MyGoals: React.FC<{
             })
           : doneGoalList?.map((data: any, i: number) => {
               return (
-                <li key={i} className="text-gray-600 flex flex-col w-full">
-                  <h2>{data.year}</h2>
-                  <ul className=" flex w-full flex-wrap gap-2">
+                <li
+                  key={i}
+                  className={`text-gray-600 flex flex-col w-full h-[${
+                    goalBoxSize * Math.floor(data.goals.length / 3) + 1 + 45
+                  }px]`}
+                >
+                  <hr className="my-6 border-dashed" />
+                  <h2 className="h-8 font-semibold">{data.year}</h2>
+                  <ul className="flex w-full flex-wrap gap-2">
                     {data.goals.map((list: any, index: number) => {
                       return (
                         <li
                           key={index}
-                          className="w-[calc(33%-8px)] aspect-square bg-white relative flex items-center justify-center goal-element"
+                          className={`w-[${goalBoxSize}px] h-[${goalBoxSize}px] bg-white relative flex items-center justify-center goal-element `}
                           onClick={() => handleSelectGoalClick(index)}
                         >
                           <Image

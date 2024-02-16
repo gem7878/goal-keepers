@@ -125,7 +125,7 @@ const PostBox: React.FC<{
               className="text-orange-500"
             />
             <label
-              className={`text-xs	
+              className={`text-xs	font-semibold	
               ${data.cheer ? 'text-orange-400' : 'text-gray-500'}
               `}
             >
@@ -151,16 +151,12 @@ const PostBox: React.FC<{
         </ul>
       </div>
       <div className="w-1/2	flex flex-col justify-center">
-        {/* <div className="mt-2">
-          <h3 className="font-bold	">{data.goalTitle}</h3>
-          <p className="text-sm	">{data.goalDescription}</p>
-        </div> */}
         <li
           className={`text-gray-600 text-sm bg-orange-100 my-2 py-1 rounded-md px-2 flex justify-between`}
         >
           <span>{data.content.content}</span>
         </li>
-        <FontAwesomeIcon icon={faPlus} className='text-gray-600 mt-3' />
+        <FontAwesomeIcon icon={faPlus} className="text-gray-600 mt-3" />
         {/* <div className="flex flex-col">
           <span className="text-center h-5">.</span>
           <span className="text-center h-5">.</span>

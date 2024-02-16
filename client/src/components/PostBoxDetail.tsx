@@ -56,26 +56,6 @@ interface postContentTypes {
   nickname: string;
   postCheerCnt: number;
 }
-interface postDataTypes {
-  content: postContentTypes[];
-  empty: boolean;
-  first: boolean;
-  last: boolean;
-  number: number;
-  numberOfElements: number;
-  pageable: {
-    offset: number;
-    pageNumber: number;
-    pageSize: number;
-    paged: boolean;
-    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-    unpaged: boolean;
-  };
-  size: number;
-  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-  totalElements: number;
-  totalPages: number;
-}
 const PostBoxDetail: React.FC<{
   data: postContentTypes;
   myNickname: string;
@@ -93,8 +73,6 @@ const PostBoxDetail: React.FC<{
   onShareGoal,
   onGetShareData,
 }) => {
-  const [createPostContent, setCreatePostContent] = useState('');
-  const [postContent, setPostContent] = useState([]);
   const [addContent, setAddContent] = useState(false);
   const [contentList, setContentList] = useState<postContentContentTypes[]>([]);
   const [pageable, setPageable] = useState({
@@ -263,7 +241,7 @@ const PostBoxDetail: React.FC<{
       </div>
 
       <div className="w-full	mt-2 flex flex-col flex-1">
-        <ul className="flex-1 overflow-y-auto w-full p-2 " ref={contentRef}>
+        <ul className="flex-1 overflow-y-auto w-full p-2 pb-4" ref={contentRef}>
           {addContent && (
             <li className="w-full h-9 flex gap-2 items-center">
               <input
@@ -287,7 +265,7 @@ const PostBoxDetail: React.FC<{
                 key={index}
                 onMouseEnter={() => setFocusContent(index)}
                 onMouseLeave={() => setFocusContent(null)}
-                className={`text-gray-600 text-sm ${
+                className={`text-gray-600 font-semibold	 text-sm ${
                   focusContent === index ? 'bg-orange-200' : 'bg-orange-100'
                 } mt-3 py-1 rounded-md px-2 drop-shadow-md flex justify-between`}
               >
