@@ -58,11 +58,20 @@ public class CommonUtils {
     // joinMemberList 가져오기
     public static List<Map<String, Object>> getJoinMemberList(Goal goal) {
         List<Map<String, Object>> joinMemberList = new ArrayList<>();
+        if(Objects.nonNull(goal) && Objects.nonNull(goal.getMember())) {
+            Map<String, Object> owner = new HashMap<>();
+            owner.put("memberId", goal.getMember().getId());
+            owner.put("nickname", goal.getMember().getNickname());
+            owner.put("isOwner", true);
+            joinMemberList.add(owner);
+        }
+
         if(Objects.nonNull(goal) && Objects.nonNull(goal.getShareList())) {
             for(GoalShare goalShare : goal.getShareList()) {
                 Map<String, Object> joinMember = new HashMap<>();
                 joinMember.put("memberId", goalShare.getMember().getId());
                 joinMember.put("nickname", goalShare.getMember().getNickname());
+                joinMember.put("isOwner", false);
                 joinMemberList.add(joinMember);
             }
         }
