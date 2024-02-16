@@ -1,5 +1,7 @@
 package com.goalkeepers.server.entity;
 
+import java.util.Optional;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,4 +33,15 @@ public class Faq {
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    public Faq(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public static Faq updateFaq(Faq faq, String title, String content) {
+        faq.title = Optional.ofNullable(title).orElse(faq.getTitle());
+        faq.content = Optional.ofNullable(content).orElse(faq.getContent());
+        return faq;
+    }
 }
