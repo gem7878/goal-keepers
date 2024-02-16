@@ -46,15 +46,16 @@ public class ContentService extends CommonService {
         Member member = isMemberCurrent(memberRepository);
 
         Goal goal = isMyGoal(memberRepository, goalRepository, requestDto.getGoalId());
-        // 담기한 Goal이면 shareGoal로 바꾸기
-        if(Objects.nonNull(goal.getShare()) && Objects.nonNull(goal.getShare().getGoal())) {
-            goal = goal.getShare().getGoal();
-        }
-        
+
         Post post = postRepository.findByGoal(goal).orElse(null);
         // 처음 컨텐트 작성할 때 postId 생성
         if(Objects.isNull(post)) {
             post = postRepository.save(new Post(goal));
+        }
+
+        // 담기한 Goal이면 shareGoal로 바꾸기
+        if(Objects.nonNull(goal.getShare()) && Objects.nonNull(goal.getShare().getGoal())) {
+            goal = goal.getShare().getGoal();
         }
 
         // 컨텐트 생성
