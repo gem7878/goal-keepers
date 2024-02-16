@@ -175,7 +175,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
         <ul className="w-full h-[calc(100%-29px)] overflow-y-scroll mb-1" ref={containerRef}>
           {commentList.map((list, index) => {
             return (
-              <li key={index} className={`flex-col w-full comment-element`}>
+              <li key={index} className={`flex-col w-full comment-element text-gray-700`}>
                 <div className="flex text-xs w-full justify-between">
                   <h4 className=" font-bold">{list.nickname}</h4>
                   {myNickname === list.nickname &&

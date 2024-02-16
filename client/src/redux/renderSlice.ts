@@ -5,6 +5,7 @@ const renderSlice = createSlice({
   initialState: {
     goalBoolean: false,
     postBoolean: null,
+    communityBoolean: false,
     commentBoolean: false,
     goalId: null,
     contentBoolean: false,
@@ -15,6 +16,9 @@ const renderSlice = createSlice({
     },
     setStatePost: (state, action) => {
       state.postBoolean = action.payload;
+    },
+    setStateCommunity: (state, action) => {
+      state.communityBoolean = action.payload;
     },
     setStateComment: (state, action) => {
       state.commentBoolean = action.payload;
@@ -35,6 +39,7 @@ export const {
   setStateGoal,
   setCreateButton,
   setStatePost,
+  setStateCommunity,
   setStateComment,
   setShareGoal,
   setStateContent,

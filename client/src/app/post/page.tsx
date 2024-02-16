@@ -51,27 +51,7 @@ interface postContentTypes {
   postCheerCnt: number;
 }
 
-interface myPostListTypes {
-  content: postContentTypes[];
-  empty: boolean;
-  first: boolean;
-  last: boolean;
-  number: number;
-  numberOfElements: number;
-  pageable: {
-    offset: number;
-    pageNumber: number;
-    pageSize: number;
-    paged: boolean;
-    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-    unpaged: boolean;
-  };
-  size: number;
-  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-  totalElements: number;
-  totalPages: number;
-}
-const Community = (props: any) => {
+const Post = () => {
   const [focusNum, setFocusNum] = useState<number | null>(null);
   const [postData, setPostData] = useState<postContentTypes[]>([]);
   const [nickname, setNickname] = useState('');
@@ -158,7 +138,7 @@ const Community = (props: any) => {
           className="w-6 h-6 mr-3 text-gray-500"
         />
       </header>
-      <section className="z-0 h-full overflow-y-scroll w-full postList">
+      <section className="z-0 h-full overflow-y-scroll w-full">
         {postData.map((data, index) => {
           if (focusNum === index) {
             return (
@@ -220,4 +200,4 @@ const Community = (props: any) => {
     </div>
   );
 };
-export default Community;
+export default Post;

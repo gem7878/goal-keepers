@@ -16,7 +16,6 @@ import { selectRender, setStatePost } from '@/redux/renderSlice';
 import {
   handleGetMyPostAll,
   handleGetPostAll,
-  handleLikePost,
 } from '@/app/post/actions';
 import { setStateGoal } from '@/redux/renderSlice';
 import { PostBox, PostBoxDetail } from './index';
@@ -42,10 +41,11 @@ interface postContentContentTypes {
   like: boolean;
   likeCnt: number;
   nickname: string;
+  contentId: number;
 }
 
 interface postContentTypes {
-  content: postContentContentTypes[];
+  content: postContentContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -53,40 +53,18 @@ interface postContentTypes {
   goalshareCnt: number;
   postId: number;
   share: boolean;
-  isCheer: boolean;
+  cheer: boolean;
+  myPost: false;
+  nickname: string;
   postCheerCnt: number;
-  myPost: boolean;
 }
 
-interface myPostListTypes {
-  content: postContentTypes[];
-  empty: boolean;
-  first: boolean;
-  last: boolean;
-  number: number;
-  numberOfElements: number;
-  pageable: {
-    offset: number;
-    pageNumber: number;
-    pageSize: number;
-    paged: boolean;
-    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-    unpaged: boolean;
-  };
-  size: number;
-  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-  totalElements: number;
-  totalPages: number;
-}
 const MyPosts: React.FC<{
-  myPostList: myPostListTypes[];
-  setMyPostList: any;
-}> = ({ myPostList, setMyPostList }) => {
+}> = ({  }) => {
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
   });
-  const [more, setMore] = useState<boolean>(false);
   const [nickname, setNickname] = useState('');
   const [focusNum, setFocusNum] = useState<number | null>(null);
   const [page, setPage] = useState(pageable.pageNumber);
@@ -126,7 +104,7 @@ const MyPosts: React.FC<{
       .catch((error) => console.log(error));
   };
 
-  const onLikePost = async (index: number) => {
+  const onCheerPost = async (index: number) => {
     // await handleLikePost(postData[index].postId)
     //   .then((response) => {
     //     if (response.success) {
@@ -178,7 +156,7 @@ const MyPosts: React.FC<{
                   myNickname={nickname}
                   setFocusNum={setFocusNum}
                   index={index}
-                  onLikePost={onLikePost}
+                  onCheerPost={onCheerPost}
                   onShareGoal={onShareGoal}
                   onGetShareData={onGetShareData}
                 ></PostBoxDetail>
@@ -191,7 +169,7 @@ const MyPosts: React.FC<{
                   index={index}
                   focusNum={focusNum}
                   setFocusNum={setFocusNum}
-                  onLikePost={onLikePost}
+                  onCheerPost={onCheerPost}
                   onShareGoal={onShareGoal}
                   onGetShareData={onGetShareData}
                 ></PostBox>

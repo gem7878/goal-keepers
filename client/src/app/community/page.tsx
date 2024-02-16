@@ -1,5 +1,9 @@
 'use client';
-import { CreateButton, PostBox, PostBoxDetail } from '@/components/index.js';
+import {
+  CreateButton,
+  CommunityBox,
+  CommunityBoxDetail,
+} from '@/components/index.js';
 import React, {
   useCallback,
   useEffect,
@@ -7,10 +11,10 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { handleGetPostAll, handleLikePost } from './actions';
+import { handleGetCommunityAll } from './actions';
 import { handleGetUserInfo } from '../actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setStatePost } from '@/redux/renderSlice';
+import { selectRender, setStateCommunity } from '@/redux/renderSlice';
 import {
   handleCreateShare,
   handleDeleteShare,
@@ -23,80 +27,85 @@ import {
   faChevronCircleLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
-interface postContentTypes {
-  content: {
-    content: string;
-    createdAt: string;
-    goalDescription: null | string;
-    goalId: null | number;
-    goalImageUrl: null | string;
-    goalTitle: null | string;
-    like: boolean;
-    likeCnt: number;
-    nickname: string;
-  };
-  goalDescription: string;
+interface communityContentList {
+  nickname: string;
+  content: number;
+  updatedAt: string;
+  likeCnt: number;
   goalId: number;
-  goalImageUrl: null | string;
   goalTitle: string;
-  goalshareCnt: number;
-  postId: number;
+  goalDescription: string;
+  goalImageUrl: null | string;
+  like: false;
+}
+interface communityContentTypes {
+  originalGoalId: number;
+  originalGoalTitle: string;
+  originalGoalDescription: string;
+  originalGoalImageUrl: null | string;
+  originalGoalshareCnt: number;
+  joinMemberList: string[];
+  contentList: communityContentList[];
+  count: null | number;
   share: boolean;
 }
 
-interface myPostListTypes {
-  content: postContentTypes[];
-  empty: boolean;
-  first: boolean;
-  last: boolean;
-  number: number;
-  numberOfElements: number;
+interface myCommunityListTypes {
+  timestamp: string;
+  success: boolean;
+  message: null | string;
+  data: {
+    content: communityContentTypes[];
+  };
   pageable: {
-    offset: number;
     pageNumber: number;
     pageSize: number;
+    sort: {
+      empty: boolean;
+      sorted: boolean;
+      unsorted: boolean;
+    };
+    offset: number;
     paged: boolean;
-    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
     unpaged: boolean;
   };
-  size: number;
-  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-  totalElements: number;
+  last: boolean;
   totalPages: number;
+  totalElements: number;
+  first: boolean;
+  numberOfElements: number;
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+  };
+  empty: boolean;
 }
 const Community = (props: any) => {
   const [focusNum, setFocusNum] = useState<number | null>(null);
-  const [postData, setPostData] = useState<postContentTypes[]>([]);
+  const [communityData, setCommunityData] = useState<communityContentTypes[]>(
+    [],
+  );
   const [nickname, setNickname] = useState('');
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
   });
   const [page, setPage] = useState(pageable.pageNumber);
+  const [sort, setSort] = useState('NEW');
 
   const dispatch = useDispatch();
-  const reduxPostData = useSelector(selectRender);
+  const reduxCommunityData = useSelector(selectRender);
 
   useEffect(() => {
     onGetUserInfo();
   }, []);
 
   useEffect(() => {
-    onGetAllPost(page);
-  }, [page, reduxPostData.postBoolean]);
-
-  const onGetAllPost = async (pageParam: number) => {
-    const form = { pageNum: pageParam };
-    await handleGetPostAll(form)
-      .then((response) => {
-        setPostData(response.content);
-        setPageable({
-          pageNumber: response.pageable.pageNumber + 1,
-          last: response.last,
-        });
-      })
-      .catch((error) => console.log(error));
-  };
+    onGetCommunityAll(page);
+  }, [page, reduxCommunityData.communityBoolean]);
 
   const onGetUserInfo = async () => {
     await handleGetUserInfo()
@@ -105,84 +114,84 @@ const Community = (props: any) => {
       })
       .catch((error) => console.log(error));
   };
-  const onLikePost = async (index: number) => {
-    await handleLikePost(postData[index].postId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStatePost(!reduxPostData.postBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-  const onShareGoal = async (index: number) => {
-    await handleCreateShare(postData[index].goalId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStatePost(!reduxPostData.postBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-  const onGetShareData = async (goalId: number) => {
-    await handleGetShare(goalId)
-      .then(async (response) => {
-        if (response.success) {
-          await onDeleteShareGoal(response.data.goalId);
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-  const onDeleteShareGoal = async (goalId: number) => {
-    await handleDeleteShare(goalId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStatePost(!reduxPostData.postBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
+
+  const onGetCommunityAll = async (pageParam: number) => {
+    const formData = {
+      pageNum: pageParam,
+      sort: sort,
+    };
+    const response = await handleGetCommunityAll(formData);
+    console.log(response);
+
+    if (response.success) {
+      setCommunityData(response.data.content);
+      setPageable({
+        pageNumber: response.data.pageable.pageNumber + 1,
+        last: response.data.last,
+      });
+    }
   };
 
   return (
-    <div className="w-full	h-full pt-[80px]">
-      <header className="w-11/12 inset-x-0 mx-auto flex justify-between	border h-11	fixed top-7 bg-white rounded-full items-center">
+    <div className="w-full h-full pt-[40px] flex flex-col">
+      <header className="w-11/12 inset-x-0 mx-auto flex justify-between	border h-11 top-7 bg-white rounded-full items-center">
         <input type="text" className="outline-0	w-4/5 pl-3 z-40"></input>
         <FontAwesomeIcon
           icon={faSearch}
           className="w-6 h-6 mr-3 text-gray-500"
         />
       </header>
-      <section className="z-0 h-full overflow-y-scroll w-full postList">
-        {/* {postData.map((data, index) => {
-          if (focusNum === index) {
-            return (
-              <PostBoxDetail
-                data={data}
-                key={index}
-                myNickname={nickname}
-                setFocusNum={setFocusNum}
-                index={index}
-                onLikePost={onLikePost}
-                onShareGoal={onShareGoal}
-                onGetShareData={onGetShareData}
-              ></PostBoxDetail>
-            );
-          } else {
-            return (
-              <PostBox
-                data={data}
-                key={index}
-                index={index}
-                focusNum={focusNum}
-                setFocusNum={setFocusNum}
-                onLikePost={onLikePost}
-                onShareGoal={onShareGoal}
-                onGetShareData={onGetShareData}
-              ></PostBox>
-            );
-          }
-        })} */}
-
-        <section className="h-[30px] w-full flex justify-center gap-4 text-gray-600 ">
+      <section className="flex gap-4 justify-end mt-2 mr-4 mb-2 h-6">
+        <div className="flex items-center">
+          <input
+            type="radio"
+            id="new"
+            name="community"
+            value="new"
+            checked={sort === 'NEW'}
+            onChange={() => setSort('NEW')}
+            className="bg-white border-2 border-orange-300 appearance-none w-3.5 h-3.5	rounded-full checked:bg-orange-300"
+          ></input>
+          <label
+            className="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300"
+            htmlFor="new"
+          >
+            최신순
+          </label>
+        </div>
+        <div className="flex items-center">
+          <input
+            type="radio"
+            id="popular"
+            name="community"
+            value="popular"
+            checked={sort === 'POPULAR'}
+            onChange={() => setSort('POPULAR')}
+            className="bg-white border-2 border-orange-300 appearance-none w-3.5 h-3.5	rounded-full checked:bg-orange-300"
+          ></input>
+          <label
+            className="ms-2 text-sm font-medium text-gray-600 dark:text-gray-300"
+            htmlFor="popular"
+          >
+            인기순
+          </label>
+        </div>
+      </section>
+      <section className="z-0 h-full overflow-y-scroll w-full py-4">
+        {communityData.map((data, index) => {
+          return focusNum === index ? (
+            <CommunityBoxDetail data={data}></CommunityBoxDetail>
+          ) : (
+            <CommunityBox
+              data={data}
+              key={index}
+              index={index}
+              focusNum={focusNum}
+              setFocusNum={setFocusNum}
+            ></CommunityBox>
+          );
+        })}
+        {/* <section className="h-[30px] w-full flex justify-center gap-4 text-gray-600 ">
           <FontAwesomeIcon
             icon={faChevronCircleLeft}
             className="cursor-pointer"
@@ -207,9 +216,8 @@ const Community = (props: any) => {
               }
             }}
           />
-        </section>
+        </section> */}
       </section>
-      <CreateButton></CreateButton>
     </div>
   );
 };
