@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class InquiryResponseDto {
 
+    private Long inquiryId;
     private String title;
     private String content;
     private LocalDateTime createdAt;
@@ -22,6 +23,7 @@ public class InquiryResponseDto {
 
     public static InquiryResponseDto of(Inquiry inquiry) {
         return InquiryResponseDto.builder()
+                .inquiryId(inquiry.getId())
                 .title(inquiry.getTitle())
                 .content(inquiry.getContent())
                 .createdAt(inquiry.getCreatedAt())
