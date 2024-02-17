@@ -11,11 +11,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
 @Entity
+@Getter
 @Table(name = "LIKE_TB")
 public class PostLike {
     
