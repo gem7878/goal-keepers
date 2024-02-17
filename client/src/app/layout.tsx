@@ -51,6 +51,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const EventSource = EventSourcePolyfill || NativeEventSource;
+    
     let eventSource: any;
 
     const initializeEventSource = async () => {
