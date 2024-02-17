@@ -75,12 +75,8 @@ const MyGoals: React.FC<{
     onDoneGoal();
   }, [goalDoing]);
 
-  const [goalBoxSize, setGoalBoxSize] = useState<number>(0);
-
   useLayoutEffect(() => {
     if (containerRef.current) {
-      setGoalBoxSize((containerRef.current.offsetWidth - 40) * 0.33);
-
       containerRef.current.addEventListener('scroll', handleScroll);
       return () =>
         containerRef.current.removeEventListener('scroll', handleScroll);
@@ -176,8 +172,6 @@ const MyGoals: React.FC<{
       setDoneGoalList(groupedByYearArray);
     }
   };
-  useEffect(() => {}, []);
-
   return (
     <div className="w-full h-[calc(100%-40px)] border-x border-b border-orange-300">
       <div className="flex gap-4 justify-end mt-2 mr-4 h-6">
@@ -228,7 +222,7 @@ const MyGoals: React.FC<{
                 return (
                   <li
                     key={index}
-                    className={`w-[${goalBoxSize}px] h-[${goalBoxSize}px] bg-white relative flex items-center justify-center goal-element`}
+                    className={` w-[95px] h-[95px] bg-white relative flex items-center justify-center goal-element`}
                     onClick={() => handleSelectGoalClick(index)}
                   >
                     <Image
@@ -251,7 +245,7 @@ const MyGoals: React.FC<{
                 <li
                   key={i}
                   className={`text-gray-600 flex flex-col w-full h-[${
-                    goalBoxSize * Math.floor(data.goals.length / 3) + 1 + 45
+                    95 * Math.floor(data.goals.length / 3) + 1 + 45
                   }px]`}
                 >
                   <hr className="my-6 border-dashed" />
@@ -261,7 +255,7 @@ const MyGoals: React.FC<{
                       return (
                         <li
                           key={index}
-                          className={`w-[${goalBoxSize}px] h-[${goalBoxSize}px] bg-white relative flex items-center justify-center goal-element `}
+                          className={`w-[95px] h-[95px] bg-white relative flex items-center justify-center goal-element `}
                           onClick={() => handleSelectGoalClick(index)}
                         >
                           <Image

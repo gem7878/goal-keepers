@@ -180,7 +180,9 @@ const Community = (props: any) => {
       <section className="z-0 h-full overflow-y-scroll w-full py-4">
         {communityData.map((data, index) => {
           return focusNum === index ? (
-            <CommunityBoxDetail data={data}></CommunityBoxDetail>
+            <CommunityBoxDetail
+              data={data}
+            ></CommunityBoxDetail>
           ) : (
             <CommunityBox
               data={data}
