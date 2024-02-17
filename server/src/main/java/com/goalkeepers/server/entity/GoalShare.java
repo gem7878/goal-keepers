@@ -14,10 +14,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
 @Table(name = "SHARE_TB")
 public class GoalShare {
     

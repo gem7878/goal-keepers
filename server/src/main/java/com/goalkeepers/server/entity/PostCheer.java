@@ -13,9 +13,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
 @NoArgsConstructor
-@Entity
 @Table(name = "CHEER_TB")
 public class PostCheer {
     @Id
