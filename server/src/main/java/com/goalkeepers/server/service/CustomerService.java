@@ -3,6 +3,7 @@ package com.goalkeepers.server.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.goalkeepers.server.dto.AnswerRequestDto;
 import com.goalkeepers.server.dto.AnswerResponseDto;
@@ -23,6 +24,7 @@ import com.goalkeepers.server.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class CustomerService extends CommonService {
@@ -46,7 +48,9 @@ public class CustomerService extends CommonService {
     }
 
     public Long createAnswer(AnswerRequestDto requestDto) {
-        Answer newAnswer = answerRepository.save(new Answer(requestDto.getContent(), findOneInquiry(requestDto.getInquiryId())));
+        Inquiry inquiry = findOneInquiry(requestDto.getInquiryId());
+        Answer newAnswer = answerRepository.save(requestDto.toAnswer(inquiry, isMemberCurrent(memberRepository)));
+        inquiry.setAnswered(true);
         return newAnswer.getId();
     }
 

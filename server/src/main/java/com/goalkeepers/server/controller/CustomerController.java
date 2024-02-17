@@ -12,6 +12,7 @@ import com.goalkeepers.server.dto.InquiryRequestDto;
 import com.goalkeepers.server.dto.InquiryResponseDto;
 import com.goalkeepers.server.service.CustomerService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -36,14 +37,14 @@ public class CustomerController {
      * FAQ 삭제
      */
     @PostMapping("/admin/faq")
-    public ResponseEntity<CommonResponseDto> createFaq(@RequestBody FAQRequestDto requestDto) {
+    public ResponseEntity<CommonResponseDto> createFaq(@Valid @RequestBody FAQRequestDto requestDto) {
         Long faqId = customerService.createFaq(requestDto);
         return ResponseEntity.ok(new CommonResponseDto(true, faqId + " FAQ가 생성되었습니다."));
     }
 
     @PutMapping("/admin/faq")
     public ResponseEntity<CommonResponseDto> updateFaq(@RequestParam(name = "faq-id") Long faqId,
-                                                        @RequestBody FAQUpdateRequestDto requestDto) {
+                                                        @Valid @RequestBody FAQUpdateRequestDto requestDto) {
         customerService.updateFaq(faqId, requestDto);
         return ResponseEntity.ok(new CommonResponseDto(true, faqId + " FAQ가 수정되었습니다."));
     }
@@ -59,7 +60,7 @@ public class CustomerController {
      * 문의 답변하기
      */
     @PostMapping("/admin/answer")
-    public ResponseEntity<CommonResponseDto> createAnswer(@RequestBody AnswerRequestDto requestDto) {
+    public ResponseEntity<CommonResponseDto> createAnswer(@Valid @RequestBody AnswerRequestDto requestDto) {
         Long answerId = customerService.createAnswer(requestDto);
         return ResponseEntity.ok(new CommonResponseDto(true, answerId + " 답변이 생성되었습니다."));
     }
@@ -93,7 +94,7 @@ public class CustomerController {
     }
 
     @PostMapping("/inquiry")
-    public ResponseEntity<CommonResponseDto> createInquiry(@RequestBody InquiryRequestDto requestDto) {
+    public ResponseEntity<CommonResponseDto> createInquiry(@Valid @RequestBody InquiryRequestDto requestDto) {
         Long inquiryId = customerService.createInquiry(requestDto);
         return ResponseEntity.ok(new CommonResponseDto(true, inquiryId + " 문의가 생성되었습니다."));
     }

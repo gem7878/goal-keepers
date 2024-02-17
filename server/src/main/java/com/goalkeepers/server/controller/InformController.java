@@ -27,20 +27,15 @@ public class InformController {
      * 공지사항 생성, 삭제
      */
 
-    @PostMapping("/inform")
+    @PostMapping("/admin/inform")
     public ResponseEntity<CommonResponseDto> createInform(@Valid @RequestBody InformRequestDto requestDto) {
         Long id = informService.createInform(requestDto);
         return ResponseEntity.ok(new CommonResponseDto(true, id + " 공지를 작성하였습니다."));
     }
 
-    @DeleteMapping("/inform")
+    @DeleteMapping("/admin/inform")
     public ResponseEntity<CommonResponseDto> deleteInform(@RequestParam(value = "id") Long id) {
         informService.deleteInform(id);
         return ResponseEntity.ok(new CommonResponseDto(true, id + " 공지를 삭제하였습니다."));
     }
-
-    
-    
-    
-
 }

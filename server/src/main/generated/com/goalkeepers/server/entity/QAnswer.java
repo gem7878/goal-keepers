@@ -24,7 +24,7 @@ public class QAnswer extends EntityPathBase<Answer> {
 
     public final StringPath content = createString("content");
 
-    public final ComparablePath<org.threeten.bp.LocalDateTime> createdAt = createComparable("createdAt", org.threeten.bp.LocalDateTime.class);
+    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

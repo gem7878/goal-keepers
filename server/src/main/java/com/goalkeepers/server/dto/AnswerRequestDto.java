@@ -1,5 +1,9 @@
 package com.goalkeepers.server.dto;
 
+import com.goalkeepers.server.entity.Answer;
+import com.goalkeepers.server.entity.Inquiry;
+import com.goalkeepers.server.entity.Member;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,4 +21,12 @@ public class AnswerRequestDto {
     
     @NotBlank(message = "문의를 선택해주세요")
     private Long inquiryId;
+
+    public Answer toAnswer(Inquiry inquiry, Member admin) {
+        return Answer.builder()
+                .content(content)
+                .inquiry(inquiry)
+                .member(admin)
+                .build();
+    }
 }

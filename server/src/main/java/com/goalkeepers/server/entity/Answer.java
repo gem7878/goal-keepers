@@ -1,7 +1,7 @@
 package com.goalkeepers.server.entity;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.threeten.bp.LocalDateTime;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,7 +36,6 @@ public class Answer {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(columnDefinition = "TIMESTAMP")
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -47,9 +46,4 @@ public class Answer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id")
     private Member member;
-
-    public Answer(String content, Inquiry inquiry) {
-        this.content = content;
-        this.inquiry = inquiry;
-    }
 }
