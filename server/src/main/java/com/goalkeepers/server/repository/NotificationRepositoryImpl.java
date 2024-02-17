@@ -3,6 +3,7 @@ package com.goalkeepers.server.repository;
 import static com.goalkeepers.server.entity.QGoal.goal;
 import static com.goalkeepers.server.entity.QNotification.notification;
 import static com.goalkeepers.server.entity.QPost.post;
+import static com.goalkeepers.server.entity.QInform.inform;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -69,7 +70,13 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
                                 .where(post.id.eq(notification.getTargetId()))
                                 .fetchOne();
                         break;
-                
+                    case NOTIFY:
+                        title = queryFactory
+                                .select(inform.title)
+                                .from(inform)
+                                .where(inform.id.eq(notification.getTargetId()))
+                                .fetchOne();
+                        break;
                     case TODAY:
                         break;
                     default:
