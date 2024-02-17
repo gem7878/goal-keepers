@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalShareRequestDto;
 import com.goalkeepers.server.dto.PostCheerRequestDto;
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.ContentLikeRequestDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
@@ -34,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class LikeShareService extends CommonService {
+public class LikeShareService extends ServiceHelper {
     
     private final PostLikeRepository likeRepository;
     private final GoalShareRepository shareRepository;

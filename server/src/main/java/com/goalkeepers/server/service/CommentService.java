@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.entity.Member;
@@ -22,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CommentService extends CommonService {
+public class CommentService extends ServiceHelper {
     
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;

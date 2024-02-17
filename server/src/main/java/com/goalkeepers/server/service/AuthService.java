@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.LoginRequestDto;
 import com.goalkeepers.server.dto.MemberRequestDto;
 import com.goalkeepers.server.dto.MemberResponseDto;
@@ -28,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AuthService extends CommonService {
+public class AuthService extends ServiceHelper {
     private final AuthenticationManagerBuilder managerBuilder;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;

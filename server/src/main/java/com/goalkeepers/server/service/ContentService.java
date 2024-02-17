@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
@@ -28,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 @DependsOn("firebaseStorageService")
-public class ContentService extends CommonService {
+public class ContentService extends ServiceHelper {
 
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;

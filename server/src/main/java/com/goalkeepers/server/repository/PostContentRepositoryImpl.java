@@ -13,7 +13,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.goalkeepers.server.common.CommonUtils;
+import com.goalkeepers.server.common.RepositoryHelper;
 import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.PostResponseDto;
@@ -64,7 +64,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
             page = posts
                 .stream()
                 .map(post -> {
-                    Member member = CommonUtils.MemberOrNull(memberRepository);
+                    Member member = RepositoryHelper.MemberOrNull(memberRepository);
                     Goal goal = post.getGoal();
                     PostContent content = queryFactory
                                             .selectFrom(postContent)
@@ -73,17 +73,17 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                             .limit(1)
                                             .fetchOne();
 
-                    String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                    boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                    boolean isCheer = CommonUtils.isCheerPost(post, member, cheerRepository);
+                    String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                    boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
+                    boolean isCheer = RepositoryHelper.isCheerPost(post, member, cheerRepository);
                     boolean isMyPost = goal.getMember().equals(member);
-                    int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(goal);
-                    Member writer = CommonUtils.getWriter(content);
+                    int goalShareCnt = RepositoryHelper.getOriginalGoalShareCnt(goal);
+                    Member writer = RepositoryHelper.getWriter(content);
                     PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
                                                                 content, 
                                                                 null, 
                                                                 writer.getNickname(),
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                                 null);
                                                                 
                     return PostResponseDto.of(post, writer, isCheer, isMyPost, goal, imageUrl, isShare, goalShareCnt, contentResponseDto);
@@ -107,20 +107,20 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
             page = contents
                 .stream()
                 .map(content -> {
-                    Member member = CommonUtils.MemberOrNull(memberRepository);
+                    Member member = RepositoryHelper.MemberOrNull(memberRepository);
                     Goal goal = content.getPost().getGoal();
-                    Member writer = CommonUtils.getWriter(content);
+                    Member writer = RepositoryHelper.getWriter(content);
                     PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
                                                                 content,
                                                                 null, 
                                                                 writer.getNickname(), 
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                                 null);
-                    String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                    boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                    boolean isCheer = CommonUtils.isCheerPost(content.getPost(), member, cheerRepository);
+                    String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                    boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
+                    boolean isCheer = RepositoryHelper.isCheerPost(content.getPost(), member, cheerRepository);
                     boolean isMyPost = goal.getMember().equals(member);
-                    int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(goal);
+                    int goalShareCnt = RepositoryHelper.getOriginalGoalShareCnt(goal);
                     return PostResponseDto.of(content.getPost(), writer, isCheer, isMyPost, goal, imageUrl, isShare, goalShareCnt, contentResponseDto);
                 }).collect(Collectors.toList());
 
@@ -156,16 +156,16 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                     .limit(1)
                                     .fetchOne();
 
-                String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                Member writer = CommonUtils.getWriter(content);
+                String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                Member writer = RepositoryHelper.getWriter(content);
                 PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
                                                             content, 
                                                             null, 
                                                             writer.getNickname(), 
-                                                            CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                            RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                             null);
-                boolean isCheer = CommonUtils.isCheerPost(post, member, cheerRepository);
-                int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(goal);
+                boolean isCheer = RepositoryHelper.isCheerPost(post, member, cheerRepository);
+                int goalShareCnt = RepositoryHelper.getOriginalGoalShareCnt(goal);
                 return PostResponseDto.of(post, writer, isCheer, true, goal, imageUrl, false, goalShareCnt, contentResponseDto);
             }).collect(Collectors.toList());
 
@@ -191,12 +191,12 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
             .stream()
             .map(content -> {
                 Goal goal = content.getPost().getGoal();
-                Member writer = CommonUtils.getWriter(content);
+                Member writer = RepositoryHelper.getWriter(content);
                 return PostContentResponseDto.of(
                         content,
                         goal,
                         writer.getNickname(), 
-                        CommonUtils.isLikeContent(content, CommonUtils.MemberOrNull(memberRepository), likeRepository), 
+                        RepositoryHelper.isLikeContent(content, RepositoryHelper.MemberOrNull(memberRepository), likeRepository), 
                         null); // CommonUtils.getImageUrl(goal, firebaseStorageService)
             }).collect(Collectors.toList());
 
@@ -240,28 +240,28 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                     .limit(1)
                                     .fetchOne();
 
-                Member member = CommonUtils.MemberOrNull(memberRepository);
-                Member writer = CommonUtils.getWriter(content);               
+                Member member = RepositoryHelper.MemberOrNull(memberRepository);
+                Member writer = RepositoryHelper.getWriter(content);               
                 PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
                                                             content, 
                                                             null, 
                                                             writer.getNickname(), 
-                                                            CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                            RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                             null);
                 Post onePost = queryFactory
                             .selectFrom(post)
                             .where(post.id.eq(tuple.get(post.id)))
                             .fetchFirst();
                 boolean isMyPost = oneGoal.getMember().equals(member);
-                int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(oneGoal);
+                int goalShareCnt = RepositoryHelper.getOriginalGoalShareCnt(oneGoal);
                 return PostResponseDto.of(
                     onePost,
                     writer,
-                    CommonUtils.isCheerPost(onePost, member, cheerRepository),
+                    RepositoryHelper.isCheerPost(onePost, member, cheerRepository),
                     isMyPost,
                     oneGoal, 
-                    CommonUtils.getImageUrl(oneGoal, firebaseStorageService), 
-                    CommonUtils.isShareGoal(oneGoal, member, shareRepository), 
+                    RepositoryHelper.getImageUrl(oneGoal, firebaseStorageService), 
+                    RepositoryHelper.isShareGoal(oneGoal, member, shareRepository), 
                     goalShareCnt,
                     contentResponseDto);
 
@@ -285,14 +285,14 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                     .limit(pageable.getPageSize())
                                     .fetch();
         
-        Member member = CommonUtils.MemberOrNull(memberRepository);
+        Member member = RepositoryHelper.MemberOrNull(memberRepository);
         List<PostContentResponseDto> page = contents
             .stream()
             .map(content -> PostContentResponseDto.of(
                             content, 
                             content.getPost().getGoal(), 
                             content.getMember().getNickname(), 
-                            CommonUtils.isLikeContent(content, member, likeRepository), 
+                            RepositoryHelper.isLikeContent(content, member, likeRepository), 
                             null))
             .collect(Collectors.toList());
 

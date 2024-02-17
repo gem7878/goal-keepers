@@ -20,7 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import com.goalkeepers.server.common.CommonUtils;
+import com.goalkeepers.server.common.RepositoryHelper;
 import com.goalkeepers.server.dto.CommunityResponseDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.PostContentResponseDto;
@@ -128,14 +128,14 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
             .map(goal -> {
 
                 // 이미지 URL
-                String originalGoalImageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
+                String originalGoalImageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
 
                 // 담기했는지
-                Member member = CommonUtils.MemberOrNull(memberRepository);
-                boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
+                Member member = RepositoryHelper.MemberOrNull(memberRepository);
+                boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
 
                 // joinMemberList 가져오기
-                List<Map<String, Object>> joinMemberList = CommonUtils.getJoinMemberList(goal);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
 
                 // PostContent 가져오기
                 List<PostContent> contents = queryFactory
@@ -152,7 +152,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                                                                 content, 
                                                                 content.getPost().getGoal(), 
                                                                 content.getMember().getNickname(), 
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                                 null))
                                                 .collect(Collectors.toList());
 
@@ -188,10 +188,10 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 Goal goal = tuple.get(postContent.shareGoal);
                 Long count = tuple.get(postContent.count());
 
-                String originalGoalImageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                Member member = CommonUtils.MemberOrNull(memberRepository);
-                boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                List<Map<String, Object>> joinMemberList = CommonUtils.getJoinMemberList(goal);
+                String originalGoalImageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                Member member = RepositoryHelper.MemberOrNull(memberRepository);
+                boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
 
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
@@ -206,7 +206,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                                                                 content, 
                                                                 content.getPost().getGoal(), 
                                                                 content.getMember().getNickname(), 
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                                 null))
                                                 .collect(Collectors.toList());
                 
@@ -298,10 +298,10 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
             .stream()
             .map(goal -> {
 
-                String originalGoalImageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                Member member = CommonUtils.MemberOrNull(memberRepository);
-                boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                List<Map<String, Object>> joinMemberList = CommonUtils.getJoinMemberList(goal);
+                String originalGoalImageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                Member member = RepositoryHelper.MemberOrNull(memberRepository);
+                boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
                                                 .where(postContent.shareGoal.eq(goal))
@@ -316,7 +316,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                                                                 content, 
                                                                 content.getPost().getGoal(), 
                                                                 content.getMember().getNickname(), 
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                                 null))
                                                 .collect(Collectors.toList());
 
