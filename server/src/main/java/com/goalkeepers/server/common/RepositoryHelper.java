@@ -18,7 +18,7 @@ import com.goalkeepers.server.repository.PostCheerRepository;
 import com.goalkeepers.server.repository.PostLikeRepository;
 import com.goalkeepers.server.service.FirebaseStorageService;
 
-public class CommonUtils {
+public class RepositoryHelper {
 
     // 이미지 URL
     public static String getImageUrl(Goal goal, FirebaseStorageService firebaseStorageService) {

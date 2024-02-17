@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.dto.LoginRequestDto;
 import com.goalkeepers.server.dto.MemberResponseDto;
@@ -23,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class MemberService extends CommonService {
+public class MemberService extends ServiceHelper {
     
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;

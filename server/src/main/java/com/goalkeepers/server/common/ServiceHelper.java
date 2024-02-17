@@ -1,4 +1,4 @@
-package com.goalkeepers.server.service;
+package com.goalkeepers.server.common;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +31,7 @@ import com.goalkeepers.server.repository.SettingRepository;
 
 @Transactional
 @Service
-public class CommonService {
+public class ServiceHelper {
     
     // 로그인 했는지 확인
     public Member isMemberCurrent(MemberRepository memberRepository) {

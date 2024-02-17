@@ -3,6 +3,7 @@ package com.goalkeepers.server.service;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.InformRequestDto;
 import com.goalkeepers.server.entity.Inform;
 import com.goalkeepers.server.entity.Member;
@@ -14,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class InformService extends CommonService {
+public class InformService extends ServiceHelper {
 
     private final InformRepository informRepository;
     private final MemberRepository memberRepository;

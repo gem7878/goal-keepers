@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
@@ -35,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 @DependsOn("firebaseStorageService")
-public class GoalService extends CommonService{
+public class GoalService extends ServiceHelper{
     
     private final GoalRepository goalRepository;
     private final MemberRepository memberRepository;

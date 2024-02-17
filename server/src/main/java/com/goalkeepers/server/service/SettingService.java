@@ -3,6 +3,7 @@ package com.goalkeepers.server.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.SettingResponseDto;
 import com.goalkeepers.server.dto.SettingUpdateRequestDto;
 import com.goalkeepers.server.entity.Member;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class SettingService extends CommonService {
+public class SettingService extends ServiceHelper {
 
     private final MemberRepository memberRepository;
     private final SettingRepository settingRepository;

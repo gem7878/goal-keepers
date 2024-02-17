@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.AnswerRequestDto;
 import com.goalkeepers.server.dto.AnswerResponseDto;
 import com.goalkeepers.server.dto.FAQRequestDto;
@@ -27,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 @Service
-public class CustomerService extends CommonService {
+public class CustomerService extends ServiceHelper {
 
     private final FaqRepository faqRepository;
     private final InquiryRepository inquiryRepository;

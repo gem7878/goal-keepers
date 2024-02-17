@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.CommunityResponseDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.entity.SORT;
@@ -17,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 @DependsOn("firebaseStorageService")
-public class BoardService extends CommonService {
+public class BoardService extends ServiceHelper {
     
     private final PostContentRepository contentRepository;
     private final GoalRepository goalRepository;
