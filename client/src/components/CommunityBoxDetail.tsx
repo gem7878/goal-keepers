@@ -170,7 +170,13 @@ const CommunityBoxDetail: React.FC<{
             ref={containerRef}
           >
             {contentData.map((list, listIndex) => {
-              return <ContentBox list={list} index={listIndex}></ContentBox>;
+              return (
+                <ContentBox
+                  list={list}
+                  key={listIndex}
+                  index={listIndex}
+                ></ContentBox>
+              );
             })}
           </ul>
         </section>
