@@ -1,6 +1,6 @@
 package com.goalkeepers.server.dto;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostLikeRequestDto {
+public class PostContentUpdateRequestDto {
 
-    @NotNull(message = "postId 값이 필요합니다.")
-    private Long postId;
+    @NotBlank(message = "내용을 입력해주세요.")
+    private String content;
 }

@@ -2,9 +2,19 @@
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
-import { handleDeletePost, handlePutPost } from '@/app/community/actions';
+import {
+  handleCreatePostContent,
+  handleDeletePost,
+  handleDeletePostContent,
+  handleGetAllPostContent,
+  handleLikeContent,
+} from '@/app/post/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setStatePost } from '@/redux/renderSlice';
+import {
+  selectRender,
+  setStateContent,
+  setStatePost,
+} from '@/redux/renderSlice';
 import { CommentBox } from './index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -15,29 +25,43 @@ import {
   faWindowClose,
   faCheckSquare,
   faCheck,
+  faTimes,
+  faThumbsUp,
+  faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
-interface postDataTypes {
+interface postContentContentTypes {
   content: string;
-  goalDescription: string;
-
-  goalId: number;
-  goalImageUrl: string;
-  goalTitle: string;
+  createdAt: string;
+  goalDescription: null | string;
+  goalId: null | number;
+  goalImageUrl: null | string;
+  goalTitle: null | string;
   like: boolean;
   likeCnt: number;
   nickname: string;
+  contentId: number;
+}
+
+interface postContentTypes {
+  content: postContentContentTypes;
+  goalDescription: string;
+  goalId: number;
+  goalImageUrl: null | string;
+  goalTitle: string;
+  goalshareCnt: number;
   postId: number;
   share: boolean;
-  shareCnt: number;
-  title: string;
-  updatedAt: string;
+  cheer: boolean;
+  myPost: false;
+  nickname: string;
+  postCheerCnt: number;
 }
 const PostBoxDetail: React.FC<{
-  data: postDataTypes;
+  data: postContentTypes;
   myNickname: string;
   index: number;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
-  onLikePost: (index: number) => void;
+  onCheerPost: (index: number) => void;
   onShareGoal: (index: number) => void;
   onGetShareData: (index: number) => void;
 }> = ({
@@ -45,38 +69,58 @@ const PostBoxDetail: React.FC<{
   myNickname,
   setFocusNum,
   index,
-  onLikePost,
+  onCheerPost,
   onShareGoal,
   onGetShareData,
 }) => {
-  const [isPostEdit, setIsPostEdit] = useState(false);
-  const [postTitle, setPostTitle] = useState(data.title);
-  const [postContent, setPostContent] = useState(data.content);
+  const [addContent, setAddContent] = useState(false);
+  const [contentList, setContentList] = useState<postContentContentTypes[]>([]);
+  const [pageable, setPageable] = useState({
+    pageNumber: 1,
+    last: false,
+  });
+  const [more, setMore] = useState<boolean>(false);
+  const [focusContent, setFocusContent] = useState<null | number>(null);
+  const [contentValue, setContentValue] = useState('');
+
   const likeRef = useRef<HTMLUListElement>(null);
+  const contentRef = useRef<any>(null);
   const reduxPostData = useSelector(selectRender);
   const dispatch = useDispatch();
-  const onUpdatePost = async () => {
-    const postData = {
-      title: postTitle,
-      content: postContent,
-      goalId: data.goalId,
+
+  useEffect(() => {
+    onGetAllPostContent(pageable.pageNumber);
+  }, [reduxPostData.contentBoolean]);
+
+  const onGetAllPostContent = async (pageNumber: number) => {
+    const formData = {
+      pageNum: pageNumber,
       postId: data.postId,
     };
-    const confirm = window.confirm('포스트 수정을 완료하시겠습니까?');
-    if (confirm) {
-      await handlePutPost(postData)
-        .then((response) => {
-          if (response.success) {
-            setIsPostEdit(false);
-            dispatch(setStatePost(data.postId));
-          }
-        })
-        .catch((error) => console.log(error));
+
+    const response = await handleGetAllPostContent(formData);
+
+    if (response.success) {
+      if (more) {
+        setContentList((prevPostData) => [
+          ...prevPostData,
+          ...response.data.content,
+        ]);
+        setPageable({
+          pageNumber: response.data.pageable.pageNumber + 1,
+          last: response.data.last,
+        });
+      } else {
+        setContentList(response.data.content);
+        setPageable({
+          pageNumber: response.data.pageable.pageNumber + 1,
+          last: response.data.last,
+        });
+      }
+      setMore(false);
     }
   };
-  const test =
-    '차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차차';
-  console.log(test.length);
+
   const onDeletePost = async () => {
     const postData = {
       postId: data.postId,
@@ -91,14 +135,44 @@ const PostBoxDetail: React.FC<{
         .catch((error) => console.log(error));
     }
   };
+
+  const onCreatePostContent = async (goalId: number) => {
+    const formData = {
+      content: contentValue,
+      goalId: goalId,
+    };
+    const response = await handleCreatePostContent(formData);
+
+    if (response.success) {
+      setAddContent(false);
+      dispatch(setStateContent(!reduxPostData.contentBoolean));
+    }
+  };
+
+  const onLikeContent = async (contentId: number) => {
+    const response = await handleLikeContent(contentId);
+
+    if (response.success) {
+      dispatch(setStateContent(!reduxPostData.contentBoolean));
+    }
+  };
+  const onDeleteContent = async (contentId: number) => {
+    const response = await handleDeletePostContent(contentId);
+
+    if (response.success) {
+      dispatch(setStateContent(!reduxPostData.contentBoolean));
+    }
+  };
+
   return (
     <article
-      className="h-3/4 flex-col p-3 mb-4 border rounded-md duration-100	
+      className="h-[450px] flex flex-col p-3 mb-4 border rounded-md duration-100	
       w-11/12
       inset-x-0
-      mx-auto"
+      mx-auto justify-between
+      "
     >
-      <div className="w-full h-1/4 relative z-0 flex rounded-md	">
+      <div className="w-full h-1/4 relative z-0 flex rounded-md">
         <Image
           src={data.goalImageUrl === null ? Image1 : data.goalImageUrl}
           alt=""
@@ -113,31 +187,14 @@ const PostBoxDetail: React.FC<{
           }}
         ></Image>
         <div className="w-full h-full bg-black absolute opacity-50"></div>
-        {myNickname === data.nickname && (
+        {data.myPost && (
           <div className="flex text-white absolute top-0 right-0 text-xs gap-2 m-2">
-            {isPostEdit ? (
-              <>
-                <FontAwesomeIcon
-                  onClick={() => setIsPostEdit(false)}
-                  icon={faWindowClose}
-                />
-                <FontAwesomeIcon
-                  onClick={() => onUpdatePost()}
-                  icon={faCheck}
-                />
-              </>
-            ) : (
-              <>
-                <FontAwesomeIcon
-                  onClick={() => setIsPostEdit(true)}
-                  icon={faEdit}
-                />
-                <FontAwesomeIcon
-                  onClick={() => onDeletePost()}
-                  icon={faTrash}
-                />
-              </>
-            )}
+            <>
+              <FontAwesomeIcon
+                onClick={() => onDeletePost()}
+                icon={faTrashAlt}
+              />
+            </>
           </div>
         )}
         <h3 className="text-center px-1  mx-4	text-white	font-bold absolute top-1/4 -translate-y-1/3 z-10 text-ellipsis	">
@@ -156,16 +213,14 @@ const PostBoxDetail: React.FC<{
         >
           <li className="flex items-center gap-1">
             <FontAwesomeIcon
-              icon={faHeart}
-              onClick={() => onLikePost(index)}
-              className="text-orange-500"
-            />
-            <label
-              className={`text-xs	${
-                data.like ? 'text-orange-400' : 'text-gray-300'
+              icon={faThumbsUp}
+              onClick={() => onCheerPost(index)}
+              className={`text-gray-400 ${
+                data.cheer ? 'text-orange-400' : 'text-gray-300'
               }`}
-            >
-              {data.likeCnt}
+            />
+            <label className={`text-xs 'text-gray-300'`}>
+              {data.postCheerCnt}
             </label>
           </li>
           <li className="flex items-center gap-1">
@@ -174,45 +229,88 @@ const PostBoxDetail: React.FC<{
               onClick={() => {
                 data.share ? onGetShareData(data.goalId) : onShareGoal(index);
               }}
-              className="text-gray-400"
-            />
-            <label
-              className={`text-xs	${
+              className={`text-gray-400 ${
                 data.share ? 'text-orange-400' : 'text-gray-300'
               }`}
-            >
-              {data.shareCnt}
+            />
+            <label className={`text-xs 'text-gray-300'	`}>
+              {data.goalshareCnt}
             </label>
           </li>
         </ul>
       </div>
-      {isPostEdit ? (
-        <div className="w-full h-[40%]	pt-2 flex flex-col">
-          <input
-            className="font-bold"
-            value={postTitle}
-            onChange={(e) => setPostTitle(e.target.value)}
-          ></input>
-          <h5 className="text-xs	w-full text-right	">
-            {data.updatedAt.slice(0, 10)}
-          </h5>
-          <textarea
-            className="text-sm h-3/5"
-            defaultValue={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
-          ></textarea>
-        </div>
-      ) : (
-        <div className="w-full h-[40%]	pt-2 flex flex-col">
-          <h3 className="font-bold">
-            {postTitle.length > 20 ? postTitle.slice(0, 20) + '...' : postTitle}
-          </h3>
-          <h5 className="text-xs	w-full text-right	">
-            {data.updatedAt.slice(0, 10)}
-          </h5>
-          <p className="text-sm	">{postContent}</p>
-        </div>
-      )}
+
+      <div className="w-full	mt-2 flex flex-col flex-1">
+        <ul className="flex-1 overflow-y-auto w-full p-2 pb-4" ref={contentRef}>
+          {addContent && (
+            <li className="w-full h-9 flex gap-2 items-center">
+              <input
+                className="w-11/12 text-sm border-b p-1 text-gray-600"
+                type="text"
+                autoFocus
+                placeholder="목표의 현재 진행 상황을 기록하세요!"
+                onChange={(e) => setContentValue(e.target.value)}
+              ></input>
+              <button className="w-6 h-6" onClick={() => setAddContent(false)}>
+                <FontAwesomeIcon
+                  icon={faTimes}
+                  className="w-full text-gray-600 h-full"
+                />
+              </button>
+            </li>
+          )}
+          {contentList.map((list, index) => {
+            return (
+              <li
+                key={index}
+                onMouseEnter={() => setFocusContent(index)}
+                onMouseLeave={() => setFocusContent(null)}
+                className={`text-gray-600 font-semibold	 text-sm ${
+                  focusContent === index ? 'bg-orange-200' : 'bg-orange-100'
+                } mt-3 py-1 rounded-md px-2 drop-shadow-md flex justify-between`}
+              >
+                <span>{list.content}</span>
+                <button>
+                  {focusContent === index ? (
+                    data.myPost ? (
+                      <FontAwesomeIcon
+                        onClick={() => onDeleteContent(list.contentId)}
+                        className={`text-white`}
+                        icon={faTrashAlt}
+                      />
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        className={` ${
+                          list.like ? 'text-orange-600' : 'text-white'
+                        }`}
+                        onClick={() => onLikeContent(list.contentId)}
+                      />
+                    )
+                  ) : (
+                    <></>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        {data.myPost && (
+          <button
+            onClick={() => {
+              if (addContent) {
+                onCreatePostContent(data.goalId);
+              } else {
+                contentRef.current.scrollTop = 0;
+                setAddContent(true);
+              }
+            }}
+            className="h-[13%] w-full bg-orange-400 rounded-xl text-sm text-white"
+          >
+            {addContent ? '입력' : '기록하기'}
+          </button>
+        )}
+      </div>
       <CommentBox postId={data.postId} myNickname={myNickname}></CommentBox>
     </article>
   );

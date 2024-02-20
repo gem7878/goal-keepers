@@ -56,6 +56,7 @@ public class AuthController {
 
     @PostMapping("/email/verification-request")
     public ResponseEntity<CommonResponseDto> verificationEmail(@Valid @RequestBody ConfirmEmailRequestDto requestDto) {
+        authService.confirmDuplicateEmail(requestDto.getEmail());
         authService.sendCodeToEmail(requestDto.getEmail());
         return ResponseEntity.ok(new CommonResponseDto(true, "이메일을 전송하였습니다."));
     }

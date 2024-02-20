@@ -22,23 +22,17 @@ public class QPost extends EntityPathBase<Post> {
 
     public static final QPost post = new QPost("post");
 
+    public final NumberPath<Integer> cheerCnt = createNumber("cheerCnt", Integer.class);
+
+    public final SetPath<PostCheer, QPostCheer> cheerList = this.<PostCheer, QPostCheer>createSet("cheerList", PostCheer.class, QPostCheer.class, PathInits.DIRECT2);
+
     public final ListPath<PostComment, QPostComment> comments = this.<PostComment, QPostComment>createList("comments", PostComment.class, QPostComment.class, PathInits.DIRECT2);
 
-    public final StringPath content = createString("content");
+    public final ListPath<PostContent, QPostContent> contentList = this.<PostContent, QPostContent>createList("contentList", PostContent.class, QPostContent.class, PathInits.DIRECT2);
 
     public final QGoal goal;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
-
-    public final NumberPath<Integer> likeCnt = createNumber("likeCnt", Integer.class);
-
-    public final SetPath<PostLike, QPostLike> likes = this.<PostLike, QPostLike>createSet("likes", PostLike.class, QPostLike.class, PathInits.DIRECT2);
-
-    public final QMember member;
-
-    public final StringPath title = createString("title");
-
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
 
     public QPost(String variable) {
         this(Post.class, forVariable(variable), INITS);
@@ -59,7 +53,6 @@ public class QPost extends EntityPathBase<Post> {
     public QPost(Class<? extends Post> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.goal = inits.isInitialized("goal") ? new QGoal(forProperty("goal"), inits.get("goal")) : null;
-        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
     }
 
 }

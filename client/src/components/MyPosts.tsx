@@ -12,117 +12,133 @@ import React, {
 import Image1 from '../../public/assets/images/goalKeepers.png';
 import Image2 from '@/public/assets/images/gem.png';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectRender } from '@/redux/renderSlice';
-import { handleGetGoalListAll } from '@/app/actions';
+import { selectRender, setStatePost } from '@/redux/renderSlice';
+import {
+  handleGetMyPostAll,
+  handleGetPostAll,
+} from '@/app/post/actions';
 import { setStateGoal } from '@/redux/renderSlice';
+import { PostBox, PostBoxDetail } from './index';
+import { handleGetUserInfo } from '@/app/actions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faChevronCircleRight,
+  faChevronCircleLeft,
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  handleCreateShare,
+  handleDeleteShare,
+  handleGetShare,
+} from '@/app/community/share/actions';
 
-interface myGoalListTypes {
-  goalId: number;
-  title: string;
-  description: string;
-  imageUrl: any;
-  startDate: string;
-  endDate: string;
-  shareCnt: number;
+interface postContentContentTypes {
+  content: string;
+  createdAt: string;
+  goalDescription: null | string;
+  goalId: null | number;
+  goalImageUrl: null | string;
+  goalTitle: null | string;
+  like: boolean;
+  likeCnt: number;
+  nickname: string;
+  contentId: number;
 }
+
+interface postContentTypes {
+  content: postContentContentTypes;
+  goalDescription: string;
+  goalId: number;
+  goalImageUrl: null | string;
+  goalTitle: string;
+  goalshareCnt: number;
+  postId: number;
+  share: boolean;
+  cheer: boolean;
+  myPost: false;
+  nickname: string;
+  postCheerCnt: number;
+}
+
 const MyPosts: React.FC<{
-  myGoalList: myGoalListTypes[];
-  setSelectGoalNum: React.Dispatch<SetStateAction<number | null>>;
-  setMyGoalList: any;
-}> = ({ myGoalList, setSelectGoalNum, setMyGoalList }) => {
+}> = ({  }) => {
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
   });
-  const [more, setMore] = useState<boolean>(false);
+  const [nickname, setNickname] = useState('');
+  const [focusNum, setFocusNum] = useState<number | null>(null);
+  const [page, setPage] = useState(pageable.pageNumber);
+  const [postData, setPostData] = useState<postContentTypes[]>([]);
+
   const containerRef = useRef<any>(null);
 
   const dispatch = useDispatch();
-  const reduxGoalData = useSelector(selectRender);
+  const reduxPostData = useSelector(selectRender);
 
   useEffect(() => {
-    handleFetchGoalListAll(pageable.pageNumber);
+    onGetUserInfo();
   }, []);
-  useEffect(() => {
-    if (reduxGoalData.goalBoolean === true) {
-      handleFetchGoalListAll(1);
-      dispatch(setStateGoal(false));
-    }
-  }, [reduxGoalData.goalBoolean]);
 
   useEffect(() => {
-    if (more) {
-      handleCheckLastPage();
-    }
-  }, [more]);
+    onGetMyAllPost(page);
+  }, [page, reduxPostData.postBoolean]);
 
-  useLayoutEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.addEventListener('scroll', handleScroll);
-      return () =>
-        containerRef.current.removeEventListener('scroll', handleScroll);
-    }
-  }, []);
-
-  const handleScroll = useCallback(() => {
-    if (containerRef.current) {
-      const elements = containerRef.current.querySelectorAll('.goal-element');
-
-      if (elements.length > 0) {
-        const lastElement = elements[elements.length - 1];
-
-        const lastElementBottom = lastElement.getBoundingClientRect().bottom;
-        const parentElementBottom =
-          lastElement.parentElement.getBoundingClientRect().bottom;
-
-        if (lastElementBottom - parentElementBottom < -20) {
-          setMore(true);
-        }
-      }
-    }
-  }, []);
-
-  const handleFetchGoalListAll = async (pageParam: number) => {
+  const onGetMyAllPost = async (pageParam: number) => {
     const form = { pageNum: pageParam };
-    try {
-      const response = await handleGetGoalListAll(form);
+    await handleGetMyPostAll(form)
+      .then((response) => {
+        setPostData(response.content);
+        setPageable({
+          pageNumber: response.pageable.pageNumber + 1,
+          last: response.last,
+        });
+      })
+      .catch((error) => console.log(error));
+  };
 
-      if (response.data) {
-        if (more) {
-          setMyGoalList((prevPostData: any) => [
-            ...prevPostData,
-            ...response.data.content,
-          ]);
-          setPageable({
-            pageNumber: response.data.pageable.pageNumber + 1,
-            last: response.data.last,
-          });
-        } else {
-          setMyGoalList(response.data.content);
-          setPageable({
-            pageNumber: response.data.pageable.pageNumber + 1,
-            last: response.data.last,
-          });
+  const onGetUserInfo = async () => {
+    await handleGetUserInfo()
+      .then((response) => {
+        setNickname(response.nickname);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const onCheerPost = async (index: number) => {
+    // await handleLikePost(postData[index].postId)
+    //   .then((response) => {
+    //     if (response.success) {
+    //       dispatch(setStatePost(!reduxPostData.postBoolean));
+    //     }
+    //   })
+    //   .catch((error) => console.log(error));
+  };
+  const onShareGoal = async (index: number) => {
+    // await handleCreateShare(postData[index].goalId)
+    //   .then((response) => {
+    //     if (response.success) {
+    //       dispatch(setStatePost(!reduxPostData.postBoolean));
+    //     }
+    //   })
+    //   .catch((error) => console.log(error));
+  };
+  const onGetShareData = async (goalId: number) => {
+    // await handleGetShare(goalId)
+    //   .then(async (response) => {
+    //     if (response.success) {
+    //       await onDeleteShareGoal(response.data.goalId);
+    //     }
+    //   })
+    //   .catch((error) => console.log(error));
+  };
+  const onDeleteShareGoal = async (goalId: number) => {
+    await handleDeleteShare(goalId)
+      .then((response) => {
+        if (response.success) {
+          dispatch(setStatePost(!reduxPostData.postBoolean));
         }
-
-        setMore(false);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleSelectGoalClick = (index: number) => {
-    setSelectGoalNum(index);
-  };
-
-  const handleCheckLastPage = () => {
-    const pageNumber = pageable.pageNumber + 1;
-    if (pageable.last) {
-      console.log('마지막 페이지 입니다.');
-    } else {
-      handleFetchGoalListAll(pageNumber);
-    }
+      })
+      .catch((error) => console.log(error));
   };
   return (
     <div className="w-full h-[calc(100%-40px)] border-x border-b border-orange-300">
@@ -130,27 +146,64 @@ const MyPosts: React.FC<{
         className="w-full max-h-full flex flex-wrap pr-2 pl-4 py-6 overflow-y-scroll gap-2"
         ref={containerRef}
       >
-        {/* {myGoalList.map((list, index) => {
-          return (
-            <li
-              key={index}
-              className="w-[calc(33%-8px)] aspect-square bg-white relative flex items-center justify-center goal-element"
-              onClick={() => handleSelectGoalClick(index)}
-            >
-              <Image
-                src={list.imageUrl === null ? Image1 : list.imageUrl}
-                alt=""
-                fill
-                style={{
-                  objectFit: 'cover',
-                  position: 'absolute',
-                }}
-              ></Image>
-              <div className="w-full h-full bg-black opacity-50 absolute"></div>
-              <h3 className="text-white absolute">{list.title}</h3>
-            </li>
-          );
-        })} */}
+        <section className="z-0 h-full overflow-y-scroll w-full postList">
+          {postData.map((data, index) => {
+            if (focusNum === index) {
+              return (
+                <PostBoxDetail
+                  data={data}
+                  key={index}
+                  myNickname={nickname}
+                  setFocusNum={setFocusNum}
+                  index={index}
+                  onCheerPost={onCheerPost}
+                  onShareGoal={onShareGoal}
+                  onGetShareData={onGetShareData}
+                ></PostBoxDetail>
+              );
+            } else {
+              return (
+                <PostBox
+                  data={data}
+                  key={index}
+                  index={index}
+                  focusNum={focusNum}
+                  setFocusNum={setFocusNum}
+                  onCheerPost={onCheerPost}
+                  onShareGoal={onShareGoal}
+                  onGetShareData={onGetShareData}
+                ></PostBox>
+              );
+            }
+          })}
+
+          <section className="h-[30px] w-full flex justify-center gap-4 text-gray-600 ">
+            <FontAwesomeIcon
+              icon={faChevronCircleLeft}
+              className="cursor-pointer"
+              onClick={() => {
+                if (page > 1) {
+                  setPage(page - 1);
+                  setFocusNum(null);
+                } else {
+                  alert('첫 번째 페이지 입니다.');
+                }
+              }}
+            />
+            <FontAwesomeIcon
+              icon={faChevronCircleRight}
+              className="cursor-pointer"
+              onClick={() => {
+                if (pageable.last) {
+                  alert('마지막 페이지 입니다.');
+                } else {
+                  setPage(page + 1);
+                  setFocusNum(null);
+                }
+              }}
+            />
+          </section>
+        </section>
       </ul>
     </div>
   );

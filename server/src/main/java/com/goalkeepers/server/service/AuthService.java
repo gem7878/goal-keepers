@@ -50,7 +50,7 @@ public class AuthService extends CommonService {
     public TokenDto login(LoginRequestDto requestDto) {
         UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
         Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
-        return tokenProvider.createJwt(authentication,12);
+        return tokenProvider.createJwt(authentication,24);
     }
 
     // 멤버 정보 가져오기
@@ -58,7 +58,7 @@ public class AuthService extends CommonService {
         return memberRepository.findByEmail(email);
     }
 
-    // 지울 예정
+    // 이메일 중복 확인
     public void confirmDuplicateEmail(String email) {
         Boolean isExistsEmail = memberRepository.existsByEmail(email);
         if (isExistsEmail) {

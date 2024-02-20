@@ -3,14 +3,14 @@
 import { handleGetToken } from '@/utils/getToken';
 import axios from 'axios';
 
-export const handleGetComment = async (getData: {
-  postId: number;
-  page: number;
-}) => {
+export const handleGetShare = async (goalId: number) => {
   const token = handleGetToken().token;
+  const formData = {
+    goalId: goalId,
+  };
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/all-comment?post-id=${getData.postId}&page=${getData.page}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/share?goal-id=${formData.goalId}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -19,7 +19,6 @@ export const handleGetComment = async (getData: {
         withCredentials: true,
       },
     );
-
     return response.data;
   } catch (error) {
     console.log('error', error);
@@ -29,17 +28,16 @@ export const handleGetComment = async (getData: {
   }
 };
 
-export const handleCreateComment = async (formData: {
-  postId: number;
-  content: string;
-}) => {
+export const handleCreateShare = async (goalId: number) => {
   const token = handleGetToken().token;
+  const formData = {
+    goalId: goalId,
+  };
   try {
-    const id = formData.postId;
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/comment?post-id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/share`,
       {
-        content: formData.content,
+        goalId: formData.goalId,
       },
       {
         headers: {
@@ -59,43 +57,18 @@ export const handleCreateComment = async (formData: {
   }
 };
 
-export const handleUpdateComment = async (formData: {
-  commentId: number;
-  content: string;
-}) => {
+export const handleDeleteShare = async (goalId: number) => {
   const token = handleGetToken().token;
+  const formData = {
+    goalId: goalId,
+  };
   try {
-    const id = formData.commentId;
-    const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/comment?comment-id=${id}`,
-      {
-        content: formData.content,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      },
-    );
-    return response.data;
-  } catch (error: any) {
-    console.error('Error during request setup:', error.message);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal Server Error' }),
-    };
-  }
-};
-
-export const handleDeleteComment = async (formData: { commentId: number }) => {
-  try {
-    const token = handleGetToken().token;
-    const id = formData.commentId;
     const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/comment?comment-id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/share`,
       {
+        data: {
+          goalId: formData.goalId,
+        },
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,

@@ -1,8 +1,8 @@
 package com.goalkeepers.server.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,15 +43,14 @@ public class Goal {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    @NotNull
+    @JoinColumn(name = "member_id", nullable = true)
     private Member member;
 
-    @Column(length = 50)
+    @Column(length = 18)
     @NotNull
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 65)
     private String description;
 
     @Column
@@ -61,10 +60,16 @@ public class Goal {
     private LocalDate endDate;
 
     @Column
+    private LocalDateTime completeDate;
+
+    @Column
     private String imageUrl;
 
     @ColumnDefault("0")
     private int shareCnt;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean completed;
 
     @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY)
     private Set<GoalShare> shareList;
@@ -73,19 +78,25 @@ public class Goal {
     @JoinColumn(name = "share_id", nullable = true)
     private GoalShare share;
 
-    @OneToMany(mappedBy = "goal")
-    private List<Post> posts;
-
     public static Goal goalUpdate(Goal goal, GoalUpdateRequestDto requestDto, String imageUrl) {
         if (Objects.isNull(requestDto)) {
             goal.imageUrl = imageUrl;
             return goal;
         }
-        goal.title = Optional.ofNullable(requestDto.getTitle()).orElse(goal.getTitle());
         goal.description = Optional.ofNullable(requestDto.getDescription()).orElse(goal.getDescription());
         goal.startDate = Optional.ofNullable(requestDto.getStartDate()).orElse(goal.getStartDate());
         goal.endDate = Optional.ofNullable(requestDto.getEndDate()).orElse(goal.getEndDate());
         goal.imageUrl = Optional.ofNullable(imageUrl).orElse(goal.getImageUrl());
+        return goal;
+    }
+
+    public static Goal disconnectedGoal(Goal goal) {
+        goal.description = null;
+        goal.startDate = null;
+        goal.endDate = null;
+        goal.member = null;
+        goal.completed = false;
+        goal.share = null;
         return goal;
     }
 

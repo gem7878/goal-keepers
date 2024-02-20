@@ -12,7 +12,7 @@ import {
   handleDeleteComment,
   handleGetComment,
   handleUpdateComment,
-} from '@/app/community/comment/actions';
+} from '@/app/post/comment/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStateComment } from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,7 +38,7 @@ interface commentTypes {
 const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
   const [commentList, setCommentList] = useState<commentTypes[]>([]);
   const [inputContent, setInputContent] = useState('');
-  const [CommentEditNum, setCommentEditNum] = useState<number | null>(null);
+  const [commentEditNum, setCommentEditNum] = useState<number | null>(null);
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
@@ -51,13 +51,15 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    onGetComment(pageable.pageNumber);
+    onGetComment(pageable.pageNumber, false);
   }, [reduxCommentData.commentBoolean]);
+
   useEffect(() => {
     if (more) {
       handleCheckLastPage();
     }
   }, [more]);
+
   useLayoutEffect(() => {
     if (containerRef.current) {
       containerRef.current.addEventListener('scroll', handleScroll);
@@ -85,53 +87,58 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
     }
   }, []);
 
-  const onGetComment = async (pageNumber: number) => {
+  const onGetComment = async (pageNumber: number, create: boolean) => {
     const formData = {
       postId: postId,
       page: pageNumber,
     };
-    await handleGetComment(formData)
-      .then((response) => {
-        if (response.success) {
-          if (more) {
-            setCommentList((prevPostData) => [
-              ...prevPostData,
-              ...response.data.content,
-            ]);
-            setPageable({
-              pageNumber: response.data.pageable.pageNumber + 1,
-              last: response.last,
-            });
-          } else {
-            setCommentList(response.data.content);
-            setPageable({
-              pageNumber: response.data.pageable.pageNumber + 1,
-              last: response.last,
-            });
-          }
-          setMore(false);
+
+    const response = await handleGetComment(formData);
+
+    if (response.success) {
+      if (create) {
+        setCommentList((prevPostData) => [
+          ...prevPostData,
+          response.data.content[response.data.content.length - 1],
+        ]);
+      } else {
+        if (more) {
+          setCommentList((prevPostData) => [
+            ...prevPostData,
+            ...response.data.content,
+          ]);
+        } else {
+          setCommentList(response.data.content);
         }
-      })
-      .catch((error) => console.log(error));
+        setMore(false);
+      }
+      setPageable({
+        pageNumber: response.data.pageable.pageNumber + 1,
+        last: response.data.last,
+      });
+    }
   };
+
   const onCreateComment = async () => {
     const formData = {
       postId: postId,
       content: inputContent,
     };
+
     await handleCreateComment(formData)
       .then((response) => {
         if (response.success) {
           setInputContent('');
-          dispatch(setStateComment(!reduxCommentData.commentBoolean));
+          onGetComment(pageable.pageNumber, true);
         }
       })
       .catch((error) => console.log(error));
   };
+
   const onUpdateComment = async () => {
-    if (typeof CommentEditNum === 'number') {
+    if (typeof commentEditNum === 'number') {
       const formData = {
-        commentId: CommentEditNum,
+        commentId: commentEditNum,
         content: inputContent,
       };
       await handleUpdateComment(formData)
@@ -145,6 +152,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
         .catch((error) => console.log(error));
     }
   };
+
   const onDeleteComment = async (index: number) => {
     const formData = {
       commentId: index,
@@ -166,25 +174,31 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
     if (pageable.last) {
       console.log('마지막 페이지 입니다.');
     } else {
-      onGetComment(pageNumber);
+      onGetComment(pageNumber, false);
     }
   };
 
   return (
-    <div className="w-full h-[35%] flex-col text-sm">
-      <h3 className="h-4 ml-1">댓글</h3>
-      <div className="w-full h-[calc(100%-20px)] mt-1 border rounded-lg p-2">
-        <ul className="w-full h-3/4 overflow-y-scroll" ref={containerRef}>
+    <div className="w-full max-h-[30%] min-h-[50px] flex-col text-sm">
+      <div className="w-full h-[calc(100%-9px)] mt-2 border rounded-lg p-2">
+        <ul
+          className="w-full h-[calc(100%-29px)] overflow-y-scroll mb-1"
+          ref={containerRef}
+        >
           {commentList.map((list, index) => {
             return (
-              <li key={index} className={`flex-col w-full comment-element`}>
+              <li
+                key={index}
+                className={`flex-col w-full comment-element text-gray-700`}
+              >
                 <div className="flex text-xs w-full justify-between">
                   <h4 className=" font-bold">{list.nickname}</h4>
                   {myNickname === list.nickname &&
-                    (CommentEditNum ? (
-                      CommentEditNum === list.commentId ? (
+                    (commentEditNum ? (
+                      commentEditNum === list.commentId ? (
                         <div className="flex gap-1 mr-2">
                           <FontAwesomeIcon
+                            className="text-gray-600"
                             onClick={() => {
                               setCommentEditNum(null);
                               setInputContent('');
@@ -198,6 +212,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
                     ) : (
                       <div className="flex gap-1 mr-2">
                         <FontAwesomeIcon
+                          className="text-gray-600"
                           onClick={() => {
                             setCommentEditNum(list.commentId);
                             setInputContent(list.content);
@@ -205,6 +220,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
                           icon={faEdit}
                         />
                         <FontAwesomeIcon
+                          className="text-gray-600"
                           onClick={() => onDeleteComment(list.commentId)}
                           icon={faTrash}
                         />
@@ -213,7 +229,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
                 </div>
                 <p
                   className={`text-xs w-auto ${
-                    CommentEditNum === list.commentId && 'bg-orange-100'
+                    commentEditNum === list.commentId && 'bg-orange-100'
                   }`}
                 >
                   {list.content}
@@ -222,7 +238,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
             );
           })}
         </ul>
-        <div className="w-full flex justify-between h-1/4">
+        <div className="w-full flex justify-between h-[25px]">
           <input
             type="text"
             className="border rounded-lg w-5/6 pl-2 text-xs"
@@ -230,7 +246,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
             value={inputContent}
             onChange={(e) => setInputContent(e.target.value)}
           />
-          {CommentEditNum !== null ? (
+          {commentEditNum !== null ? (
             <button
               className="w-[13%] bg-orange-300 rounded-lg text-xs text-white border border-white"
               onClick={() => onUpdateComment()}

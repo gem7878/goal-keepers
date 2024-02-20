@@ -20,6 +20,9 @@
   outline: none;
   resize: none !important;
 }
+html {
+  height: 100%;
+}
 body {
   width: 100vw;
   /* color: rgb(var(--foreground-rgb));
@@ -74,4 +77,7 @@ body {
 @font-face {
   font-family: 'MoiraiOne';
   src: url('../../public/assets/font/MoiraiOne-Regular.ttf');
+}
+.alarm-menu::-webkit-scrollbar {
+  display: none;
 }

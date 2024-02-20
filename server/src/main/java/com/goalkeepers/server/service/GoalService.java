@@ -1,6 +1,8 @@
 package com.goalkeepers.server.service;
 
+import java.util.List;
 import java.util.Objects;
+import java.time.LocalDateTime;
 import java.io.IOException;
 
 import org.springframework.context.annotation.DependsOn;
@@ -16,7 +18,7 @@ import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
-import com.goalkeepers.server.entity.Post;
+import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
@@ -36,6 +38,7 @@ public class GoalService extends CommonService{
     private final LikeShareService shareService;
     private final GoalShareRepository shareRepository;
     private final FirebaseStorageService firebaseStorageService;
+    private final ContentService contentService;
     
 
     /*
@@ -62,18 +65,20 @@ public class GoalService extends CommonService{
             imageUrl = firebaseStorageService.showFile(imageUrl);
         }
         if(member == null) {
-            return GoalResponseDto.of(goal, imageUrl);
+            return GoalResponseDto.of(goal, imageUrl, findJoinMemberList(goal));
         }
         Boolean isShare = shareRepository.existsByMemberAndGoal(member, goal);
-        return GoalResponseDto.of(goal, imageUrl, isShare);
+        return GoalResponseDto.of(goal, imageUrl, isShare, findJoinMemberList(goal));
     }
 
-    public GoalResponseDto createMyGoal(GoalRequestDto requestDto, String imageUrl) {
+    public Long createMyGoal(GoalRequestDto requestDto, String imageUrl) {
         Member member = isMemberCurrent(memberRepository);
-        return GoalResponseDto.of(goalRepository.save(requestDto.toGoal(member, imageUrl)));
+        Goal goal = goalRepository.save(requestDto.toGoal(member, imageUrl));
+        return goal.getId();
+        //return GoalResponseDto.of(goalRepository.save(requestDto.toGoal(member, imageUrl)), null);
     }
 
-    public GoalResponseDto updateMyGoal(GoalUpdateRequestDto requestDto, Long goalId, MultipartFile multipartFile) throws IOException, FirebaseException {
+    public void updateMyGoal(GoalUpdateRequestDto requestDto, Long goalId, MultipartFile multipartFile) throws IOException, FirebaseException {
         Goal currentGoal = isMyGoal(memberRepository, goalRepository, goalId);
         
         if (multipartFile == null && requestDto != null) {
@@ -83,12 +88,13 @@ public class GoalService extends CommonService{
                 if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
                     firebaseStorageService.deleteFile(imageUrl);
                 }
-                return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null));
-            }
-            /* 이미지 변경 안함 */
-            String showImageUrl = firebaseStorageService.showFile(currentGoal.getImageUrl());
-            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null), showImageUrl);
-            
+                Goal.goalUpdate(currentGoal, requestDto, null);
+                //return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null), findJoinMemberList(currentGoal));
+            } else {
+                /* 이미지 변경 안함 */
+                Goal.goalUpdate(currentGoal, requestDto, null);
+                //return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, null), showImageUrl, findJoinMemberList(currentGoal));         
+            }         
         } else {
             /* 이미지 변경 */
             String imageUrl = currentGoal.getImageUrl();
@@ -100,29 +106,53 @@ public class GoalService extends CommonService{
             String newImageUrl = firebaseStorageService.upload(multipartFile, "images");
             
             // 이미지 url 가져오기
-            String showImageUrl = firebaseStorageService.showFile(newImageUrl);
+            //String showImageUrl = firebaseStorageService.showFile(newImageUrl);
 
             // DB 업데이트
-            return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, newImageUrl), showImageUrl);
+            Goal.goalUpdate(currentGoal, requestDto, newImageUrl);
+            //return GoalResponseDto.of(Goal.goalUpdate(currentGoal, requestDto, newImageUrl), showImageUrl, findJoinMemberList(currentGoal));
         }
     }
 
-    public void deleteMyGoal(Long goalId) {
+    public String deleteMyGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
+        Member member = isMemberCurrent(memberRepository);
         String imageUrl = goal.getImageUrl();
         if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
             firebaseStorageService.deleteFile(imageUrl);
         }
-        disconnectedPost(goal);
-        shareService.deleteShare(goal);
-        goalRepository.delete(goal);
+        // 포스트 지우기
+        List<PostContent> contents = contentService.getMyPostContentWithGoal(goal);
+        for (PostContent content : contents) {
+            contentService.deleteMyPostContent(content.getId());
+        }
+        if(goal.getShareCnt() == 0 && !shareRepository.existsByMemberAndGoal(member, goal)) {
+            if(Objects.isNull(goal.getShare())) {
+                // 쉐어 지우기
+                shareService.deleteShare(goal);
+            }
+            goalRepository.deleteById(goalId);
+            return "삭제";
+        } else {
+            // 참여한 사람들이 있을 때
+            // title, share_cnt, image_url 제외 정보 지우기
+            Goal.disconnectedGoal(goal);
+            return "정보 삭제";
+        }
     }
 
-    private void disconnectedPost(Goal goal) {
-        for (Post post : goal.getPosts()) {
-            if(post.getGoal() != null) {
-                post.setGoal(null);
-            }
+    public String completeMyGoal(Long goalId) {
+        Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
+        if(goal.isCompleted()) {
+            goal.setCompleted(false);
+            goal.setCompleteDate(null);
+            return goalId + " Goal 완료 취소하였습니다.";
+        } else {
+            LocalDateTime today = LocalDateTime.now();
+            goal.setCompleted(true);
+            goal.setCompleteDate(today);
+            return goalId + " Goal 완료하였습니다.";
         }
+        
     }
 }

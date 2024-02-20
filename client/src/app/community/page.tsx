@@ -1,5 +1,9 @@
 'use client';
-import { CreateButton, PostBox, PostBoxDetail } from '@/components/index.js';
+import {
+  CommunityBox,
+  CommunityBoxDetail,
+  SearchBox,
+} from '@/components/index.js';
 import React, {
   useCallback,
   useEffect,
@@ -7,183 +11,204 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { handleGetPostAll, handleLikePost } from './actions';
-import { handleGetUserInfo } from '../actions';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setStatePost } from '@/redux/renderSlice';
-import {
-  handleCreateShare,
-  handleDeleteShare,
-  handleGetShare,
-} from './share/actions';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faSearch,
-  faChevronCircleRight,
-  faChevronCircleLeft,
-} from '@fortawesome/free-solid-svg-icons';
+import { handleGetCommunityAll } from './actions';
+import { useSelector } from 'react-redux';
+import { selectRender } from '@/redux/renderSlice';
 
-interface postTypes {
-  postId: number;
-  nickname: string;
-  title: string;
+interface communityContentList {
   content: string;
-  updatedAt: string;
-  likeCnt: number;
-  goalId: number;
-  goalTitle: string;
+  contentId: number;
+  createdAt: string;
   goalDescription: string;
-  goalImageUrl: string;
-  shareCnt: number;
+  goalId: number;
+  goalImageUrl: null | string;
+  goalTitle: string;
   like: boolean;
-  share: false;
+  likeCnt: number;
+  nickname: string;
+}
+interface joinMemberListTypes {
+  isOwner: boolean;
+  memberId: number;
+  nickname: string;
+}
+interface communityContentTypes {
+  originalGoalId: number;
+  originalGoalTitle: string;
+  originalGoalDescription: string;
+  originalGoalImageUrl: null | string;
+  originalGoalshareCnt: number;
+  joinMemberList: joinMemberListTypes[];
+  contentList: communityContentList[];
+  count: null | number;
+  share: boolean;
+}
+
+interface myCommunityListTypes {
+  timestamp: string;
+  success: boolean;
+  message: null | string;
+  data: {
+    content: communityContentTypes[];
+  };
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      empty: boolean;
+      sorted: boolean;
+      unsorted: boolean;
+    };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  last: boolean;
+  totalPages: number;
+  totalElements: number;
+  first: boolean;
+  numberOfElements: number;
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+  };
+  empty: boolean;
 }
 const Community = (props: any) => {
   const [focusNum, setFocusNum] = useState<number | null>(null);
-  const [postData, setPostData] = useState<postTypes[]>([]);
-  const [nickname, setNickname] = useState('');
+  const [communityData, setCommunityData] = useState<communityContentTypes[]>(
+    [],
+  );
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
   });
-  const [page, setPage] = useState(pageable.pageNumber);
+  const [more, setMore] = useState<boolean>(false);
+  const [sort, setSort] = useState('NEW');
 
-  const dispatch = useDispatch();
-  const reduxPostData = useSelector(selectRender);
+  const nickNameBg = [
+    'bg-purple-400',
+    'bg-green-400',
+    'bg-cyan-400',
+    'bg-blue-400',
+    'bg-fuchsia-400',
+    'bg-rose-400',
+    'bg-pink-400',
+    'bg-violet-400',
+    'bg-indigo-400',
+    'bg-amber-400',
+  ];
+
+  const containerRef = useRef<any>(null);
+
+  const reduxCommunityData = useSelector(selectRender);
 
   useEffect(() => {
-    onGetUserInfo();
+    onGetCommunityAll(pageable.pageNumber);
+  }, [reduxCommunityData.communityBoolean, sort]);
+
+  useEffect(() => {
+    if (more) {
+      handleCheckLastPage();
+    }
+  }, [more]);
+
+  useLayoutEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.addEventListener('scroll', handleScroll);
+      return () =>
+        containerRef.current.removeEventListener('scroll', handleScroll);
+    }
   }, []);
 
-  useEffect(() => {
-    onGetAllPost(page);
-  }, [page, reduxPostData.postBoolean]);
+  const handleScroll = useCallback(() => {
+    if (containerRef.current) {
+      const elements =
+        containerRef.current.querySelectorAll('.community-element');
 
-  const onGetAllPost = async (pageParam: number) => {
-    const form = { pageNum: pageParam };
-    await handleGetPostAll(form)
-      .then((response) => {
-        setPostData(response.content);
-        setPageable({
-          pageNumber: response.pageable.pageNumber + 1,
-          last: response.last,
-        });
-      })
-      .catch((error) => console.log(error));
+      if (elements.length > 0) {
+        const lastElement = elements[elements.length - 1];
+
+        const lastComment = lastElement.getBoundingClientRect().bottom;
+        const parentComment =
+          lastElement.parentElement.getBoundingClientRect().bottom;
+
+        if (lastComment - parentComment < 2) {
+          setMore(true);
+        }
+      }
+    }
+  }, []);
+
+  const onGetCommunityAll = async (pageParam: number) => {
+    const formData = {
+      pageNum: pageParam,
+      sort: sort,
+    };
+
+    const response = await handleGetCommunityAll(formData);
+
+    if (response.success) {
+      if (more) {
+        setCommunityData((preData) => [...preData, ...response.data.content]);
+      } else {
+        setCommunityData(response.data.content);
+      }
+      setMore(false);
+      setPageable({
+        pageNumber: response.data.pageable.pageNumber + 1,
+        last: response.data.last,
+      });
+    }
   };
 
-  const onGetUserInfo = async () => {
-    await handleGetUserInfo()
-      .then((response) => {
-        setNickname(response.nickname);
-      })
-      .catch((error) => console.log(error));
+  const handleCheckLastPage = () => {
+    const pageNumber = pageable.pageNumber + 1;
+    if (pageable.last) {
+      console.log('마지막 페이지 입니다.');
+    } else {
+      onGetCommunityAll(pageNumber);
+    }
   };
-  const onLikePost = async (index: number) => {
-    await handleLikePost(postData[index].postId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStatePost(!reduxPostData.postBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-  const onShareGoal = async (index: number) => {
-    await handleCreateShare(postData[index].goalId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStatePost(!reduxPostData.postBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-  const onGetShareData = async (goalId: number) => {
-    await handleGetShare(goalId)
-      .then(async (response) => {
-        if (response.success) {
-          await onDeleteShareGoal(response.data.goalId);
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-  const onDeleteShareGoal = async (goalId: number) => {
-    await handleDeleteShare(goalId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStatePost(!reduxPostData.postBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
+
+  const onChangeSort = async (state: string) => {
+    setSort(state);
+    setPageable({
+      pageNumber: 1,
+      last: false,
+    });
   };
 
   return (
-    <div className="w-full	h-full pt-[80px]">
-      <header className="w-11/12 inset-x-0 mx-auto flex justify-between	border h-11	fixed top-7 bg-white rounded-full items-center">
-        <input type="text" className="outline-0	w-4/5 pl-3 z-40"></input>
-        <FontAwesomeIcon
-          icon={faSearch}
-          className="w-6 h-6 mr-3 text-gray-500"
-        />
-      </header>
-      <section className="z-0 h-full overflow-y-scroll w-full postList">
-        {postData.map((data, index) => {
-          if (focusNum === index) {
-            return (
-              <PostBoxDetail
-                data={data}
-                key={index}
-                myNickname={nickname}
-                setFocusNum={setFocusNum}
-                index={index}
-                onLikePost={onLikePost}
-                onShareGoal={onShareGoal}
-                onGetShareData={onGetShareData}
-              ></PostBoxDetail>
-            );
-          } else {
-            return (
-              <PostBox
-                data={data}
-                key={index}
-                index={index}
-                focusNum={focusNum}
-                setFocusNum={setFocusNum}
-                onLikePost={onLikePost}
-                onShareGoal={onShareGoal}
-                onGetShareData={onGetShareData}
-              ></PostBox>
-            );
-          }
+    <div className="w-full h-full pt-[40px] flex flex-col">
+      <SearchBox sort={sort} onChangeSort={onChangeSort}></SearchBox>
+      <section
+        className="z-0 h-full overflow-y-scroll w-full py-4"
+        ref={containerRef}
+      >
+        {communityData.map((data, index) => {
+          return focusNum === index ? (
+            <CommunityBoxDetail
+              key={index}
+              index={index}
+              data={data}
+              nickNameBg={nickNameBg}
+            ></CommunityBoxDetail>
+          ) : (
+            <CommunityBox
+              data={data}
+              key={index}
+              index={index}
+              focusNum={focusNum}
+              setFocusNum={setFocusNum}
+              nickNameBg={nickNameBg}
+            ></CommunityBox>
+          );
         })}
-
-        <section className="h-[30px] w-full flex justify-center gap-4 text-gray-600 ">
-          <FontAwesomeIcon
-            icon={faChevronCircleLeft}
-            className="cursor-pointer"
-            onClick={() => {
-              if (page > 1) {
-                setPage(page - 1);
-                setFocusNum(null);
-              } else {
-                alert('첫 번째 페이지 입니다.');
-              }
-            }}
-          />
-          <FontAwesomeIcon
-            icon={faChevronCircleRight}
-            className="cursor-pointer"
-            onClick={() => {
-              if (pageable.last) {
-                alert('마지막 페이지 입니다.');
-              } else {
-                setPage(page + 1);
-                setFocusNum(null);
-              }
-            }}
-          />
-        </section>
       </section>
-      <CreateButton></CreateButton>
     </div>
   );
 };

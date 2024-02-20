@@ -1,6 +1,9 @@
 package com.goalkeepers.server.dto;
 
+import java.util.List;
+import java.util.Map;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.goalkeepers.server.entity.Goal;
 
@@ -17,6 +20,7 @@ import lombok.Setter;
 @Builder
 public class GoalResponseDto {
     private Long goalId;
+    private String nickname;
     private String title;
     private String description;
     private LocalDate startDate;
@@ -24,10 +28,14 @@ public class GoalResponseDto {
     private String imageUrl;
     private int shareCnt;
     private Boolean isShare;
+    private Boolean completed;
+    private LocalDateTime completeDate;
+    private List<Map<String, Object>> joinMemberList;
 
-    public static GoalResponseDto of(Goal goal, String imageUrl, Boolean isShare) {
+    public static GoalResponseDto of(Goal goal, String imageUrl, Boolean isShare, List<Map<String, Object>> joinMemberList) {
         return GoalResponseDto.builder()
                 .goalId(goal.getId())
+                .nickname(goal.getMember().getNickname())
                 .title(goal.getTitle())
                 .description(goal.getDescription())
                 .startDate(goal.getStartDate())
@@ -35,14 +43,17 @@ public class GoalResponseDto {
                 .imageUrl(imageUrl)
                 .shareCnt(goal.getShareCnt())
                 .isShare(isShare)
+                .completed(goal.isCompleted())
+                .completeDate(goal.getCompleteDate())
+                .joinMemberList(joinMemberList)
                 .build();
     }
 
-    public static GoalResponseDto of(Goal goal, String imageUrl) {
-        return of(goal, imageUrl, false);
+    public static GoalResponseDto of(Goal goal, String imageUrl, List<Map<String, Object>> joinMemberList) {
+        return of(goal, imageUrl, false, joinMemberList);
     }
 
-    public static GoalResponseDto of(Goal goal) {
-        return of(goal, goal.getImageUrl(), false);
+    public static GoalResponseDto of(Goal goal, List<Map<String, Object>> joinMemberList) {
+        return of(goal, goal.getImageUrl(), false, joinMemberList);
     }
 }

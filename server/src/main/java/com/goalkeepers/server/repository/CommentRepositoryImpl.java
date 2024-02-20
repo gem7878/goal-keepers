@@ -39,7 +39,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberId != null ?
-                memberRepository.findById(memberId).orElseThrow(() -> new CustomException("유저 오류")) :
+                memberRepository.findById(memberId).orElseThrow(() -> new CustomException("유저 찾기 오류")) :
                 null;
         
         List<CommentResponseDto> page = comments

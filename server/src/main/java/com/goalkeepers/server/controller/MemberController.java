@@ -34,7 +34,8 @@ public class MemberController {
 
     @PostMapping("/nickname")
     public ResponseEntity<CommonResponseDto> setMemberNickname(@Valid @RequestBody ConfirmNicknameRequestDto requestDto) {
-        return ResponseEntity.ok(new CommonResponseDto(true, memberService.changeMemberNickname(requestDto.getNickname())));
+        memberService.changeMemberNickname(requestDto.getNickname());
+        return ResponseEntity.ok(new CommonResponseDto(true, "닉네임이 변경되었습니다."));
     }
     
     @PostMapping("/password")

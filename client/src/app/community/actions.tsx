@@ -3,43 +3,14 @@
 import { handleGetToken } from '@/utils/getToken';
 import axios from 'axios';
 
-
-export const handleGetPostAll = async (getData: { pageNum: number }) => {
-  const token = handleGetToken().token;
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/all?page=${getData.pageNum}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-
-    return response.data.data;
-  } catch (error) {
-    console.log('error', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
-      status: 500,
-    });
-  }
-};
-
-export const handlePutPost = async (postData: {
-  title: string;
-  content: string;
-  goalId: number;
-  postId: number;
+export const handleGetCommunityAll = async (getData: {
+  pageNum: number;
+  sort: string;
 }) => {
   const token = handleGetToken().token;
   try {
-    const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/post?post-id=${postData.postId}`,
-      {
-        title: postData.title,
-        content: postData.content,
-        goalId: postData.goalId,
-      },
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/community?page=${getData.pageNum}&sort=${getData.sort}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -57,13 +28,14 @@ export const handlePutPost = async (postData: {
     };
   }
 };
-
-export const handleDeletePost = async (postData: { postId: number }) => {
+export const handleGetCommunityContentAll = async (getData: {
+  pageNum: number;
+  goalId: number;
+}) => {
   const token = handleGetToken().token;
   try {
-    const id = postData.postId;
-    const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/post?post-id=${id}`,
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/community/contents?page=${getData.pageNum}&goal-id=${getData.goalId}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -73,21 +45,21 @@ export const handleDeletePost = async (postData: { postId: number }) => {
       },
     );
     return response.data;
-  } catch (error) {
-    console.log('error', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
-      status: 500,
-    });
+  } catch (error: any) {
+    console.error('Error during request setup:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+    };
   }
 };
-
-export const handleLikePost = async (postId: number) => {
+export const handleLikeContent = async (contentId: number) => {
   const token = handleGetToken().token;
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/board/post/like`,
+      `${process.env.NEXT_PUBLIC_API_URL}/content/like`,
       {
-        postId: postId,
+        contentId: contentId,
       },
       {
         headers: {

@@ -1,13 +1,9 @@
 package com.goalkeepers.server.entity;
 
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import com.goalkeepers.server.dto.PostRequestDto;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+
+import org.hibernate.annotations.ColumnDefault;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,7 +16,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,39 +36,23 @@ public class Post {
     @Column(name = "post_id")
     private Long id;
 
-    @Column(length = 50)
-    @NotNull
-    private String title;
-
-    @Column(columnDefinition = "TEXT")
-    @NotNull
-    private String content;
-
-    @ColumnDefault("0")
-    private int likeCnt;
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PostLike> likes;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    @NotNull
-    private Member member;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id", nullable = true)
     private Goal goal;
 
+    @ColumnDefault("0")
+    private int cheerCnt;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostContent> contentList;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostComment> comments;
 
-    public static Post postUpdate(Post post, PostRequestDto requestDto) {
-        post.title = requestDto.getTitle();
-        post.content = requestDto.getContent();
-        return post;
-    }
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PostCheer> cheerList;
    
+    public Post(Goal goal) {
+        this.goal = goal;
+    }
 }

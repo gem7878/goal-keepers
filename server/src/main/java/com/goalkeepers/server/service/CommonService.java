@@ -2,15 +2,26 @@ package com.goalkeepers.server.service;
 
 import org.springframework.stereotype.Service;
 
+import java.lang.Object;
+import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Map;
+import java.util.HashMap;
+
 import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.entity.Goal;
+import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostComment;
+import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.CommentRepository;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostRepository;
 
 
@@ -30,11 +41,11 @@ public class CommonService {
                             .orElseThrow(() -> new CustomException("나의 Goal Id가 아닙니다."));
     }
 
-    // 나의 Post 찾기
-    public Post isMyPost(MemberRepository memberRepository, PostRepository postRepository, Long postId) {
+    // 나의 PostContent 찾기
+    public PostContent isMyPostContent(MemberRepository memberRepository, PostContentRepository contentRepository, Long contentId) {
         Member member = isMemberCurrent(memberRepository);
-        return postRepository.findByIdAndMember(postId, member)
-                            .orElseThrow(() -> new CustomException("나의 Post Id가 아닙니다."));
+        return contentRepository.findByIdAndMember(contentId, member)
+                            .orElseThrow(() -> new CustomException("나의 PostContent Id가 아닙니다."));
     }
 
     // Goal ID로 골 찾기
@@ -49,10 +60,38 @@ public class CommonService {
                     .orElseThrow(() -> new CustomException("Post Id를 확인해주세요."));
     }
 
+    // PostContent ID로 content 찾기
+    public PostContent isPostContent(PostContentRepository contentRepository, Long contentId) {
+        return contentRepository.findById(contentId)
+                            .orElseThrow(() -> new CustomException("PostContent Id를 확인해주세요."));
+    }
+
     // 나의 Comment 찾기
     public PostComment isMyComment(MemberRepository memberRepository, CommentRepository commentRepository, Long commentId) {
         Member member = isMemberCurrent(memberRepository);
         return commentRepository.findByIdAndMember(commentId, member)
                     .orElseThrow(() -> new CustomException("나의 Comment Id가 아닙니다."));
+    }
+
+    public List<Map<String, Object>> findJoinMemberList(Goal currentGoal) {
+        // currentGoal
+        Goal goal = currentGoal;
+        // shareGoal로 바꾸기
+        GoalShare share = goal.getShare();
+        if(Objects.nonNull(share)) {
+            goal = Optional.ofNullable(share.getGoal()).orElse(null);
+        }
+        // shareGoal이 삭제됐을 때
+        if(Objects.isNull(goal)) {
+            return null;
+        }
+        List<Map<String, Object>> joinMemberList = new ArrayList<>();
+        for(GoalShare goalShare : goal.getShareList()) {
+            Map<String, Object> member = new HashMap<>();
+            member.put("memberId", goalShare.getMember().getId());
+            member.put("nickname", goalShare.getMember().getNickname());
+            joinMemberList.add(member);
+        }
+        return joinMemberList;
     }
 }

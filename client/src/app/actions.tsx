@@ -56,10 +56,9 @@ export const handleGetUserInfo = async () => {
 };
 export const handleGetGoalListAll = async (getData: { pageNum: number }) => {
   const token = handleGetToken().token;
-  // const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/all?page=${getData.pageNum}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/all/me?page=${getData.pageNum}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +79,7 @@ export const handleUpdateGoal = async (putData: any) => {
   try {
     const id = putData.goalId;
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal?id=${id}`,
       putData.formData,
       {
         headers: {
@@ -104,9 +103,10 @@ export const handleDeleteGoal = async (deleteData: {
   goalId: number | undefined;
 }) => {
   const token = handleGetToken().token;
+
   try {
     const response = await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal?id=${deleteData.goalId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal?id=${deleteData.goalId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -114,6 +114,32 @@ export const handleDeleteGoal = async (deleteData: {
         withCredentials: true,
       },
     );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
+};
+export const handleCompleteGoal = async (completeData: {
+  goalId: number | undefined;
+  completed: boolean;
+}) => {
+  const token = handleGetToken().token;
+
+  try {
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_API_URL}/goal/completed?id=${completeData.goalId}`,
+      { completed: completeData.completed },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      },
+    );
+
     return response.data;
   } catch (error) {
     console.log('error', error);

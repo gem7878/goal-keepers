@@ -1,7 +1,6 @@
 package com.goalkeepers.server.service;
 
 import com.google.cloud.storage.*;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.StorageClient;
 
 import jakarta.annotation.PostConstruct;

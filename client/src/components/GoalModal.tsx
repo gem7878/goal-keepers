@@ -3,7 +3,11 @@
 import Image, { StaticImageData } from 'next/image';
 import React, { SetStateAction, useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
-import { handleDeleteGoal, handleUpdateGoal } from '@/app/actions';
+import {
+  handleDeleteGoal,
+  handleUpdateGoal,
+  handleCompleteGoal,
+} from '@/app/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStateGoal } from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,13 +20,19 @@ interface selectDataTypes {
   endDate: string;
   shareCnt: number;
   goalId: number;
+  completeDate: string | null;
+  completed: boolean;
+  isShare: boolean;
+  joinMemberList: string[];
+  nickname: string;
 }
 
-const Modal: React.FC<{
+const GoalModal: React.FC<{
   setOpen: React.Dispatch<SetStateAction<boolean>>;
   selectData: selectDataTypes | null;
   setSelectGoalNum: React.Dispatch<SetStateAction<number | null>>;
-}> = ({ setOpen, selectData, setSelectGoalNum }) => {
+  goalDoing: string;
+}> = ({ setOpen, selectData, setSelectGoalNum, goalDoing }) => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState(selectData?.title);
   const [editDescription, setEditDescription] = useState(
@@ -81,7 +91,7 @@ const Modal: React.FC<{
       await handleDeleteGoal(deleteData)
         .then((response) => {
           if (response.success === true) {
-            dispatch(setStateGoal(!reduxGoalData.goalBoolean));
+            dispatch(setStateGoal(true));
             setOpen(false);
             setSelectGoalNum(null);
           }
@@ -104,6 +114,27 @@ const Modal: React.FC<{
       setIsEdit(false);
       setOpen(false);
       setSelectGoalNum(null);
+    }
+  };
+
+  const onCompleteGoal = async () => {
+    const completeData = {
+      goalId: selectData?.goalId,
+      completed: !selectData?.completed,
+    };
+
+    const confirm =
+      goalDoing === 'doing'
+        ? window.confirm('목표를 완료하시겠습니까?')
+        : window.confirm('목표 완료를 취소하시겠습니까?');
+    if (confirm) {
+      const response = await handleCompleteGoal(completeData);
+
+      if (response.success === true) {
+        dispatch(setStateGoal(true));
+        setOpen(false);
+        setSelectGoalNum(null);
+      }
     }
   };
   return (
@@ -133,31 +164,40 @@ const Modal: React.FC<{
               )}
             </h2>
           </div>
-          {!isEdit ? (
-            <>
-              <FontAwesomeIcon
-                className="absolute text-white text-xs bottom-2 right-6"
-                onClick={() => setIsEdit(true)}
-                icon={faEdit}
-              />
+          {goalDoing === 'doing' &&
+            (!isEdit ? (
+              <>
+                <FontAwesomeIcon
+                  className="absolute text-white text-xs bottom-2 right-6"
+                  onClick={() => setIsEdit(true)}
+                  icon={faEdit}
+                />
 
-              <FontAwesomeIcon
-                className="absolute text-white text-xs bottom-2 right-2"
-                onClick={() => handleRemoveGoal()}
-                icon={faTrash}
-              />
-            </>
-          ) : (
-            <input
-              type="file"
-              className="absolute text-white text-xs bottom-2 right-2 w-[150px]"
-              onChange={(e) => {
-                setImageFile((e.target.files?.[0] as File) || null);
-              }}
-            ></input>
-          )}
+                <FontAwesomeIcon
+                  className="absolute text-white text-xs bottom-2 right-2"
+                  onClick={() => handleRemoveGoal()}
+                  icon={faTrash}
+                />
+              </>
+            ) : (
+              <input
+                type="file"
+                className="absolute text-white text-xs bottom-2 right-2 w-[150px]"
+                onChange={(e) => {
+                  setImageFile((e.target.files?.[0] as File) || null);
+                }}
+              ></input>
+            ))}
         </section>
-        <section className="h-3/5 w-full pt-8 px-8 flex flex-col justify-between">
+        <section className="h-3/5 w-full pt-4 px-8 flex flex-col justify-between">
+          <button
+            onClick={() => onCompleteGoal()}
+            className={`top-3 right-3  text-white text-sm py-1 px-2 rounded-xl font-bold ${
+              goalDoing === 'doing' ? 'bg-green-400' : 'bg-red-400'
+            }`}
+          >
+            {goalDoing === 'doing' ? 'COMPLETE' : 'CANCEL'}
+          </button>
           <div className="w-full h-2/3">
             <textarea
               className="h-full"
@@ -207,4 +247,4 @@ const Modal: React.FC<{
   );
 };
 
-export default Modal;
+export default GoalModal;

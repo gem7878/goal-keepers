@@ -46,7 +46,7 @@ public class Member {
     private List<Goal> goals;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
+    private List<PostContent> postContents;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GoalShare> shares;

@@ -22,6 +22,10 @@ public class QGoal extends EntityPathBase<Goal> {
 
     public static final QGoal goal = new QGoal("goal");
 
+    public final BooleanPath completed = createBoolean("completed");
+
+    public final DateTimePath<java.time.LocalDateTime> completeDate = createDateTime("completeDate", java.time.LocalDateTime.class);
+
     public final StringPath description = createString("description");
 
     public final DatePath<java.time.LocalDate> endDate = createDate("endDate", java.time.LocalDate.class);
@@ -31,8 +35,6 @@ public class QGoal extends EntityPathBase<Goal> {
     public final StringPath imageUrl = createString("imageUrl");
 
     public final QMember member;
-
-    public final ListPath<Post, QPost> posts = this.<Post, QPost>createList("posts", Post.class, QPost.class, PathInits.DIRECT2);
 
     public final QGoalShare share;
 

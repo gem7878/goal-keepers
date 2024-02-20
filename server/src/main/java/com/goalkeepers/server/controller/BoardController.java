@@ -7,22 +7,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.dto.CommonResponseDto;
-import com.goalkeepers.server.dto.GoalResponseDto;
-import com.goalkeepers.server.dto.GoalShareRequestDto;
-import com.goalkeepers.server.dto.PostLikeRequestDto;
-import com.goalkeepers.server.dto.PostListPageResponseDto;
-import com.goalkeepers.server.dto.PostRequestDto;
+import com.goalkeepers.server.dto.CommunityResponseDto;
+import com.goalkeepers.server.dto.PostCheerRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
+import com.goalkeepers.server.entity.SORT;
 import com.goalkeepers.server.service.BoardService;
 import com.goalkeepers.server.service.CommentService;
-import com.goalkeepers.server.service.GoalService;
+import com.goalkeepers.server.service.ContentService;
 import com.goalkeepers.server.service.LikeShareService;
 
 import jakarta.validation.Valid;
@@ -30,91 +28,69 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/board")
 public class BoardController {
 
     private final BoardService boardService;
     private final CommentService commentService;
+    private final ContentService contentService;
     private final LikeShareService likeShareService;
-    private final GoalService goalService;
 
+    
     /*
-     * 모든 게시글 가져오기
-     * 나의 모든 게시글 가져오기
-     * 하나의 게시글 가져오기
+     * 모든 포스트 가져오기
+     * 나의 모든 포스트 가져오기
      */
 
-    @GetMapping("/all")
-    public ResponseEntity<CommonResponseDto> getAllPost(@RequestParam(name = "page") int pageNumber) {
-        Page<PostListPageResponseDto> response = boardService.getAllPostList(pageNumber);
+    @GetMapping("/post/all")
+    public ResponseEntity<CommonResponseDto> getAllPost(@RequestParam(name = "page") int pageNumber,
+                                                        @RequestParam(name = "sort") SORT sort) {
+        Page<PostResponseDto> response = contentService.getAllPost(pageNumber, sort);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
-    @GetMapping("/all/me")
+    @GetMapping("/post/all/me")
     public ResponseEntity<CommonResponseDto> getMyAllPost(@RequestParam(name = "page") int pageNumber) {
-        Page<PostListPageResponseDto> response = boardService.getMyAllPostList(pageNumber);
+        Page<PostResponseDto> response = contentService.getMyAllPost(pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
-    }
-
-    @GetMapping("/post")
-    public ResponseEntity<CommonResponseDto> getOnePost(@RequestParam(name = "post-id") Long postId) {
-        PostListPageResponseDto response = boardService.getOnePost(postId);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
-    }
-    /*
-     * 좋아요
-     * 공유
-     */
-
-    @PostMapping("/post/like")
-    public ResponseEntity<CommonResponseDto> postlike(@Valid @RequestBody PostLikeRequestDto requestDto) {
-        String response = likeShareService.addLike(requestDto);
-        return ResponseEntity.ok(new CommonResponseDto(true, "Post " + requestDto.getPostId() + response));
-    }
-
-    // 연결된 골 찾기
-    @GetMapping("/goal/share")
-    public ResponseEntity<CommonResponseDto> findMyGoalWithShare(@RequestParam(name = "goal-id") Long goalId) {
-        GoalResponseDto response = likeShareService.findGoal(goalId);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
-    }
-
-    // 공유하기 -> 골 만들기
-    @PostMapping("/goal/share")
-    public ResponseEntity<CommonResponseDto> postShare(@Valid @RequestBody GoalShareRequestDto requestDto) {
-        likeShareService.addShare(requestDto);
-        return ResponseEntity.ok(new CommonResponseDto(true, "Goal " + requestDto.getGoalId() + " 담기 성공"));
-    }
-
-    // 공유 취소하기 -> 골 삭제하기
-    @DeleteMapping("/goal/share")
-    public ResponseEntity<CommonResponseDto> deleteShare(@Valid @RequestBody GoalShareRequestDto requestDto) {
-        goalService.deleteMyGoal(requestDto.getGoalId());
-        return ResponseEntity.ok(new CommonResponseDto(true, "Goal " + requestDto.getGoalId() + " 삭제 성공"));
     }
 
     /*
-     *  게시글 쓰기
-        게시글 수정하기
-        게시글 삭제하기
+     * 커뮤니티 가져오기
      */
 
-    @PostMapping("/post")
-    public ResponseEntity<CommonResponseDto> createPost(@Valid @RequestBody PostRequestDto requestDto) {
-        PostResponseDto response = boardService.createMyPost(requestDto);
+    @GetMapping("/community")
+    public ResponseEntity<CommonResponseDto> getAllNewGoal(@RequestParam(name = "page") int pageNumber,
+                                                        @RequestParam(name = "sort") SORT sort) {                                            
+        Page<CommunityResponseDto> response = null;
+        if(SORT.NEW.equals(sort)) {
+            response = boardService.getAllNewGoal(pageNumber);
+        } else if(SORT.POPULAR.equals(sort)) {
+            response = boardService.getAllPopularGoal(pageNumber);
+        } else {
+            throw new MethodArgumentTypeMismatchException(null, null, null, null, null);
+        }
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
-    @PutMapping("/post")
-    public ResponseEntity<CommonResponseDto> updateMyPost(@RequestParam(name = "post-id") Long postId, @Valid @RequestBody PostRequestDto requestDto) {
-        PostResponseDto response = boardService.updateMyPost(requestDto, postId);
+    /*
+     * 포스트 검색
+     * 커뮤니티 검색
+     */
+
+    @GetMapping("/post/search")
+    public ResponseEntity<CommonResponseDto> searchPost(@RequestParam(name = "page", required = true) int pageNumber,
+                                                                @RequestParam(name = "query", required = true) String query,
+                                                                @RequestParam(name = "sort", required = false) SORT sort) {
+        Page<PostResponseDto> response = boardService.searchPost(pageNumber, query, sort);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
-    @DeleteMapping("/post")
-    public ResponseEntity<CommonResponseDto> deleteMyPost(@RequestParam(name = "post-id") Long postId) {
-        boardService.deleteMyPost(postId);
-        return ResponseEntity.ok(new CommonResponseDto(true, postId + " 게시글을 삭제하였습니다."));
+    @GetMapping("/community/search")
+    public ResponseEntity<CommonResponseDto> searchCommunity(@RequestParam(name = "page", required = true) int pageNumber,
+                                                                @RequestParam(name = "query", required = true) String query,
+                                                                @RequestParam(name = "sort", required = false) SORT sort) {
+        Page<CommunityResponseDto> response = boardService.searchCommunity(pageNumber, query, sort);
+        return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
     /*
@@ -124,7 +100,7 @@ public class BoardController {
         댓글 수정
      */
 
-    @GetMapping("/all-comment")
+    @GetMapping("/comment/all")
     public ResponseEntity<CommonResponseDto> getAllComment(@RequestParam(name = "page") int pageNumber, @RequestParam(name = "post-id") Long postId) {
         Page<CommentResponseDto> response = commentService.getSelectedPost(postId, pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
@@ -146,5 +122,15 @@ public class BoardController {
     public ResponseEntity<?> deleteMyComment(@RequestParam(name = "comment-id") Long commentId) {
         commentService.deleteMyComment(commentId);
         return ResponseEntity.ok(new CommonResponseDto(true, commentId + " 댓글을 삭제하였습니다."));
+    }
+
+    /*
+     * 포스트 응원해요
+     */
+
+    @PostMapping("/post/cheer")
+    public ResponseEntity<CommonResponseDto> cheerPost(@Valid @RequestBody PostCheerRequestDto requestDto) {
+        String response = likeShareService.addPostCheer(requestDto);
+        return ResponseEntity.ok(new CommonResponseDto(true, "Post " + requestDto.getPostId() + response));
     }
 }

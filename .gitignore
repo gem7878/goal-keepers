@@ -3,3 +3,4 @@ docker-compose.yml
 .vscode/settings.json
 server/src/main/java/com/goalkeepers/server/config/secret.json
 .vscode/extensions.json
+.vscode/launch.json
