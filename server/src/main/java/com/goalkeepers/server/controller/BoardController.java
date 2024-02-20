@@ -15,6 +15,7 @@ import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.CommunityResponseDto;
+import com.goalkeepers.server.dto.PostSelectResponseDto;
 import com.goalkeepers.server.dto.PostCheerRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.entity.SORT;
@@ -51,6 +52,12 @@ public class BoardController {
     @GetMapping("/post/all/me")
     public ResponseEntity<CommonResponseDto> getMyAllPost(@RequestParam(name = "page") int pageNumber) {
         Page<PostResponseDto> response = contentService.getMyAllPost(pageNumber);
+        return ResponseEntity.ok(new CommonResponseDto(true, response));
+    }
+
+    @GetMapping("/post/all/me/select")
+    public ResponseEntity<CommonResponseDto> getSelectAllPost(@RequestParam(name = "page") int pageNumber) {
+        Page<PostSelectResponseDto> response = boardService.getSelectAllPost(pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 

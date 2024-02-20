@@ -39,6 +39,9 @@ public class Post {
     @ColumnDefault("0")
     private int cheerCnt;
 
+    @Column(columnDefinition = "boolean default true")
+    private boolean privated;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostContent> contentList;
 
@@ -48,6 +51,11 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostCheer> cheerList;
    
+    public Post(Goal goal, boolean privated) {
+        this.goal = goal;
+        this.privated = privated;
+    }
+
     public Post(Goal goal) {
         this.goal = goal;
     }
