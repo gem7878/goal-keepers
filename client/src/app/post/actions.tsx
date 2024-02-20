@@ -3,11 +3,14 @@
 import { handleGetToken } from '@/utils/getToken';
 import axios from 'axios';
 
-export const handleGetPostAll = async (getData: { pageNum: number }) => {
+export const handleGetPostAll = async (getData: {
+  pageNum: number;
+  sort: string;
+}) => {
   const token = handleGetToken().token;
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/post/all?page=${getData.pageNum}&sort=LIKE`,
+      `${process.env.NEXT_PUBLIC_API_URL}/post/all?page=${getData.pageNum}&sort=${getData.sort}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -153,7 +156,7 @@ export const handleGetAllPostContent = async (getData: {
 export const handleCreatePostContent = async (formData: {
   content: string;
   goalId: number;
-}) => {  
+}) => {
   const token = handleGetToken().token;
   try {
     const response = await axios.post(
