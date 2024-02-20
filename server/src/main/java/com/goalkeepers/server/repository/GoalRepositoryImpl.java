@@ -6,9 +6,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -65,7 +63,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
     }
 
     @Override
-    public Page<GoalResponseDto> searchMyAllGoal(Pageable pageable, Long memberId) {
+    public Page<GoalResponseDto> getMyAllGoal(Pageable pageable, Long memberId) {
         
         List<Goal> goals = queryFactory
                             .selectFrom(goal)
@@ -79,26 +77,13 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
         List<GoalResponseDto> page = goals
             .stream()
             .map(goal -> {
-                String imageUrl = goal.getImageUrl();
-                if(Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
-                    imageUrl = firebaseStorageService.showFile(imageUrl);
-                }
+                String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
                 Goal shareGoal = goal;
                 GoalShare share = goal.getShare();
                 if(Objects.nonNull(share)) {
                     shareGoal = Optional.ofNullable(share.getGoal()).orElse(null);
                 }
-                // shareGoal에 대한 joinMemberList 가져오기
-                List<Map<String, Object>> joinMemberList = new ArrayList<>();
-                if(Objects.nonNull(shareGoal)) {
-                    for(GoalShare goalShare : shareGoal.getShareList()) {
-                        Map<String, Object> member = new HashMap<>();
-                        member.put("memberId", goalShare.getMember().getId());
-                        member.put("nickname", goalShare.getMember().getNickname());
-                        joinMemberList.add(member);
-                    }
-                }
-                System.out.println("joinMemberList: " + joinMemberList);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(shareGoal);
                 return GoalResponseDto.of(goal, imageUrl, joinMemberList);
             })
             .collect(Collectors.toList());
