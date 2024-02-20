@@ -1,5 +1,10 @@
 'use client';
-import { CreateButton, PostBox, PostBoxDetail } from '@/components/index.js';
+import {
+  CreateButton,
+  PostBox,
+  PostBoxDetail,
+  SearchBox,
+} from '@/components/index.js';
 import React, {
   useCallback,
   useEffect,
@@ -60,6 +65,7 @@ const Post = () => {
     last: false,
   });
   const [page, setPage] = useState(pageable.pageNumber);
+  const [sort, setSort] = useState('NEW');
 
   const dispatch = useDispatch();
   const reduxPostData = useSelector(selectRender);
@@ -70,11 +76,14 @@ const Post = () => {
 
   useEffect(() => {
     onGetAllPost(page);
-  }, [page, reduxPostData.postBoolean]);
+  }, [page, reduxPostData.postBoolean, sort]);
 
   const onGetAllPost = async (pageParam: number) => {
-    const form = { pageNum: pageParam };
-    await handleGetPostAll(form)
+    const formData = {
+      pageNum: pageParam,
+      sort: sort,
+    };
+    await handleGetPostAll(formData)
       .then((response) => {
         setPostData(response.content);
         setPageable({
@@ -92,6 +101,7 @@ const Post = () => {
       })
       .catch((error) => console.log(error));
   };
+
   const onCheerPost = async (index: number) => {
     await handleCheerPost(postData[index].postId)
       .then((response) => {
@@ -129,16 +139,17 @@ const Post = () => {
       .catch((error) => console.log(error));
   };
 
+  const onChangeSort = async (state: string) => {
+    setSort(state);
+    setPageable({
+      pageNumber: 1,
+      last: false,
+    });
+  };
   return (
-    <div className="w-full	h-full pt-[80px]">
-      <header className="w-11/12 inset-x-0 mx-auto flex justify-between	border h-11	fixed top-7 bg-white rounded-full items-center">
-        <input type="text" className="outline-0	w-4/5 pl-3 z-40"></input>
-        <FontAwesomeIcon
-          icon={faSearch}
-          className="w-6 h-6 mr-3 text-gray-500"
-        />
-      </header>
-      <section className="z-0 h-full overflow-y-scroll w-full">
+    <div className="w-full h-full pt-[40px] flex flex-col">
+      <SearchBox sort={sort} onChangeSort={onChangeSort}></SearchBox>
+      <section className="z-0 h-full overflow-y-scroll w-full py-4">
         {postData.map((data, index) => {
           if (focusNum === index) {
             return (
