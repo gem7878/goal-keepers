@@ -21,12 +21,13 @@ import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
-import com.goalkeepers.server.entity.PostContent;
+import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+import com.goalkeepers.server.repository.PostRepository;
 import com.goalkeepers.server.repository.SettingRepository;
 import com.google.firebase.FirebaseException;
 
@@ -43,8 +44,8 @@ public class GoalService extends ServiceHelper{
     private final LikeShareService shareService;
     private final GoalShareRepository shareRepository;
     private final SettingRepository settingRepository;
+    private final PostRepository postRepository;
     private final FirebaseStorageService firebaseStorageService;
-    private final ContentService contentService;
     private final NotificationService notificationService;
     
 
@@ -124,25 +125,30 @@ public class GoalService extends ServiceHelper{
     public String deleteMyGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
         Member member = isMemberCurrent(memberRepository);
+
+        // 포스트 삭제 (응원해요, 컨텐트 좋아요, 컨텐트 삭제)
+        Post post = postRepository.findByGoal(goal).orElse(null);
+        if(Objects.nonNull(post)) {
+            postRepository.delete(post);
+        }
+
+        // 이미지 지우기
         String imageUrl = goal.getImageUrl();
         if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
             firebaseStorageService.deleteFile(imageUrl);
         }
-        // 포스트 지우기
-        List<PostContent> contents = contentService.getMyPostContentWithGoal(goal);
-        for (PostContent content : contents) {
-            contentService.deleteMyPostContent(content.getId());
-        }
+
+        // 참여한 사람들이 없을 때
         if(goal.getShareCnt() == 0 && !shareRepository.existsByMemberAndGoal(member, goal)) {
-            if(Objects.isNull(goal.getShare())) {
-                // 쉐어 지우기
+            if(Objects.nonNull(goal.getShare())) {
+                // 담기 정보 삭제
                 shareService.deleteShare(goal);
             }
-            goalRepository.deleteById(goalId);
+            // 목표 삭제
+            goalRepository.delete(goal);
             return "삭제";
-        } else {
-            // 참여한 사람들이 있을 때
-            // title, share_cnt, image_url 제외 정보 지우기
+        } else { // 참여한 사람들이 있을 때
+            // title, share_cnt 제외 정보 지우기
             Goal.disconnectedGoal(goal);
             return "정보 삭제";
         }
