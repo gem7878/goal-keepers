@@ -3,13 +3,12 @@
 // import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Layout, Navbar } from '@/components/index.js';
+import { Navbar } from '@/components/index.js';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { handleConfirmToken } from './actions';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
-import { PullToRefresh } from '@/components/index.js';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -48,26 +47,12 @@ function RootLayout({ children }: { children: React.ReactNode }) {
     const wrapElement: any = document.querySelector('.wrap');
     wrapElement.style.height = window.innerHeight + 'px';
   }
-  const [refreshing, setRefreshing] = useState(false);
-
-  const handleRefresh = () => {
-    // 리프레시 작업 수행
-    setRefreshing(true);
-
-    // 예: 2초 후에 리프레시 종료
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  };
 
   return (
     <Provider store={store}>
       <html lang="en">
         <body className={`${inter.className} wrap`}>
-          {/* <body className={`${inter.className} h-full`}> */}
-
           <main className="h-[calc(100%-56px)] w-screen flex flex-col	items-center justify-center">
-            {/* <PullToRefresh onRefresh={handleRefresh}>{children}</PullToRefresh> */}
             {children}
           </main>
           {loginPath.includes(pathname) || <Navbar></Navbar>}
