@@ -59,7 +59,7 @@ public class GoalService extends ServiceHelper{
 
     public Page<GoalResponseDto> getMyGoalList(int pageNumber) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        return goalRepository.searchMyAllGoal(PageRequest.of(pageNumber - 1, 18), memberId);
+        return goalRepository.getMyAllGoal(PageRequest.of(pageNumber - 1, 18), memberId);
     }
 
     // 모든 유저가 접근 가능
