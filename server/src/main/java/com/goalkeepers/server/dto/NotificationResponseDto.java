@@ -17,15 +17,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class NotificationResponseDto {
-    private Long notificationId;
-    private Long receiverId;
-    private Long giverId;
+    private long notificationId;
+    private long receiverId;
+    private long giverId;
     private String giverNickname;
     private TYPE type;
-    private Long targetId;
+    private long targetId;
     private String targetTitle;
     private String message;
-    private Long commentId;
+    private long commentId;
     
 
     public static NotificationResponseDto of(Notification notification, String title) {

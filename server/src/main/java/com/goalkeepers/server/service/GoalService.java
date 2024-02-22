@@ -91,7 +91,7 @@ public class GoalService extends ServiceHelper{
         
         if (multipartFile == null && requestDto != null) {
             /* 이미지를 변경하지 않고 삭제 */
-            if(requestDto.getDeleteImage() == true) {
+            if(requestDto.isDeleteImage() == true) {
                 String imageUrl = currentGoal.getImageUrl();
                 if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
                     firebaseStorageService.deleteFile(imageUrl);

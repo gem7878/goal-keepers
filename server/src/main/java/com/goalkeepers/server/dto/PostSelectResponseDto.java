@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostSelectResponseDto {
-    private Long goalId;
+    private long goalId;
     private String title;
     private String description;
-    private Boolean privated;
+    private boolean privated;
     public static PostSelectResponseDto of(Goal goal, Post post, String imageUrl) {
         return PostSelectResponseDto.builder()
                 .goalId(goal.getId())

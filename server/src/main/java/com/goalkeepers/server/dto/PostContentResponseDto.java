@@ -16,13 +16,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostContentResponseDto {
-    private Long contentId;
+    private long contentId;
     private String nickname; // Member
     private String content; // PostContent
     private LocalDateTime createdAt; // PostContent
     private int likeCnt; // PostContent
     private boolean isLike; // PostContent, Member
-    private Long goalId; // Goal : share goal id
+    private long goalId; // Goal : share goal id
     private String goalTitle; // Goal : share goal title
     private String goalDescription; // Goal : share goal description
     private String goalImageUrl; // Goal : share goal image_url
