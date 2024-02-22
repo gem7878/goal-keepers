@@ -51,9 +51,9 @@ public class ContentService extends ServiceHelper {
         Post post = postRepository.findByGoal(goal).orElse(null);
         // 처음 컨텐트 작성할 때 postId 생성
         if(Objects.isNull(post)) {
-            post = postRepository.save(new Post(goal, requestDto.isPrivated()));
-        } else if (post.isPrivated() != requestDto.isPrivated()) {
-            post.setPrivated(requestDto.isPrivated());
+            post = postRepository.save(new Post(goal, requestDto.getPrivated()));
+        } else if (post.getPrivated() != requestDto.getPrivated()) {
+            post.setPrivated(requestDto.getPrivated());
         }
 
         // 담기한 Goal이면 shareGoal로 바꾸기
