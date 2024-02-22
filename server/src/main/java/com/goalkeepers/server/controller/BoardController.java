@@ -40,6 +40,7 @@ public class BoardController {
     /*
      * 모든 포스트 가져오기
      * 나의 모든 포스트 가져오기
+     * 선택할 포스트 가져오기
      */
 
     @GetMapping("/post/all")

@@ -1,1 +1,1 @@
-ALTER TABLE post_tb ADD COLUMN privated boolean default true;
+ALTER TABLE post_tb ADD COLUMN privated boolean default false;

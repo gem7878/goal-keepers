@@ -39,7 +39,7 @@ public class Post {
     @ColumnDefault("0")
     private Integer cheerCnt;
 
-    @Column(columnDefinition = "boolean default true")
+    @Column(columnDefinition = "boolean default false")
     private Boolean privated;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
