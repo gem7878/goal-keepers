@@ -14,13 +14,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CommentResponseDto {
-    private Long commentId;
+    private long commentId;
     private String content;
     private String nickname;
     private LocalDateTime updatedAt;
-    private Boolean isMyComment;
+    private boolean isMyComment;
     
-    public static CommentResponseDto of(PostComment comment, Boolean isMyComment) {
+    public static CommentResponseDto of(PostComment comment, boolean isMyComment) {
         return CommentResponseDto.builder()
                 .commentId(comment.getId())
                 .content(comment.getContent())

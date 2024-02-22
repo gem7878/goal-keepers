@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostMyResponseDto {
-    private Long postId;
-    private Long myGoalId; // 나의 goal
-	private Long originalGoalId; // 원본 goal (나의 goal과 같을 수 있음)
+    private long postId;
+    private long myGoalId; // 나의 goal
+	private long originalGoalId; // 원본 goal (나의 goal과 같을 수 있음)
     private String myGoalTitle;
     private String myGoalDescription;
     private String myGoalImageUrl;

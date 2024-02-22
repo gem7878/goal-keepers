@@ -113,7 +113,7 @@ public class NotificationService extends ServiceHelper {
      */
     public Long deleteAlarms(DeleteAlarmRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
-        if(requestDto.isAll()) {
+        if(requestDto.getAll()) {
             System.out.println("isAll true");
             return notificationRepository.deleteAllAlarms(member);
         } else {

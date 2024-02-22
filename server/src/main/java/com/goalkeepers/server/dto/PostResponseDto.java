@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostResponseDto {
-    private Long postId;
+    private long postId;
     private String nickname;
     private int postCheerCnt;
     private boolean isCheer;
-	private Long goalId;
+	private long goalId;
     private String goalTitle;
     private String goalDescription;
     private String goalImageUrl;

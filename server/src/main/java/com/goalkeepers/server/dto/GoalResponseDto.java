@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class GoalResponseDto {
-    private Long goalId;
+    private long goalId;
     private String nickname;
     private String title;
     private String description;
@@ -27,12 +27,12 @@ public class GoalResponseDto {
     private LocalDate endDate;
     private String imageUrl;
     private int shareCnt;
-    private Boolean isShare;
-    private Boolean completed;
+    private boolean isShare;
+    private boolean completed;
     private LocalDateTime completeDate;
     private List<Map<String, Object>> joinMemberList;
 
-    public static GoalResponseDto of(Goal goal, String imageUrl, Boolean isShare, List<Map<String, Object>> joinMemberList) {
+    public static GoalResponseDto of(Goal goal, String imageUrl, boolean isShare, List<Map<String, Object>> joinMemberList) {
         return GoalResponseDto.builder()
                 .goalId(goal.getId())
                 .nickname(goal.getMember().getNickname())

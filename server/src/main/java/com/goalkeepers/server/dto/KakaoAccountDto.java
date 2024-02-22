@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class KakaoAccountDto {
     
-    private Long id;
+    private long id;
     private KaKaoAccount kakao_account;
 
     @Getter
