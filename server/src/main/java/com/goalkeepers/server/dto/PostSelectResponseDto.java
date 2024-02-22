@@ -16,13 +16,13 @@ public class PostSelectResponseDto {
     private Long goalId;
     private String title;
     private String description;
-    private boolean privated;
+    private Boolean privated;
     public static PostSelectResponseDto of(Goal goal, Post post, String imageUrl) {
         return PostSelectResponseDto.builder()
                 .goalId(goal.getId())
                 .title(goal.getTitle())
                 .description(goal.getDescription())
-                .privated(post.isPrivated())
+                .privated(post.getPrivated())
                 .build();
     }
 
