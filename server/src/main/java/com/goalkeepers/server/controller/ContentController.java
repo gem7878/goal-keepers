@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.goalkeepers.server.dto.CommonResponseDto;
+import com.goalkeepers.server.dto.CommunityContentResponseDto;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.ContentLikeRequestDto;
 import com.goalkeepers.server.dto.PostRequestDto;
@@ -64,7 +65,7 @@ public class ContentController {
     @GetMapping("/community/contents")
     public ResponseEntity<CommonResponseDto> getOneCommunity(@RequestParam(name = "goal-id") Long goalId,
                                                         @RequestParam(name = "page") int pageNumber) {
-        Page<PostContentResponseDto> response = contentService.getCommunityContents(goalId, pageNumber);
+        Page<CommunityContentResponseDto> response = contentService.getCommunityContents(goalId, pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 

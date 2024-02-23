@@ -21,7 +21,7 @@ public class CommunityResponseDto {
     private int originalGoalshareCnt;
     private boolean isShare;
     private List<Map<String, Object>> joinMemberList;
-    private List<PostContentResponseDto> contentList;
+    private List<CommunityContentResponseDto> contentList;
     private Long count; // null or long
 
     
@@ -29,7 +29,7 @@ public class CommunityResponseDto {
                             String originalGoalImageUrl, 
                             boolean isShare,
                             List<Map<String, Object>> joinMemberList,
-                            List<PostContentResponseDto> contentList,
+                            List<CommunityContentResponseDto> contentList,
                             Long count) {
 
         return CommunityResponseDto.builder()

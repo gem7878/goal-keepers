@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.goalkeepers.server.common.ServiceHelper;
+import com.goalkeepers.server.dto.CommunityContentResponseDto;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
@@ -93,7 +94,7 @@ public class ContentService extends ServiceHelper {
         return contentRepository.getPostContents(PageRequest.of(pageNumber - 1, 10), isPost(postRepository, postId));
     }
 
-    public Page<PostContentResponseDto> getCommunityContents(Long goalId, int pageNumber) {
+    public Page<CommunityContentResponseDto> getCommunityContents(Long goalId, int pageNumber) {
         return contentRepository.getCommunityContents(PageRequest.of(pageNumber - 1, 10), isGoal(goalRepository, goalId));
     }
 

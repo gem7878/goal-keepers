@@ -19,9 +19,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.goalkeepers.server.common.RepositoryHelper;
+import com.goalkeepers.server.dto.CommunityContentResponseDto;
 import com.goalkeepers.server.dto.CommunityResponseDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
-import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
@@ -125,15 +125,16 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 // PostContent 가져오기
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
-                                                .where(postContent.shareGoal.eq(goal))
+                                                .where(postContent.shareGoal.eq(goal)
+                                                    .and(postContent.post.privated.eq(false)))
                                                 .orderBy(postContent.createdAt.desc())
                                                 .offset(contentPageable.getOffset())
                                                 .limit(contentPageable.getPageSize())
                                                 .fetch();
                                             
-                List<PostContentResponseDto> contentList = contents
+                List<CommunityContentResponseDto> contentList = contents
                                                 .stream()
-                                                .map(content -> PostContentResponseDto.of(
+                                                .map(content -> CommunityContentResponseDto.of(
                                                                 content, 
                                                                 content.getPost().getGoal(), 
                                                                 content.getMember().getNickname(), 
@@ -180,14 +181,15 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
 
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
-                                                .where(postContent.shareGoal.eq(goal))
+                                                .where(postContent.shareGoal.eq(goal)
+                                                    .and(postContent.post.privated.eq(false)))
                                                 .orderBy(postContent.createdAt.desc())
                                                 .offset(contentPageable.getOffset())
                                                 .limit(contentPageable.getPageSize())
                                                 .fetch();
-                List<PostContentResponseDto> contentList = contents
+                List<CommunityContentResponseDto> contentList = contents
                                                 .stream()
-                                                .map(content -> PostContentResponseDto.of(
+                                                .map(content -> CommunityContentResponseDto.of(
                                                                 content, 
                                                                 content.getPost().getGoal(), 
                                                                 content.getMember().getNickname(), 
@@ -289,15 +291,16 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
-                                                .where(postContent.shareGoal.eq(goal))
+                                                .where(postContent.shareGoal.eq(goal)
+                                                    .and(postContent.post.privated.eq(false)))
                                                 .orderBy(postContent.createdAt.desc())
                                                 .offset(contentPageable.getOffset())
                                                 .limit(contentPageable.getPageSize())
                                                 .fetch();
                                             
-                List<PostContentResponseDto> contentList = contents
+                List<CommunityContentResponseDto> contentList = contents
                                                 .stream()
-                                                .map(content -> PostContentResponseDto.of(
+                                                .map(content -> CommunityContentResponseDto.of(
                                                                 content, 
                                                                 content.getPost().getGoal(), 
                                                                 content.getMember().getNickname(), 
