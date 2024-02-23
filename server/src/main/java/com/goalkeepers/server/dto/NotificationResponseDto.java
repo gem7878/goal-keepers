@@ -19,13 +19,13 @@ import lombok.Setter;
 public class NotificationResponseDto {
     private long notificationId;
     private long receiverId;
-    private long giverId;
+    private Long giverId;
     private String giverNickname;
     private TYPE type;
-    private long targetId;
+    private Long targetId;
     private String targetTitle;
     private String message;
-    private long commentId;
+    private Long commentId;
     
 
     public static NotificationResponseDto of(Notification notification, String title) {

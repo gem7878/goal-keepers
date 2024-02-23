@@ -20,9 +20,6 @@ public class PostMyResponseDto {
     private String myGoalTitle;
     private String myGoalDescription;
     private String myGoalImageUrl;
-    // private String originalGoalTitle; // Goal : origianl goal title
-    // private String originalGoalDescription; // Goal : origianl goal description
-    // private String originalGoalImageUrl; // Goal : origianl goal image_url
     private int originalGoalshareCnt; // Goal : original goal share_cnt
     private boolean isShare; // Goal : original goal, Member
 	private List<Map<String, Object>> joinMemberList; // Member, Share
