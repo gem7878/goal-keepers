@@ -31,11 +31,12 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class AuthService extends ServiceHelper {
     private final AuthenticationManagerBuilder managerBuilder;
-    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    private final MailService mailService;
+    private final MemberRepository memberRepository;
     private final EmailCodeRepository codeRepository;
+    private final MailService mailService;
+    private final SettingService settingService;
 
     public MemberResponseDto signup(MemberRequestDto requestDto) {
         if(memberRepository.existsByEmail(requestDto.getEmail())) {
@@ -45,6 +46,7 @@ public class AuthService extends ServiceHelper {
         }
 
         Member member = requestDto.toMember(passwordEncoder);
+        settingService.initAlarmSetting(member);
         return MemberResponseDto.of(memberRepository.save(member));
     }
 
