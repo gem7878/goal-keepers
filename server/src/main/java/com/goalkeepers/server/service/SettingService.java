@@ -36,5 +36,9 @@ public class SettingService extends ServiceHelper {
         Setting.settingUpdate(mySetting, requestDto);
     }
 
+    public void initAlarmSetting(Member member) {
+        settingRepository.save(new Setting(member));
+    }
+
     
 }

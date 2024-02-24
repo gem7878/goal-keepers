@@ -53,7 +53,7 @@ public class ContentService extends ServiceHelper {
         // 처음 컨텐트 작성할 때 postId 생성
         if(Objects.isNull(post)) {
             post = postRepository.save(new Post(goal, requestDto.getPrivated()));
-        } else if (post.getPrivated() != requestDto.getPrivated()) {
+        } else if (post.isPrivated() != requestDto.getPrivated()) {
             post.setPrivated(requestDto.getPrivated());
         }
 

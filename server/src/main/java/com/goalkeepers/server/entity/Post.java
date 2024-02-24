@@ -37,10 +37,10 @@ public class Post {
     private Goal goal;
 
     @ColumnDefault("0")
-    private Integer cheerCnt;
+    private int cheerCnt;
 
     @Column(columnDefinition = "boolean default false")
-    private Boolean privated;
+    private boolean privated;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostContent> contentList;

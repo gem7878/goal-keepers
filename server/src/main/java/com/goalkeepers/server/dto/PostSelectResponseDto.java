@@ -22,7 +22,7 @@ public class PostSelectResponseDto {
                 .goalId(goal.getId())
                 .title(goal.getTitle())
                 .description(goal.getDescription())
-                .privated(post.getPrivated())
+                .privated(post.isPrivated())
                 .build();
     }
 
