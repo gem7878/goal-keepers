@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Navbar } from '@/components/index.js';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { handleConfirmToken } from './actions';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
@@ -42,6 +42,8 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setScreenSize();
   }, []);
+
+
 
   function setScreenSize() {
     const wrapElement: any = document.querySelector('.wrap');

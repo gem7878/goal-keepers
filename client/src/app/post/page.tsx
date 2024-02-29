@@ -213,7 +213,7 @@ const Post = () => {
           />
         </section>
       </section>
-      <CreateButton></CreateButton>
+      <CreateButton isMyGoals={false}></CreateButton>
     </div>
   );
 };

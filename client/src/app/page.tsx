@@ -14,6 +14,10 @@ import { selectRender } from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
+import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
+
+import { handleGetToken } from '@/utils/getToken';
+import { tokenValue } from './alarm/actions';
 
 interface postContentTypes {
   content: {
@@ -80,6 +84,7 @@ export default function Home() {
   const [myPostList, setMyPostList] = useState<myPostListTypes[]>([]);
   const containerEl = useRef<any>();
   const [goalDoing, setGoalDoing] = useState<string>('doing');
+  const [token, setToken] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     selectGoalNum !== null ? setOpen(true) : setOpen(false);
@@ -106,6 +111,69 @@ export default function Home() {
   //   // 상태 업데이트
   //   setMyGoalList(updatedList);
   // }, []);
+  const getToken = async () => {
+    const result = await tokenValue();
+
+    console.log(result);
+
+    return result;
+    // setToken(result);
+  };
+
+  useEffect(() => {
+    handleEventSource();
+  }, []);
+
+  const handleEventSource = async () => {
+    const EventSource = EventSourcePolyfill || NativeEventSource;
+
+    // const token = await tokenValue();
+    const token =
+      'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwOTI4NDE3NCwiaWF0IjoxNzA5MTk3Nzc0fQ.SE-L62ZiWO4Ssc2zI9xYFchF-hg9SnbqP5UD6myj4uQ';
+
+    console.log(token);
+
+    const eventSource = new EventSource(
+      `${process.env.NEXT_PUBLIC_API_URL}/subscribe`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Connection: 'keep-alive',
+          'Content-Type': 'text/event-stream',
+          'X-Content-Type-Options': 'nosniff',
+          'X-XSS-Protection': '0',
+          'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+          'X-Frame-Options': 'DENY',
+          'Transfer-Encoding': 'chunked',
+          'Keep-Alive': 'timeout=60',
+          'Content-Encoding': 'none',
+        },
+        withCredentials: true,
+      },
+    );
+
+    console.log(eventSource);
+
+    eventSource.onopen = async () => {
+      await console.log('sse opened!');
+    };
+
+    eventSource.addEventListener('sse', (event: any) => {
+      const data = JSON.parse(event.data);
+      const lastEventId = JSON.parse(event.id); // 이걸 저장해둬야 함 Last-Event-ID
+      console.log(data, lastEventId);
+    });
+
+    eventSource.onerror = async (e) => {
+      await console.log(e);
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  };
 
   const handleTab = (boolean: boolean) => {
     setIsMyGoals(boolean);
@@ -166,7 +234,7 @@ export default function Home() {
           <MyPosts></MyPosts>
         )}
       </section>
-      <CreateButton></CreateButton>
+      <CreateButton isMyGoals={isMyGoals}></CreateButton>
       {isOpen && portalElement
         ? createPortal(
             <GoalModal
