@@ -7,6 +7,7 @@ import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.InformRequestDto;
 import com.goalkeepers.server.entity.Inform;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.entity.Role;
 import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.repository.InformRepository;
 import com.goalkeepers.server.repository.MemberRepository;
@@ -25,7 +26,7 @@ public class InformService extends ServiceHelper {
         Inform inform = informRepository.save(new Inform(requestDto));
         Long id = inform.getId();
         // 알림 보내기
-        for (Member receiver : memberRepository.findAll()) {
+        for (Member receiver : memberRepository.findAllByRole(Role.ROLE_USER)) {
             notificationService.send(receiver, null, TYPE.NOTIFY, id, requestDto.getTitle(), requestDto.getContent(), null);
         }
         return id;

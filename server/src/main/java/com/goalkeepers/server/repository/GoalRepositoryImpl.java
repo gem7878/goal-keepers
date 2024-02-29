@@ -319,7 +319,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
         return queryFactory
             .selectFrom(goal)
             .join(goal.member, member).fetchJoin()
-            .join(member.setting, setting).on(setting.ddayAlarm.eq(true)).fetchJoin()
+            .join(member, setting.member).on(setting.ddayAlarm.eq(true)).fetchJoin()
             .where(goal.endDate.eq(endDate))
             .fetch();
     }
@@ -329,7 +329,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
         return queryFactory
                 .selectFrom(goal)
                 .join(goal.member, member).fetchJoin()
-                .join(member.setting, setting).on(setting.todayAlarm.eq(true)).fetchJoin()
+                .join(member, setting.member).on(setting.todayAlarm.eq(true)).fetchJoin()
                 .where(goal.completeDate.between(startTime, endTime))
                 .fetch();
     }

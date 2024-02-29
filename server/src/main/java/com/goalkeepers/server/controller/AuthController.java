@@ -9,7 +9,9 @@ import com.goalkeepers.server.dto.LoginRequestDto;
 import com.goalkeepers.server.dto.MemberRequestDto;
 import com.goalkeepers.server.dto.MemberResponseDto;
 import com.goalkeepers.server.dto.TokenDto;
+import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.service.AuthService;
+import com.goalkeepers.server.service.SettingService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +31,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class AuthController {
     
     private final AuthService authService;
+    private final SettingService settingService;
     
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody MemberRequestDto requestDto) {
-        MemberResponseDto response = authService.signup(requestDto);
+        Member newMember = authService.signup(requestDto);
+        settingService.initAlarmSetting(newMember);
+        MemberResponseDto response = MemberResponseDto.of(newMember);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
