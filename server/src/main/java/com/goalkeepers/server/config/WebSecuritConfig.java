@@ -35,7 +35,7 @@ public class WebSecuritConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/auth/**", "/api/kakao/login", "/public/**").permitAll()
+                .requestMatchers("/auth/**", "/api/kakao/login", "/public/**", "/subscribe").permitAll()
                 //.requestMatchers("/member/**", "/goal-list/**", "/board/post/**", "/board/comment", "/board/goal/share").hasAuthority("ROLE_USER")
                 .anyRequest().authenticated()
             )
@@ -64,7 +64,7 @@ public class WebSecuritConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // 허용할 오리진 추가
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // 허용할 메서드 추가
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH")); // 허용할 메서드 추가
         configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 자격 증명 허용
 
