@@ -7,6 +7,7 @@ import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.SettingResponseDto;
 import com.goalkeepers.server.dto.SettingUpdateRequestDto;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.entity.Role;
 import com.goalkeepers.server.entity.Setting;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.SettingRepository;
@@ -37,7 +38,9 @@ public class SettingService extends ServiceHelper {
     }
 
     public void initAlarmSetting(Member member) {
-        settingRepository.save(new Setting(member));
+        if(member.getRole().equals(Role.ROLE_USER)) {
+            settingRepository.save(new Setting(member));
+        }
     }
 
     

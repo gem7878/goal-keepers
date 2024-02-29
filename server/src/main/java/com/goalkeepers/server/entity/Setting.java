@@ -52,6 +52,12 @@ public class Setting {
 
     public Setting(Member member) {
         this.member = member;
+        this.commentAlarm = true;
+        this.contentLikeAlarm = true;
+        this.postCheerAlarm = true;
+        this.goalShareAlarm = true;
+        this.ddayAlarm = true;
+        this.todayAlarm = true;
     }
 
     public static Setting settingUpdate(Setting setting, SettingUpdateRequestDto requestDto) {
