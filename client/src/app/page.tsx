@@ -139,39 +139,46 @@ export default function Home() {
         headers: {
           Authorization: `Bearer ${token}`,
           Connection: 'keep-alive',
-          'Content-Type': 'text/event-stream',
-          'X-Content-Type-Options': 'nosniff',
-          'X-XSS-Protection': '0',
-          'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
-          Pragma: 'no-cache',
-          Expires: '0',
-          'X-Frame-Options': 'DENY',
-          'Transfer-Encoding': 'chunked',
-          'Keep-Alive': 'timeout=60',
-          'Content-Encoding': 'none',
+          Accept: 'text/event-stream',
+          // 'Content-Type': 'text/event-stream',
+          // 'X-Content-Type-Options': 'nosniff',
+          // 'X-XSS-Protection': '0',
+          // 'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
+          // Pragma: 'no-cache',
+          // Expires: '0',
+          // 'X-Frame-Options': 'DENY',
+          // 'Transfer-Encoding': 'chunked',
+          // 'Keep-Alive': 'timeout=60',
+          // 'Content-Encoding': 'none',
+          'Access-Control-Allow-Origin': '*',
         },
         withCredentials: true,
+        heartbeatTimeout: 86400000,
       },
     );
 
     console.log(eventSource);
 
+    // eslint-disable-next-line
     eventSource.onopen = async () => {
       await console.log('sse opened!');
     };
 
+    // eslint-disable-next-line
     eventSource.addEventListener('sse', (event: any) => {
       const data = JSON.parse(event.data);
       const lastEventId = JSON.parse(event.id); // 이걸 저장해둬야 함 Last-Event-ID
       console.log(data, lastEventId);
     });
 
+    // eslint-disable-next-line
     eventSource.onerror = async (e) => {
       await console.log(e);
     };
 
     return () => {
       eventSource.close();
+      // eslint-disable-next-line
     };
   };
 

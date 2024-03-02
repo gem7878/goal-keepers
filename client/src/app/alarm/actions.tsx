@@ -31,7 +31,7 @@ export const handleGetAlarm = async (getData: {
 export const handleReadAlarm = async () => {
   const token = handleGetToken().token;
   try {
-    const response = await axios.patch(
+    const response = await axios.put(
       `${process.env.NEXT_PUBLIC_API_URL}/alarm`,
       {
         headers: {
