@@ -34,24 +34,38 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class NotificationService extends CommonService {
 
-    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
+    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 30;
 
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
     private final MemberRepository memberRepository;
     private final PostContentRepository postContentRepository;
 
-    public SseEmitter subscribe(String lastEventId) {
+    public synchronized SseEmitter subscribe(String lastEventId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         if(Objects.isNull(memberId)) {
             throw new CustomException("로그인이 필요합니다.");
         }
+
+        System.out.println(emitterRepository.findAllEmitters().size());
         
         String emitterId = memberId + "_" + System.currentTimeMillis();
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
-        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
-        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
+        log.info("SSE Emitter 생성됨: {}", emitterId);
+
+        emitter.onCompletion(() -> {
+            emitter.complete();
+            emitterRepository.deleteAllEmitterStartWithMemberId(String.valueOf(memberId));
+            log.info("SSE Emitter 연결 해제");
+        });
+
+        emitter.onTimeout(() -> {
+            String newEmitterId = memberId + "_" + System.currentTimeMillis();
+            emitterRepository.save(newEmitterId, new SseEmitter(DEFAULT_TIMEOUT));
+            emitterRepository.deleteById(emitterId);
+            log.info("SSE Emitter 타임 아웃: {}", emitterId);
+        });
 
         // 503 에러 방지 더미 데이터
         String eventId = memberId + "_" + System.currentTimeMillis();
@@ -64,6 +78,8 @@ public class NotificationService extends CommonService {
             events.entrySet().stream()
                     .filter((entry) -> lastEventId.compareTo(entry.getKey()) < 0)
                     .forEachOrdered((entry) -> sendToClient(emitter, entry.getKey(), emitterId, entry.getValue()));
+            
+            emitterRepository.deleteAllEventCacheStartWithMemberId(String.valueOf(memberId));
         }
 
         return emitter;
