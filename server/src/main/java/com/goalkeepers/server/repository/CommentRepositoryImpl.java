@@ -13,6 +13,7 @@ import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.PostComment;
 import com.goalkeepers.server.exception.CustomException;
+import com.goalkeepers.server.exception.ErrorCode;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import static com.goalkeepers.server.entity.QPostComment.postComment;
@@ -39,7 +40,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberId != null ?
-                memberRepository.findById(memberId).orElseThrow(() -> new CustomException("유저 찾기 오류")) :
+                memberRepository.findById(memberId).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)) :
                 null;
         
         List<CommentResponseDto> page = comments

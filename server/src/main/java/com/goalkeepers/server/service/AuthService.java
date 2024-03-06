@@ -18,6 +18,7 @@ import com.goalkeepers.server.entity.EmailCode;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.SNS;
 import com.goalkeepers.server.exception.CustomException;
+import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.jwt.TokenProvider;
 import com.goalkeepers.server.repository.EmailCodeRepository;
 import com.goalkeepers.server.repository.MemberRepository;
@@ -37,11 +38,8 @@ public class AuthService extends ServiceHelper {
     private final MailService mailService;
 
     public Member signup(MemberRequestDto requestDto) {
-        if(memberRepository.existsByEmail(requestDto.getEmail())) {
-            throw new CustomException("이미 가입된 이메일입니다.");
-        } if (memberRepository.existsByNickname(requestDto.getNickname())) {
-            throw new CustomException("사용중인 닉네임입니다.");
-        }
+        isExistsEmail(memberRepository, requestDto.getEmail());
+        isExistsNickname(memberRepository, requestDto.getNickname());
         return memberRepository.save(requestDto.toMember(passwordEncoder));
     }
 
@@ -58,19 +56,12 @@ public class AuthService extends ServiceHelper {
 
     // 이메일 중복 확인
     public void confirmDuplicateEmail(String email) {
-        Boolean isExistsEmail = memberRepository.existsByEmail(email);
-        if (isExistsEmail) {
-            throw new CustomException("이미 가입된 이메일입니다.");
-        }
+        isExistsEmail(memberRepository, email);
     }
 
     // 닉네임 중복확인
-    public Boolean confirmDuplicateNickname(String nickname) {       
-        if (memberRepository.existsByNickname(nickname)) {
-            throw new CustomException("사용중인 닉네임입니다.");
-        } else {
-            return true;
-        }
+    public void confirmDuplicateNickname(String nickname) {       
+        isExistsNickname(memberRepository, nickname);
     }
 
 
@@ -103,12 +94,12 @@ public class AuthService extends ServiceHelper {
     public Boolean verifiedCode(String email, String authCode) {
         this.confirmDuplicateEmail(email);
         EmailCode code = codeRepository.findByEmail(email)
-                                        .orElseThrow(() -> new CustomException("최신 인증 메일의 코드가 아니거나 인증 메일을 받은 이메일이 아닙니다."));
+                                        .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "최신 인증 메일의 코드가 아니거나 인증 메일을 받은 이메일이 아닙니다."));
         
         if (code.getCode().equals(authCode)) {
             return true;
         } else {
-            throw new CustomException("잘못된 코드를 입력하였습니다. 다시 확인해주세요.");
+            throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "잘못된 코드를 입력하였습니다. 다시 확인해주세요.");
         }
     }
 
@@ -125,7 +116,7 @@ public class AuthService extends ServiceHelper {
     @Transactional
     private String findPassword(String email) {
         Member member = memberRepository.findByEmail(email)
-                                        .orElseThrow(() -> new CustomException("가입되지 않은 이메일입니다."));
+                                        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND, "가입되지 않은 이메일입니다."));
         SNS sns = member.getSns();
         if (sns != null) {
             String snsKorean = "";
@@ -134,7 +125,7 @@ public class AuthService extends ServiceHelper {
             } else if (sns == SNS.NAVER) {
                 snsKorean = "네이버";
             }
-            throw new CustomException(snsKorean+ "를 통해 로그인된 이메일입니다. " + snsKorean + " 로그인을 이용해주세요.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, snsKorean+ "를 통해 로그인된 이메일입니다. " + snsKorean + " 로그인을 이용해주세요.");
         }
 
         String newPassword = UUID.randomUUID().toString().substring(0,12);

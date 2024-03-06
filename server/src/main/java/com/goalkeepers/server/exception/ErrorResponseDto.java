@@ -2,6 +2,8 @@ package com.goalkeepers.server.exception;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,7 +32,7 @@ public class ErrorResponseDto {
     }
 
     public ErrorResponseDto(ErrorCode errorCode, String message) {
-        this.message = message;
+        this.message = Optional.ofNullable(message).orElse(errorCode.getMessage());
         this.status = errorCode.getStatus();
         this.code = errorCode.getCode();
     }
