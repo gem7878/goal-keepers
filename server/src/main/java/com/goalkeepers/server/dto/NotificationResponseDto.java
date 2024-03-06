@@ -17,8 +17,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class NotificationResponseDto {
-    private Long notificationId;
-    private Long receiverId;
+    private long notificationId;
+    private long receiverId;
     private Long giverId;
     private String giverNickname;
     private TYPE type;

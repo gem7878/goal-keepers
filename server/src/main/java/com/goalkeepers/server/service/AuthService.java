@@ -10,9 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.dto.LoginRequestDto;
 import com.goalkeepers.server.dto.MemberRequestDto;
-import com.goalkeepers.server.dto.MemberResponseDto;
 import com.goalkeepers.server.dto.TokenDto;
 import com.goalkeepers.server.entity.EmailCode;
 import com.goalkeepers.server.entity.Member;
@@ -28,23 +28,21 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AuthService extends CommonService {
+public class AuthService extends ServiceHelper {
     private final AuthenticationManagerBuilder managerBuilder;
-    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    private final MailService mailService;
+    private final MemberRepository memberRepository;
     private final EmailCodeRepository codeRepository;
+    private final MailService mailService;
 
-    public MemberResponseDto signup(MemberRequestDto requestDto) {
+    public Member signup(MemberRequestDto requestDto) {
         if(memberRepository.existsByEmail(requestDto.getEmail())) {
             throw new CustomException("이미 가입된 이메일입니다.");
         } if (memberRepository.existsByNickname(requestDto.getNickname())) {
             throw new CustomException("사용중인 닉네임입니다.");
         }
-
-        Member member = requestDto.toMember(passwordEncoder);
-        return MemberResponseDto.of(memberRepository.save(member));
+        return memberRepository.save(requestDto.toMember(passwordEncoder));
     }
 
     public TokenDto login(LoginRequestDto requestDto) {

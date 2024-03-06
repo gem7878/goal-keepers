@@ -14,15 +14,11 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name= "SETTING_TB")
 public class Setting {
@@ -56,6 +52,12 @@ public class Setting {
 
     public Setting(Member member) {
         this.member = member;
+        this.commentAlarm = true;
+        this.contentLikeAlarm = true;
+        this.postCheerAlarm = true;
+        this.goalShareAlarm = true;
+        this.ddayAlarm = true;
+        this.todayAlarm = true;
     }
 
     public static Setting settingUpdate(Setting setting, SettingUpdateRequestDto requestDto) {

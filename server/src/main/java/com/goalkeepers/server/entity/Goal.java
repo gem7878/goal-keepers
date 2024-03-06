@@ -97,6 +97,7 @@ public class Goal {
         goal.member = null;
         goal.completed = false;
         goal.share = null;
+        goal.completeDate = null;
         return goal;
     }
 

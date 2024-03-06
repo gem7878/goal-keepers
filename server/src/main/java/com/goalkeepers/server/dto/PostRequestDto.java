@@ -24,6 +24,9 @@ public class PostRequestDto {
     @NotNull(message = "Goal을 선택해주세요.")
     private Long goalId;
 
+    @NotNull(message = "공개 여부를 선택해주세요")
+    private Boolean privated;
+
     public PostContent toPostContent(Member member, Goal goal, Post post) {
         return PostContent.builder()
                 .content(content)

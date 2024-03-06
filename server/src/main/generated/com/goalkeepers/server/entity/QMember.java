@@ -18,8 +18,6 @@ public class QMember extends EntityPathBase<Member> {
 
     private static final long serialVersionUID = -1648982233L;
 
-    private static final PathInits INITS = PathInits.DIRECT2;
-
     public static final QMember member = new QMember("member1");
 
     public final StringPath email = createString("email");
@@ -38,8 +36,6 @@ public class QMember extends EntityPathBase<Member> {
 
     public final EnumPath<Role> role = createEnum("role", Role.class);
 
-    public final QSetting setting;
-
     public final SetPath<GoalShare, QGoalShare> shares = this.<GoalShare, QGoalShare>createSet("shares", GoalShare.class, QGoalShare.class, PathInits.DIRECT2);
 
     public final EnumPath<SNS> sns = createEnum("sns", SNS.class);
@@ -47,24 +43,15 @@ public class QMember extends EntityPathBase<Member> {
     public final NumberPath<Long> snsId = createNumber("snsId", Long.class);
 
     public QMember(String variable) {
-        this(Member.class, forVariable(variable), INITS);
+        super(Member.class, forVariable(variable));
     }
 
     public QMember(Path<? extends Member> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+        super(path.getType(), path.getMetadata());
     }
 
     public QMember(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QMember(PathMetadata metadata, PathInits inits) {
-        this(Member.class, metadata, inits);
-    }
-
-    public QMember(Class<? extends Member> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.setting = inits.isInitialized("setting") ? new QSetting(forProperty("setting"), inits.get("setting")) : null;
+        super(Member.class, metadata);
     }
 
 }

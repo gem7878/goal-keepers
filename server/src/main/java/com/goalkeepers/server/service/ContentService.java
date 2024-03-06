@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.common.ServiceHelper;
+import com.goalkeepers.server.dto.CommunityContentResponseDto;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
@@ -28,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 @DependsOn("firebaseStorageService")
-public class ContentService extends CommonService {
+public class ContentService extends ServiceHelper {
 
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;
@@ -50,7 +52,9 @@ public class ContentService extends CommonService {
         Post post = postRepository.findByGoal(goal).orElse(null);
         // 처음 컨텐트 작성할 때 postId 생성
         if(Objects.isNull(post)) {
-            post = postRepository.save(new Post(goal));
+            post = postRepository.save(new Post(goal, requestDto.getPrivated()));
+        } else if (post.isPrivated() != requestDto.getPrivated()) {
+            post.setPrivated(requestDto.getPrivated());
         }
 
         // 담기한 Goal이면 shareGoal로 바꾸기
@@ -90,7 +94,7 @@ public class ContentService extends CommonService {
         return contentRepository.getPostContents(PageRequest.of(pageNumber - 1, 10), isPost(postRepository, postId));
     }
 
-    public Page<PostContentResponseDto> getCommunityContents(Long goalId, int pageNumber) {
+    public Page<CommunityContentResponseDto> getCommunityContents(Long goalId, int pageNumber) {
         return contentRepository.getCommunityContents(PageRequest.of(pageNumber - 1, 10), isGoal(goalRepository, goalId));
     }
 

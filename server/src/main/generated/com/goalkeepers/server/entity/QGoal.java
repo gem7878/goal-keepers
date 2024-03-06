@@ -64,7 +64,7 @@ public class QGoal extends EntityPathBase<Goal> {
 
     public QGoal(Class<? extends Goal> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.member = inits.isInitialized("member") ? new QMember(forProperty("member"), inits.get("member")) : null;
+        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
         this.share = inits.isInitialized("share") ? new QGoalShare(forProperty("share"), inits.get("share")) : null;
     }
 

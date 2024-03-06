@@ -9,6 +9,6 @@ import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Post;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long>{
+public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
     Optional<Post> findByGoal(Goal goal);
 }

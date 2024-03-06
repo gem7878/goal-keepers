@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.goalkeepers.server.common.ServiceHelper;
 import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.dto.DeleteAlarmRequestDto;
 import com.goalkeepers.server.dto.NotificationResponseDto;
@@ -32,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class NotificationService extends CommonService {
+public class NotificationService extends ServiceHelper {
 
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 30;
 
@@ -128,7 +129,7 @@ public class NotificationService extends CommonService {
      */
     public Long deleteAlarms(DeleteAlarmRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
-        if(requestDto.isAll()) {
+        if(requestDto.getAll()) {
             System.out.println("isAll true");
             return notificationRepository.deleteAllAlarms(member);
         } else {

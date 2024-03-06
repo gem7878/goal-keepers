@@ -16,8 +16,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,8 +23,6 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "POST_TB")
 public class Post {
@@ -43,6 +39,9 @@ public class Post {
     @ColumnDefault("0")
     private int cheerCnt;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean privated;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostContent> contentList;
 
@@ -52,6 +51,11 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostCheer> cheerList;
    
+    public Post(Goal goal, Boolean privated) {
+        this.goal = goal;
+        this.privated = privated;
+    }
+
     public Post(Goal goal) {
         this.goal = goal;
     }

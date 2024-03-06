@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TargetRequestDto {
     private TYPE type;
-    private Long targetId;
-    private Long commentId;
+    private long targetId;
+    private long commentId;
 }
