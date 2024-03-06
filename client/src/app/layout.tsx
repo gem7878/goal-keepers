@@ -6,7 +6,7 @@ import './globals.css';
 import { Navbar } from '@/components/index.js';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { handleConfirmToken } from './actions';
+import { handleCloseEventSource, handleConfirmToken } from './actions';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
 import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
@@ -86,8 +86,8 @@ function RootLayout({ children }: { children: React.ReactNode }) {
       });
 
       return () => {
+        handleCloseEventSource();
         eventSource.close(); // 로그아웃 될 때 eventId 삭제와 eventSource.close()도 실행되게 하기
-        closeEventSource();
         console.log('SSE CLOSED');
       };
     };
