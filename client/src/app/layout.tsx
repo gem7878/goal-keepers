@@ -11,9 +11,6 @@ import { Provider } from 'react-redux';
 import { store } from '../redux/store';
 import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
 import { tokenValue } from './alarm/actions';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setStateLogOut } from '@/redux/renderSlice';
-import { useCookies } from 'react-cookie';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,10 +20,7 @@ const inter = Inter({ subsets: ['latin'] });
 // };
 
 function RootLayout({ children }: { children: React.ReactNode }) {
-  const [eventId, setEventId] = useState<string>('');
-
-  // const [cookies, setCookie] = useCookies(['accessToken']);
-  // const [previousToken, setPreviousToken] = useState(cookies.token);
+  const [eventId, setEventId] = useState<string>("");
 
   const pathname = usePathname();
   const router = useRouter();
@@ -54,15 +48,24 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const getToken = async () => {
+      try {
+        const result = await tokenValue();
+        return result;
+      } catch (error) {
+        console.error('Error fetching token:', error);
+        return null;
+      }
+    };
+    
     const initializeEventSource = async () => {
       const token = await getToken();
-
       if (!token) {
         console.error('Token is null');
         return;
       }
 
-      console.log('Last-Event-Id: ' + eventId);
+      console.log("Last-Event-Id: " + eventId);
       const EventSource = EventSourcePolyfill || NativeEventSource;
       const eventSource = new EventSource(
         `${process.env.NEXT_PUBLIC_API_URL}/subscribe`,
@@ -80,57 +83,19 @@ function RootLayout({ children }: { children: React.ReactNode }) {
       // eslint-disable-next-line
       eventSource.addEventListener('sse', (event: any) => {
         const { lastEventId: lastEventId, data: receivedConnectData } = event;
-        console.log('Current Event Id: ' + lastEventId);
+        console.log("Current Event Id: " + lastEventId)
         console.log(receivedConnectData);
         setEventId(lastEventId); // 임시로 해둔 것, 쿠키같은곳에 저장
       });
 
       return () => {
-        handleCloseEventSource();
         eventSource.close(); // 로그아웃 될 때 eventId 삭제와 eventSource.close()도 실행되게 하기
         console.log('SSE CLOSED');
       };
-    };
+    }
 
     initializeEventSource();
-  }, [pathname]);
-
-  // useEffect(() => {
-
-  //   if (reduxLogoutRender.logOutBoolean === true) {
-  //     closeEventSource();
-  //     setStateLogOut(false);
-  //   }
-  // }, [reduxLogoutRender.logOutBoolean]);
-
-  const closeEventSource = async () => {
-    const token = await getToken();
-    const EventSource = EventSourcePolyfill || NativeEventSource;
-    const eventSource = new EventSource(
-      `${process.env.NEXT_PUBLIC_API_URL}/subscribe`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Connetction: 'keep-alive',
-          Accept: 'text/event-stream',
-          'Last-Event-Id': eventId,
-        },
-        heartbeatTimeout: 86400000,
-      },
-    );
-    eventSource.close(); // 로그아웃 될 때 eventId 삭제와 eventSource.close()도 실행되게 하기
-    console.log('SSE CLOSED');
-  };
-
-  const getToken = async () => {
-    try {
-      const result = await tokenValue();
-      return result;
-    } catch (error) {
-      console.error('Error fetching token:', error);
-      return null;
-    }
-  };
+  }, []);
 
   function setScreenSize() {
     const wrapElement: any = document.querySelector('.wrap');

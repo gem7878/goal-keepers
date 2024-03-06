@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import { cookies } from 'next/headers';
+import Cookies from 'js-cookie';
 
 // 액세스 토큰을 쿠키에 저장하는 함수
 export const setAccessTokenCookie = (token: string) => {
@@ -9,6 +10,14 @@ export const setAccessTokenCookie = (token: string) => {
   const oneDayInSeconds = 24 * 60 * 60;
   const expiresDate = new Date();
   expiresDate.setTime(expiresDate.getTime() + oneDayInSeconds * 1000);
+
+  // Cookies.set('accessToken', token, {
+  //   expires: expiresDate,
+  //   path: '/',
+  //   httpOnly: true,
+  //   secure: process.env.NEXT_PUBLIC_ENV === 'production',
+  //   sameSite: process.env.NEXT_PUBLIC_ENV === 'production' ? 'none' : 'lax',
+  // });
 
   cookies().set({
     name: 'accessToken',
