@@ -260,7 +260,7 @@ const Register = () => {
                   type="text"
                   className="w-[calc(100%-52px)]"
                   {...field}
-                  placeholder="닉네임을 입력하세요(15자 이하)"
+                  placeholder="닉네임을 입력하세요(3자~15자)"
                 ></input>
               )}
             ></Controller>

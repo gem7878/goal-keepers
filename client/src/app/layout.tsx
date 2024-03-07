@@ -6,7 +6,7 @@ import './globals.css';
 import { Navbar } from '@/components/index.js';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { handleConfirmToken } from './actions';
+import { handleCloseEventSource, handleConfirmToken } from './actions';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
 import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
@@ -60,7 +60,6 @@ function RootLayout({ children }: { children: React.ReactNode }) {
     
     const initializeEventSource = async () => {
       const token = await getToken();
-
       if (!token) {
         console.error('Token is null');
         return;
@@ -75,10 +74,10 @@ function RootLayout({ children }: { children: React.ReactNode }) {
             Authorization: `Bearer ${token}`,
             Connetction: 'keep-alive',
             Accept: 'text/event-stream',
-            'Last-Event-Id': eventId
+            'Last-Event-Id': eventId,
           },
           heartbeatTimeout: 86400000,
-        }
+        },
       );
 
       // eslint-disable-next-line

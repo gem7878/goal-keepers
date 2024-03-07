@@ -50,7 +50,8 @@ public class NotificationService extends ServiceHelper {
         }
 
         System.out.println(emitterRepository.findAllEmitters().size());
-        
+        emitterRepository.deleteAllEmitterStartWithMemberId(String.valueOf(memberId));
+        System.out.println(emitterRepository.findAllEmitters().size());
         String emitterId = memberId + "_" + System.currentTimeMillis();
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
