@@ -17,6 +17,7 @@ import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.entity.PostLike;
 import com.goalkeepers.server.exception.CustomException;
+import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostContentRepository;
@@ -36,7 +37,7 @@ public class MemberService extends ServiceHelper {
     public MemberResponseDto getMyInfoBySecurity() {
         return memberRepository.findById(SecurityUtil.getCurrentMemberId())
                 .map(MemberResponseDto::of)
-                .orElseThrow(() -> new CustomException("로그인 유저 정보가 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     // 닉네임 변경
@@ -53,15 +54,15 @@ public class MemberService extends ServiceHelper {
         Member member = isMemberCurrent(memberRepository);
 
         if(!member.getEmail().equals(email)) {
-            throw new CustomException("로그인한 유저와 입력된 이메일이 다릅니다.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "로그인한 유저와 입력된 이메일이 다릅니다.");
         }
 
         if (!passwordEncoder.matches(exPassword, member.getPassword())) {
-            throw new CustomException("원래의 비밀번호를 확인해주세요.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "원래의 비밀번호를 확인해주세요.");
         }
 
         if(exPassword.equals(newPassword)) {
-            throw new CustomException("이전의 비밀번호와 변경하려는 비밀번호가 같습니다.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "이전의 비밀번호와 변경하려는 비밀번호가 같습니다.");
         }
 
         member.setPassword(passwordEncoder.encode(newPassword));
@@ -76,11 +77,11 @@ public class MemberService extends ServiceHelper {
         Member member = isMemberCurrent(memberRepository);
 
         if(!member.getEmail().equals(email)) {
-            throw new CustomException("이메일을 확인해주세요.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "이메일을 확인해주세요.");
         }
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new CustomException("비밀번호를 확인해주세요.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "비밀번호를 확인해주세요.");
         }
 
         // 참조하고 있던 Goal이 사라졌습니다.      

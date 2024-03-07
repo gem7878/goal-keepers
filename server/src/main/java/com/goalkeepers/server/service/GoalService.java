@@ -23,7 +23,6 @@ import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.TYPE;
-import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
@@ -66,8 +65,7 @@ public class GoalService extends ServiceHelper{
     public GoalResponseDto getSelectedGoal(Long goalId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberId != null ? memberRepository.findById(memberId).get() : null;
-        Goal goal = goalRepository.findById(goalId)
-                                    .orElseThrow(() -> new CustomException("Goal Id를 확인해주세요."));
+        Goal goal = isGoal(goalRepository, goalId);
         String imageUrl = goal.getImageUrl();
         if(Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
             imageUrl = firebaseStorageService.showFile(imageUrl);

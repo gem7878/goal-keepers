@@ -18,6 +18,7 @@ import com.goalkeepers.server.entity.Faq;
 import com.goalkeepers.server.entity.Inquiry;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.exception.CustomException;
+import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.repository.AnswerRepository;
 import com.goalkeepers.server.repository.FaqRepository;
 import com.goalkeepers.server.repository.InquiryRepository;
@@ -74,15 +75,15 @@ public class CustomerService extends ServiceHelper {
     }
 
     private Faq findOneFaq(Long faqId) {
-        return faqRepository.findById(faqId).orElseThrow(() -> new CustomException(faqId + " FAQ 정보가 없습니다."));
+        return faqRepository.findById(faqId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, faqId + " FAQ 정보가 없습니다."));
     }
 
     private Inquiry findOneInquiry(Long inquiryId) {
-        return inquiryRepository.findById(inquiryId).orElseThrow(() -> new CustomException(inquiryId + " 문의 정보가 없습니다."));
+        return inquiryRepository.findById(inquiryId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, inquiryId + " 문의 정보가 없습니다."));
     }
 
     private Answer findOneAnswer(Long inquiryId) {
         return answerRepository.findByInquiry(findOneInquiry(inquiryId))
-                                .orElseThrow(() -> new CustomException("답변 정보가 없습니다."));
+                                .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, "답변 정보가 없습니다."));
     }
 }

@@ -21,6 +21,7 @@ import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.entity.PostLike;
 import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.exception.CustomException;
+import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
@@ -102,11 +103,11 @@ public class LikeShareService extends ServiceHelper {
         Member member = isMemberCurrent(memberRepository);
         Goal goal = isGoal(goalRepository, goalId);
         if(Objects.nonNull(goal.getMember()) && goal.getMember().equals(member)) {
-            throw new CustomException("나의 Goal입니다.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "나의 Goal입니다.");
         }
         GoalShare share = shareRepository.findByMemberAndGoal(member, goal)
-                        .orElseThrow(() -> new CustomException("이 Goal과 연결된 나의 Goal이 없습니다."));
-        Goal myGoal = goalRepository.findByShare(share).orElseThrow(() -> new CustomException("이 Goal과 연결된 나의 Goal이 존재하나 데이터베이스 상에 오류가 있습니다."));
+                        .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "이 Goal과 연결된 나의 Goal이 없습니다."));
+        Goal myGoal = goalRepository.findByShare(share).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "이 Goal과 연결된 나의 Goal이 존재하나 데이터베이스 상에 오류가 있습니다."));
         return GoalResponseDto.of(myGoal, null, null);
     }
 
@@ -123,9 +124,9 @@ public class LikeShareService extends ServiceHelper {
 
         // 공유한 적이 없는지 -> 내 골이 아닌지 -> 골 만들기
         if (shareRepository.existsByMemberAndGoal(member, goal)) {
-            throw new CustomException("담기한 Goal입니다.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "담기한 Goal입니다.");
         } else if (Objects.nonNull(goal.getMember()) && goal.getMember().equals(member)) {
-            throw new CustomException("나의 Goal입니다.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "나의 Goal입니다.");
         } else {
             GoalShare share = shareRepository.save(new GoalShare(member, goal));
             goal.setShareCnt(goal.getShareCnt()+1);

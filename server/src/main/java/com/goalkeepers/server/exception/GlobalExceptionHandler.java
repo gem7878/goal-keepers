@@ -18,8 +18,11 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.cloud.storage.StorageException;
 
 import jakarta.validation.ConstraintViolationException;
@@ -131,6 +134,15 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 
+	/*
+	 * RestTemplate error
+	 */
+	@ExceptionHandler(HttpClientErrorException.class)
+	protected ResponseEntity<ErrorResponseDto> handleHttpClientErrorException(HttpClientErrorException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.PRECONDITION_FAILED);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
 	/**
 	 * 파일을 못 찾을 때
 	 */
@@ -184,6 +196,15 @@ public class GlobalExceptionHandler {
 	protected ResponseEntity<ErrorResponseDto> handleNullPointerException(NullPointerException e) {
 		e.printStackTrace();
 		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.NULL_POINT_ERROR);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/*
+	 *  JSON Parsing Error
+	 */
+	@ExceptionHandler(value = { JsonProcessingException.class, JsonMappingException.class})
+	public ResponseEntity<ErrorResponseDto> handleJsonProcessingException() {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.JSON_PARSE_ERROR);
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 

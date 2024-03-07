@@ -21,6 +21,7 @@ import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Notification;
 import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.exception.CustomException;
+import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.repository.EmitterRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.NotificationRepository;
@@ -45,7 +46,7 @@ public class NotificationService extends ServiceHelper {
     public synchronized SseEmitter subscribe(String lastEventId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         if(Objects.isNull(memberId)) {
-            throw new CustomException("로그인이 필요합니다.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "로그인이 필요합니다.");
         }
 
         System.out.println(emitterRepository.findAllEmitters().size());
