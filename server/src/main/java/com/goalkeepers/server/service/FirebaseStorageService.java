@@ -65,7 +65,8 @@ public class FirebaseStorageService {
     
     private String convertName(MultipartFile uploadFile, String dirName) {
         String originName = uploadFile.getOriginalFilename();
-        String newName = UUID.randomUUID() + "_" + originName.replaceAll("_","");
+        String subOriginName = originName.substring(0, Math.min(originName.length(), 13));
+        String newName = UUID.randomUUID() + "_" + subOriginName.replaceAll("_","");
         return dirName + "/" + newName;
     }
 
