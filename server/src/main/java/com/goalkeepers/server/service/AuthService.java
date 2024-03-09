@@ -70,12 +70,13 @@ public class AuthService extends ServiceHelper {
      */
     public void sendCodeToEmail(String toEmail) {
         String title = "[골키퍼스] 이메일 인증 번호가 발급되었습니다.";
-        String authCode = "코드는 [" + this.createCode() + "] 입니다. 30분이내에 인증해주세요.";
-        mailService.sendEmail(toEmail, title, authCode);
+        String code = this.createCode();
+        String text = "코드는 [" + code + "] 입니다. 30분이내에 인증해주세요.";
+        mailService.sendEmail(toEmail, title, text);
         if(codeRepository.existsByEmail(toEmail)) {
             codeRepository.deleteByEmail(toEmail);
         }
-        codeRepository.save(new EmailCode(toEmail, authCode));
+        codeRepository.save(new EmailCode(toEmail, code));
     }
 
     private String createCode(){
