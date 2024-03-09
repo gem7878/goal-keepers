@@ -24,10 +24,10 @@ public class Faq {
     @Column(name = "faq_id")
     private Long id;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     public Faq(String title, String content) {

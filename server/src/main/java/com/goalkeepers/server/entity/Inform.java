@@ -26,10 +26,10 @@ public class Inform {
     @Column(name = "inform_id")
     private Long id;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 60, nullable = false)
     private String content;
 
     @CreationTimestamp

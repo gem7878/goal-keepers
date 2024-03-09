@@ -1,0 +1,35 @@
+ALTER TABLE faq_tb
+ALTER COLUMN title SET NOT NULL;
+
+ALTER TABLE faq_tb
+ALTER COLUMN content SET NOT NULL;
+
+ALTER TABLE inquiry_tb
+ALTER COLUMN title SET NOT NULL;
+
+ALTER TABLE inquiry_tb
+ALTER COLUMN content SET NOT NULL;
+
+ALTER TABLE inquiry_tb
+ALTER COLUMN answered SET NOT NULL;
+
+ALTER TABLE post_tb
+ALTER COLUMN privated SET NOT NULL;
+
+ALTER TABLE setting_tb
+ALTER COLUMN comment_alarm SET NOT NULL;
+
+ALTER TABLE setting_tb
+ALTER COLUMN content_like_alarm SET NOT NULL;
+
+ALTER TABLE setting_tb
+ALTER COLUMN post_cheer_alarm SET NOT NULL;
+
+ALTER TABLE setting_tb
+ALTER COLUMN goal_share_alarm SET NOT NULL;
+
+ALTER TABLE setting_tb
+ALTER COLUMN dday_alarm SET NOT NULL;
+
+ALTER TABLE setting_tb
+ALTER COLUMN today_alarm SET NOT NULL;

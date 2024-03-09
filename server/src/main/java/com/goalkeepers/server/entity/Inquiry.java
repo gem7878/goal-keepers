@@ -29,17 +29,17 @@ public class Inquiry {
     @Column(name = "inquiry_id")
     private Long id;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Column(columnDefinition = "TIMESTAMP")
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(columnDefinition = "boolean default false")
+    @Column(columnDefinition = "boolean not null default false")
     private boolean answered;
 
     @ManyToOne(fetch = FetchType.LAZY)

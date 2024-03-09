@@ -16,5 +16,6 @@ public class InformRequestDto {
     private String title;
 
     @NotBlank(message = "내용을 입력해주세요.")
+    @Size(max = 60, message = "60자 이하로 작성하시오.")
     private String content;
 }

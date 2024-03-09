@@ -26,14 +26,16 @@ public class Member {
     private Long id;
 
     @Email
-    @Column(unique = true)
+    @Column(unique = true, length = 50, nullable = false)
     private String email;
 
+    @Column(length = 20, nullable = false)
     private String password;
 
-    @Column(unique = true, length = 15)
+    @Column(unique = true, length = 15, nullable = false)
     private String nickname;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 

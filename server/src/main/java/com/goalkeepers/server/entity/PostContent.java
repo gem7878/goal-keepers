@@ -40,7 +40,7 @@ public class PostContent {
     @Column(name = "content_id")
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 60)
     @NotNull
     private String content;
 

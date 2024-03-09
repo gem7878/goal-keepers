@@ -24,17 +24,19 @@ public class Notification {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id")
+    @JoinColumn(name = "receiver_id", nullable = false)
     private Member receiver;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "giver_id")
     private Member giver;
 
+    @Column(nullable = false)
     private TYPE type;
 
     private Long targetId;
 
+    @Column(length = 60)
     private String message;
 
     private Long commentId;

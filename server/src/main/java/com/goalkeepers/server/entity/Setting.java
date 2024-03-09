@@ -32,22 +32,22 @@ public class Setting {
     @NotNull
     private Member member;
 
-    @Column(columnDefinition = "boolean default true")
+    @Column(columnDefinition = "boolean not null default true")
     private boolean commentAlarm;
 
-    @Column(columnDefinition = "boolean default true")
+    @Column(columnDefinition = "boolean not null default true")
     private boolean contentLikeAlarm;
 
-    @Column(columnDefinition = "boolean default true")
+    @Column(columnDefinition = "boolean not null default true")
     private boolean postCheerAlarm;
 
-    @Column(columnDefinition = "boolean default true")
+    @Column(columnDefinition = "boolean not null default true")
     private boolean goalShareAlarm;
 
-    @Column(columnDefinition = "boolean default true")
+    @Column(columnDefinition = "boolean not null default true")
     private boolean ddayAlarm;
 
-    @Column(columnDefinition = "boolean default true")
+    @Column(columnDefinition = "boolean not null default true")
     private boolean todayAlarm;
 
     public Setting(Member member) {
