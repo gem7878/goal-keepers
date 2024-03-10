@@ -26,6 +26,7 @@ public class PostResponseDto {
     private boolean isShare;
     private boolean isMyPost;
     private PostContentResponseDto content;
+    private boolean isPrivated;
     
     public static PostResponseDto of(
                     Post post,
@@ -51,6 +52,7 @@ public class PostResponseDto {
             .isShare(isShare)
             .isMyPost(isMyPost)
             .content(content)
+            .isPrivated(post.isPrivated())
             .build();
     }
 }
