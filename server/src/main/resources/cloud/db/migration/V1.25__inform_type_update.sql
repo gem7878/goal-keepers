@@ -1,5 +1,5 @@
 ALTER TABLE inform_tb
-ALTER COLUMN content TYPE varchar(60);
+ALTER COLUMN content TYPE varchar(120);
 
 ALTER TABLE inform_tb
 ALTER COLUMN title SET NOT NULL;

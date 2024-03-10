@@ -1,5 +1,5 @@
 ALTER TABLE notification_tb
-ALTER COLUMN message TYPE varchar(60);
+ALTER COLUMN message TYPE varchar(120);
 
 ALTER TABLE notification_tb
 ALTER COLUMN type SET NOT NULL;
