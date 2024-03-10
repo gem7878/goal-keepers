@@ -141,4 +141,14 @@ public class BoardController {
         String response = likeShareService.addPostCheer(requestDto);
         return ResponseEntity.ok(new CommonResponseDto(true, "Post " + requestDto.getPostId() + response));
     }
+
+    /*
+     * 포스트 공개/비공개 업데이트
+     */
+    
+    @PutMapping("/post/privated")
+    public ResponseEntity<CommonResponseDto> updatePostPrivated(@Valid @RequestBody PostCheerRequestDto requestDto) {
+        Boolean response = boardService.updatePostPrivated(requestDto.getPostId());
+        return ResponseEntity.ok(new CommonResponseDto(true, response));
+    }
 }

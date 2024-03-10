@@ -12,8 +12,11 @@ import com.goalkeepers.server.dto.CommunityResponseDto;
 import com.goalkeepers.server.dto.PostSelectResponseDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.entity.Goal;
+import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.SORT;
+import com.goalkeepers.server.exception.CustomException;
+import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostContentRepository;
@@ -71,6 +74,21 @@ public class BoardService extends ServiceHelper {
     public void createMyPost(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
         postRepository.save(new Post(goal));
+    }
+
+    /*
+     * 비공개 업데이트
+     */
+    public boolean updatePostPrivated(Long postId) {
+        Member member = isMemberCurrent(memberRepository);
+        Post post = isPost(postRepository, postId);
+        if(post.getGoal().getMember().equals(member)) {
+            boolean currentPrivated = post.isPrivated();
+            post.setPrivated(!currentPrivated);
+            return !currentPrivated;
+        } else {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
     }
 }
 
