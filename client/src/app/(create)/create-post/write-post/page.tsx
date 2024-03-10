@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { handleGetGoalListAll } from '@/app/actions';
 import Link from 'next/link';
-import { handleCreatePost } from '../actions';
+import { handleCreateContent } from '../actions';
 
 const WritePost = () => {
   const [goalData, setGoalData] = useState<{
@@ -17,8 +17,8 @@ const WritePost = () => {
     content: string;
   }>({ title: '', imageUrl: null, content: '' });
   const [editDescription, setEditDescription] = useState('');
-  const [postTitle, setPostTitle] = useState('');
   const [postContent, setPostContent] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false)
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -46,10 +46,10 @@ const WritePost = () => {
   const onCreatePost = async () => {
     const postData = {
       goalId: goalId,
-      title: postTitle,
       content: postContent,
+      privated: isPrivate,
     };
-    await handleCreatePost(postData)
+    await handleCreateContent(postData)
       .then((response) => {
         if (response.success) {
           router.push('/community');
@@ -83,7 +83,7 @@ const WritePost = () => {
           </div>
         </header>
         <article className="flex-col px-4 py-5 h-3/4">
-          <input
+          {/* <input
             type="text"
             placeholder="포스트 제목을 입력하세요."
             className="text-base w-full border-b h-8"
@@ -95,15 +95,38 @@ const WritePost = () => {
             className="text-sm w-full border h-[calc(100%-40px)] mt-2 p-2"
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
-          ></textarea>
+          ></textarea> */}
+          <li className="w-full h-9 flex gap-2 items-center">
+            <input
+              className="w-11/12 text-sm border-b p-1 text-gray-600"
+              type="text"
+              autoFocus
+              placeholder="목표의 현재 진행 상황을 기록하세요!"
+              onChange={(e) => setPostContent(e.target.value)}
+            ></input>
+          </li>
+
+          <button
+            onClick={() => {
+              // if (addContent) {
+              //   onCreatePostContent(data.goalId);
+              // } else {
+              //   contentRef.current.scrollTop = 0;
+              //   setAddContent(true);
+              // }
+            }}
+            className="h-[13%] w-full bg-orange-400 rounded-xl text-sm text-white"
+          >
+            {/* {addContent ? '입력' : '기록하기'} */}
+          </button>
         </article>
       </div>
       <Link
-        className={
-          postTitle.length > 0 && postContent.length > 0
-            ? 'gk-primary-next-a'
-            : 'gk-primary-next-a-block'
-        }
+        // className={
+        //   postTitle.length > 0 && postContent.length > 0
+        //     ? 'gk-primary-next-a'
+        //     : 'gk-primary-next-a-block'
+        // }
         href={``}
         onClick={() => onCreatePost()}
       >
