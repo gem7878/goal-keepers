@@ -1,6 +1,6 @@
 'use server';
 
-import { handleGetToken } from '@/utils/getToken';
+import { handleGetToken } from '@/utils/getCookie';
 import axios from 'axios';
 import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
 

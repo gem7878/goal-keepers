@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { notFound, useParams } from 'next/navigation';
+import { notFound, useParams, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 export default function CreateGoalLayout({
@@ -9,25 +9,30 @@ export default function CreateGoalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const params: { createGoalId: string } = useParams();
+  const params = useSearchParams();
+  const item = params.get('item');
+  
+  // const params = useParams<{ createGoalId: any }>();
 
-  const [createGoalId, setCreateGoalId] = useState(1);
+  // console.log(params);
 
-  useEffect(() => {
-    setCreateGoalId(parseInt(params.createGoalId));
-  }, [params.createGoalId]);
+  // const [createGoalId, setCreateGoalId] = useState(1);
 
-  const createGoalList = ['이름', '이미지', '기간', '상세내용'];
+  // useEffect(() => {
+  //   setCreateGoalId(parseInt(params.createGoalId));
+  // }, [params.createGoalId]);
 
-  if (createGoalId > createGoalList.length) {
-    notFound();
-  }
+  const createGoalList = ['title', 'description', 'date', 'image'];
+
+  // if (createGoalId > createGoalList.length) {
+  //   notFound();
+  // }
   return (
     <section className="gk-primary-create-section">
       <nav className="w-16">
         <ul className="flex px-1 border border-orange-300	justify-around rounded-md	items-center">
           {createGoalList.map((_, index: number) => {
-            if (createGoalId === index + 1) {
+            if (createGoalList[index] === item) {
               return (
                 <li key={index} className="text-orange-300 text-xs	">
                   {index + 1}
