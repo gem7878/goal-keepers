@@ -23,6 +23,10 @@ public class SettingService extends ServiceHelper {
     private final SettingRepository settingRepository;
 
 
+    /*
+     * 설정
+     */
+
     public SettingResponseDto getMySettings() {
         Member member = isMemberCurrent(memberRepository);
         Setting mySetting = settingRepository.findByMember(member)
@@ -37,6 +41,7 @@ public class SettingService extends ServiceHelper {
         Setting.settingUpdate(mySetting, requestDto);
     }
 
+    // 회원가입시 초기 알림 설정
     public void initAlarmSetting(Member member) {
         if(member.getRole().equals(Role.ROLE_USER)) {
             settingRepository.save(new Setting(member));

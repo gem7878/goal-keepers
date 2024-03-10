@@ -84,7 +84,7 @@ public class MemberService extends ServiceHelper {
             throw new CustomException(ErrorCode.BAD_REQUEST, "비밀번호를 확인해주세요.");
         }
 
-        // 참조하고 있던 Goal이 사라졌습니다.      
+        // 참조하고 있던 목표가 사라졌습니다.      
         for (Goal goal : member.getGoals()) {
             for (GoalShare share : goal.getShareList()) {
                 share.setGoal(null);
@@ -99,7 +99,7 @@ public class MemberService extends ServiceHelper {
             }
         }
 
-        // 라이크 카운트 -1*
+        // 라이크 카운트 -1
         for (PostLike like : member.getLikes()) {
             Optional<PostContent> content = contentRepository.findById(like.getPostContent().getId());
             if(content.isPresent()) {

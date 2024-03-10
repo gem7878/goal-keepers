@@ -43,6 +43,7 @@ public class NotificationService extends ServiceHelper {
     private final MemberRepository memberRepository;
     private final PostContentRepository postContentRepository;
 
+    // SSE 구독하기
     public synchronized SseEmitter subscribe(String lastEventId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         if(Objects.isNull(memberId)) {
@@ -102,6 +103,9 @@ public class NotificationService extends ServiceHelper {
         }
     }
 
+    /*
+     * 알림 보내기
+     */
     public void send(Member receiver, Member giver, TYPE type, Long targetId, String targetTitle, String message, Long commentId) {
         Notification notification = notificationRepository.findByReceiverAndGiverAndTypeAndTargetIdAndCommentId(receiver, giver, type, targetId, commentId)
                                         .orElseGet(() -> {
@@ -121,6 +125,9 @@ public class NotificationService extends ServiceHelper {
         );
     }
 
+    /*
+     * type별 알림 가져오기
+     */
     public Page<NotificationResponseDto> getAlarms(TYPE type, int pageNumber) {
         Member member = isMemberCurrent(memberRepository);
         return notificationRepository.findAllByMember(PageRequest.of(pageNumber - 1, 20), member, type);

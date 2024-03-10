@@ -28,7 +28,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     private final MemberRepository memberRepository;
 
     @Override
-    public Page<CommentResponseDto> searchAllwithPost(Pageable pageable, Long postId) {
+    public Page<CommentResponseDto> findAllwithPost(Pageable pageable, Long postId) {
 
         List<PostComment> comments = queryFactory
                                     .selectFrom(postComment)

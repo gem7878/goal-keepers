@@ -22,6 +22,10 @@ public class InformService extends ServiceHelper {
     private final MemberRepository memberRepository;
     private final NotificationService notificationService;
 
+    /*
+     * 공지사항
+     */
+    
     public Long createInform(InformRequestDto requestDto) {
         Inform inform = informRepository.save(new Inform(requestDto));
         Long id = inform.getId();

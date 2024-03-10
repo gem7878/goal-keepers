@@ -41,7 +41,7 @@ public class CommentService extends ServiceHelper {
 
     public Page<CommentResponseDto> getSelectedPost(Long postId, int pageNumber) {
         isPost(postRepository, postId);
-        return commentRepository.searchAllwithPost(
+        return commentRepository.findAllwithPost(
                 PageRequest.of(
                     pageNumber - 1, 20), postId);
     }

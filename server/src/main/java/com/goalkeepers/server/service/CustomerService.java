@@ -36,6 +36,10 @@ public class CustomerService extends ServiceHelper {
     private final AnswerRepository answerRepository;
     private final MemberRepository memberRepository;
 
+    /*
+     * FAQ 
+     */
+
     public Long createFaq(FAQRequestDto requestDto) {
         Faq newFaq = faqRepository.save(new Faq(requestDto.getTitle(), requestDto.getContent()));
         return newFaq.getId();
@@ -49,6 +53,10 @@ public class CustomerService extends ServiceHelper {
         faqRepository.delete(findOneFaq(faqId));    
     }
 
+    /*
+     * 문의 답변하기
+     */
+    
     public Long createAnswer(AnswerRequestDto requestDto) {
         Inquiry inquiry = findOneInquiry(requestDto.getInquiryId());
         Answer newAnswer = answerRepository.save(requestDto.toAnswer(inquiry, isMemberCurrent(memberRepository)));
@@ -56,9 +64,17 @@ public class CustomerService extends ServiceHelper {
         return newAnswer.getId();
     }
 
+    /*
+     * 모든 FAQ 가져오기
+     */
+
     public Page<FAQResponseDto> getAllFaq(int pageNumber) {
         return faqRepository.findAllByPage(PageRequest.of(pageNumber - 1, 10));
     }
+
+    /*
+     * 고객센터 문의
+     */
 
     public Page<InquiryResponseDto> getMyInquiry(int pageNumber) {
         return inquiryRepository.findAllByPage(PageRequest.of(pageNumber - 1, 10), isMemberCurrent(memberRepository));
@@ -74,6 +90,7 @@ public class CustomerService extends ServiceHelper {
         return AnswerResponseDto.of(findOneAnswer(inquiryId));
     }
 
+    
     private Faq findOneFaq(Long faqId) {
         return faqRepository.findById(faqId).orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND, faqId + " FAQ 정보가 없습니다."));
     }

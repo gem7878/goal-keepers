@@ -1,7 +1,6 @@
 package com.goalkeepers.server.service;
 
 import java.util.Objects;
-import java.util.List;
 
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
@@ -40,7 +39,7 @@ public class ContentService extends ServiceHelper {
 
 
     /*
-     * 게시글 쓰기 (처음 생성할 때 postId 생성)*
+     * 게시글 쓰기
      * 게시글 삭제하기*
      */
 
@@ -50,7 +49,7 @@ public class ContentService extends ServiceHelper {
         Goal goal = isMyGoal(memberRepository, goalRepository, requestDto.getGoalId());
 
         Post post = postRepository.findByGoal(goal).orElse(null);
-        // 처음 컨텐트 작성할 때 postId 생성
+
         if(Objects.isNull(post)) {
             post = postRepository.save(new Post(goal, requestDto.getPrivated()));
         } else if (post.isPrivated() != requestDto.getPrivated()) {
@@ -87,7 +86,8 @@ public class ContentService extends ServiceHelper {
     }
 
     /*
-     * 포스트의 모든 컨텐트 가져오기
+     * 포스트 컨텐트 가져오기
+     * 커뮤니티 컨텐츠 가져오기
      */
 
     public Page<PostContentResponseDto> getPostContents(Long postId, int pageNumber) {
@@ -96,9 +96,5 @@ public class ContentService extends ServiceHelper {
 
     public Page<CommunityContentResponseDto> getCommunityContents(Long goalId, int pageNumber) {
         return contentRepository.getCommunityContents(PageRequest.of(pageNumber - 1, 10), isGoal(goalRepository, goalId));
-    }
-
-    public List<PostContent> getMyPostContentWithGoal(Goal goal) {
-        return contentRepository.findAllByShareGoal(goal);
     }
 }

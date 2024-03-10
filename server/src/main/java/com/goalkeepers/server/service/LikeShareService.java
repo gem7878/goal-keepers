@@ -98,7 +98,7 @@ public class LikeShareService extends ServiceHelper {
         }
     }
 
-    // 연결된 골 찾기
+    // 연결된 목표 찾기
     public GoalResponseDto findGoal(Long goalId) {
         Member member = isMemberCurrent(memberRepository);
         Goal goal = isGoal(goalRepository, goalId);
@@ -106,12 +106,12 @@ public class LikeShareService extends ServiceHelper {
             throw new CustomException(ErrorCode.BAD_REQUEST, "나의 Goal입니다.");
         }
         GoalShare share = shareRepository.findByMemberAndGoal(member, goal)
-                        .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "이 Goal과 연결된 나의 Goal이 없습니다."));
-        Goal myGoal = goalRepository.findByShare(share).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "이 Goal과 연결된 나의 Goal이 존재하나 데이터베이스 상에 오류가 있습니다."));
+                        .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "이 목표과 연결된 나의 목표이 없습니다."));
+        Goal myGoal = goalRepository.findByShare(share).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "이 목표과 연결된 나의 목표가 존재하나 데이터베이스 상에 오류가 있습니다."));
         return GoalResponseDto.of(myGoal, null, null);
     }
 
-    // 공유하기 -> 골 만들기
+    // 담기하기 -> 목표 만들기
     public void addShare(GoalShareRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
         
@@ -122,16 +122,16 @@ public class LikeShareService extends ServiceHelper {
             goal = goalShare.getGoal();
         }
 
-        // 공유한 적이 없는지 -> 내 골이 아닌지 -> 골 만들기
+        // 담기한 적이 없는지 -> 내 목표 아닌지 -> 목표 만들기
         if (shareRepository.existsByMemberAndGoal(member, goal)) {
-            throw new CustomException(ErrorCode.BAD_REQUEST, "담기한 Goal입니다.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "담기한 목표입니다.");
         } else if (Objects.nonNull(goal.getMember()) && goal.getMember().equals(member)) {
-            throw new CustomException(ErrorCode.BAD_REQUEST, "나의 Goal입니다.");
+            throw new CustomException(ErrorCode.BAD_REQUEST, "나의 목표입니다.");
         } else {
             GoalShare share = shareRepository.save(new GoalShare(member, goal));
             goal.setShareCnt(goal.getShareCnt()+1);
             
-            // 새로운 골 만들기
+            // 새로운 목표 만들기
             String originImageUrl = goal.getImageUrl();
             String copyImageName = originImageUrl;
             if(originImageUrl != null) {
@@ -152,17 +152,16 @@ public class LikeShareService extends ServiceHelper {
             if(Objects.nonNull(receiver) && !member.equals(receiver)) {
                 notificationService.send(receiver, member, TYPE.SHARE, goal.getId(), goal.getTitle(), null, null);
             }            
-            //return GoalResponseDto.of(newGoal, null);
         }
     }
 
-    // 공유 취소 - 참여 제외
+    // 담기 취소 - 참여 제외
     public void disconnecteOriginGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
         deleteShare(goal);
     }
 
-    // Goal Delete - Share 데이터 삭제
+    // 목표 삭제 - 담기 데이터 삭제
     public void deleteShare(Goal goal) {
         GoalShare share = goal.getShare();
         if (Objects.nonNull(share)) {
@@ -173,7 +172,7 @@ public class LikeShareService extends ServiceHelper {
         }
     }
 
-    // PostContent Delete - Like 데이터 삭제*
+    // 컨텐트 삭제 - 좋아요 데이터 삭제
     public void deleteLike(PostContent content) {
         List<PostLike> likeList = likeRepository.findAllByPostContent(content);
         for (PostLike like : likeList) {

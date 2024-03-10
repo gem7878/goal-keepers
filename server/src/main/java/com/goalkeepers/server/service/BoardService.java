@@ -46,8 +46,8 @@ public class BoardService extends ServiceHelper {
     }
     
     /*
-     * Post Menu 검색
-     * Community Menu 검색
+     * 포스트 검색
+     * 커뮤니티 검색
      */
 
     public Page<PostResponseDto> searchPost(int pageNumber, String query, SORT sort) {
@@ -66,7 +66,7 @@ public class BoardService extends ServiceHelper {
     }
 
     /*
-     * 포스트 생성
+     * 목표 생성시 포스트 생성하기
      */
     public void createMyPost(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);

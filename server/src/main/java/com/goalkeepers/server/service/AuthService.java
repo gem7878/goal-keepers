@@ -1,6 +1,5 @@
 package com.goalkeepers.server.service;
 
-import java.util.Optional;
 import java.util.UUID;
 import java.util.Random;
 
@@ -37,21 +36,18 @@ public class AuthService extends ServiceHelper {
     private final EmailCodeRepository codeRepository;
     private final MailService mailService;
 
+    // 회원가입
     public Member signup(MemberRequestDto requestDto) {
         isExistsEmail(memberRepository, requestDto.getEmail());
         isExistsNickname(memberRepository, requestDto.getNickname());
         return memberRepository.save(requestDto.toMember(passwordEncoder));
     }
 
+    // 로그인
     public TokenDto login(LoginRequestDto requestDto) {
         UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
         Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
         return tokenProvider.createJwt(authentication,24);
-    }
-
-    // 멤버 정보 가져오기
-    public Optional<Member> loadMemberByEmail(String email) {
-        return memberRepository.findByEmail(email);
     }
 
     // 이메일 중복 확인
@@ -64,21 +60,23 @@ public class AuthService extends ServiceHelper {
         isExistsNickname(memberRepository, nickname);
     }
 
-
-    /**
-     * 메일 인증
+    /*
+     * 이메일 인증
      */
+
+    // 인증 코드 이메일 보내기
     public void sendCodeToEmail(String toEmail) {
-        String title = "[골키퍼스] 이메일 인증 번호가 발급되었습니다.";
+        String title = "[골키퍼스] 이메일 인증 코드가 발급되었습니다.";
         String code = this.createCode();
         String text = "코드는 [" + code + "] 입니다. 30분이내에 인증해주세요.";
         mailService.sendEmail(toEmail, title, text);
         if(codeRepository.existsByEmail(toEmail)) {
-            codeRepository.deleteByEmail(toEmail);
+            codeRepository.deleteAllByEmail(toEmail);
         }
         codeRepository.save(new EmailCode(toEmail, code));
     }
 
+    // 코드 만들기
     private String createCode(){
         int leftLimit = 48;
         int rightLimit = 122;
@@ -92,6 +90,7 @@ public class AuthService extends ServiceHelper {
         return generatedString;
     }
 
+    // 인증 코드 확인
     public Boolean verifiedCode(String email, String authCode) {
         this.confirmDuplicateEmail(email);
         EmailCode code = codeRepository.findByEmail(email)
@@ -104,18 +103,21 @@ public class AuthService extends ServiceHelper {
         }
     }
 
-    /**
+    /*
      * 비밀번호 찾기
      */
+
+    // 임시 비밀번호 이메일 보내기
     public void sendPasswordToEmail(String toEmail) {
         String title = "[골키퍼스] 임시 비밀번호가 발급되었습니다.";
-        String content = "임시 비밀번호는 [" + this.findPassword(toEmail) + "] 입니다.";
+        String content = "임시 비밀번호는 [" + this.createNewPassword(toEmail) + "] 입니다.";
         
         mailService.sendEmail(toEmail, title, content);
     }
 
+    // 임시 비밀번호 만들기
     @Transactional
-    private String findPassword(String email) {
+    private String createNewPassword(String email) {
         Member member = memberRepository.findByEmail(email)
                                         .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND, "가입되지 않은 이메일입니다."));
         SNS sns = member.getSns();

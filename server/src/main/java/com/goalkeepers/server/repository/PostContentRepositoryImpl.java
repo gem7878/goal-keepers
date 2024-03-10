@@ -131,6 +131,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
     }
+
     @Override
     public Page<PostResponseDto> getMyAllContentAndGoal(Pageable pageable, Member member) {
 
@@ -174,6 +175,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
     }
+
     @Override
     public Page<PostContentResponseDto> getPostContents(Pageable pageable, Post post) {
         List<PostContent> contents = queryFactory
@@ -203,6 +205,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
     }
+
     @Override
     public Page<PostResponseDto> searchPost(Pageable pageable, String query, SORT sort) {
 
@@ -268,6 +271,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
     }
+
     @Override
     public Page<CommunityContentResponseDto> getCommunityContents(Pageable pageable, Goal goal) {
         List<PostContent> contents = queryFactory
@@ -298,6 +302,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
         return new PageImpl<>(page, pageable, totalSize);
     }
+    
     @SuppressWarnings("unchecked")
     @Override
     public TargetResponseDto findTarget(TYPE type, Long targetId, Long commentId) {
