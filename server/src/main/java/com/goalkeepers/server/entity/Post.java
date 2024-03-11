@@ -36,6 +36,10 @@ public class Post {
     @JoinColumn(name = "goal_id", nullable = true)
     private Goal goal;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = true)
+    private Member member;
+
     @ColumnDefault("0")
     private int cheerCnt;
 

@@ -1,6 +1,7 @@
 package com.goalkeepers.server.service;
 
 import java.util.Optional;
+import java.util.Objects;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import com.goalkeepers.server.dto.TokenDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.entity.Post;
+import com.goalkeepers.server.entity.PostCheer;
 import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.entity.PostLike;
 import com.goalkeepers.server.exception.CustomException;
@@ -21,6 +24,8 @@ import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostContentRepository;
+import com.goalkeepers.server.repository.PostRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,6 +35,7 @@ public class MemberService extends ServiceHelper {
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;
     private final PostContentRepository contentRepository;
+    private final PostRepository postRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
@@ -84,13 +90,6 @@ public class MemberService extends ServiceHelper {
             throw new CustomException(ErrorCode.BAD_REQUEST, "비밀번호를 확인해주세요.");
         }
 
-        // 참조하고 있던 목표가 사라졌습니다.      
-        for (Goal goal : member.getGoals()) {
-            for (GoalShare share : goal.getShareList()) {
-                share.setGoal(null);
-            }
-        }
-
         // 쉐어 카운트 -1
         for (GoalShare share : member.getShares()) {
             Optional<Goal> goal = goalRepository.findById(share.getGoal().getId());
@@ -104,6 +103,25 @@ public class MemberService extends ServiceHelper {
             Optional<PostContent> content = contentRepository.findById(like.getPostContent().getId());
             if(content.isPresent()) {
                 content.get().setLikeCnt(content.get().getLikeCnt() - 1);
+            }
+        }
+
+        // 응원해요 카운트 -1
+        for (PostCheer cheer : member.getCheers()) {
+            Optional<Post> post = postRepository.findById(cheer.getPost().getId());
+            if(post.isPresent()) {
+                post.get().setCheerCnt(post.get().getCheerCnt() - 1);
+            }
+        }
+
+        // 참여자 있는 목표는 본인 정보만 삭제시키기 
+        for (Goal goal : member.getGoals()) {
+            if(Objects.isNull(goal.getShare()) && Objects.nonNull(goal.getShareList())) {
+                goal.setMember(null);
+                Post post = postRepository.findByGoal(goal).orElse(null);
+                if(Objects.nonNull(post)) {
+                    postRepository.delete(post);
+                }
             }
         }
         
