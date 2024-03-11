@@ -13,7 +13,7 @@ const CreateButton: React.FC<{ isMyGoals: boolean }> = ({ isMyGoals }) => {
       }`}
     >
       {isMyGoals ? (
-        <Link href={'/create-goal/1'}>
+        <Link href={'/create-goal/?item=title'}>
           <FontAwesomeIcon
             icon={faPlusCircle}
             className="w-full h-full text-gray-600"

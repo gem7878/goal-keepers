@@ -7,3 +7,8 @@ export const handleGetToken = () => {
     : cookieStore.get('accessToken')?.value;
   return { cookieStore: cookieStore, token: token };
 };
+export const handleGetEventId = () => {
+  const cookieStore = cookies();
+  let eventId: string | undefined = cookieStore.get('eventId')?.value;
+  return { cookieStore: cookieStore, eventId: eventId };
+};

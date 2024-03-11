@@ -1,5 +1,5 @@
 'use server';
-import { handleGetToken } from '@/utils/getToken';
+import { handleGetToken } from '@/utils/getCookie';
 import axios from 'axios';
 
 export const handlePostGoalData = async (formData: any) => {
@@ -9,7 +9,7 @@ export const handlePostGoalData = async (formData: any) => {
   };
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/goal-list/goal`,
+      `${process.env.NEXT_PUBLIC_API_URL}/goal`,
       postData.formData,
       {
         headers: {
@@ -19,8 +19,11 @@ export const handlePostGoalData = async (formData: any) => {
         withCredentials: true,
       },
     );
+
     return { ok: true };
   } catch (error: any) {
+    console.log(error);
+    
     return { ok: false };
   }
 };

@@ -1,7 +1,7 @@
 'use server';
 
 import { setAccessTokenCookie } from '@/app/(auth)/login/actions';
-import { handleGetToken } from '@/utils/getToken';
+import { handleGetToken } from '@/utils/getCookie';
 import axios from 'axios';
 
 export const handleChangeNickname = async (nickname: string) => {

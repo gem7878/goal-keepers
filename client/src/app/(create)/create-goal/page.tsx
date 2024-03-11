@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { addDays, format } from 'date-fns';
 import { DateRange, DayPicker } from 'react-day-picker';
@@ -17,7 +17,7 @@ import {
 } from '@/redux/goalDataSlice';
 import { setStateGoal } from '@/redux/renderSlice';
 
-const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
+const CreateGoal = () => {
   const [titleValue, setTitleValue] = useState('');
   const [descriptionValue, setDescriptionValue] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -46,16 +46,10 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
   });
 
   const [range, setRange] = useState<DateRange | undefined>();
-  const [createGoalId, setCreateGoalId] = useState(1);
-  const [formData, setFormData] = useState({
-    goalInformation: {
-      title: '',
-      description: '',
-      startDate: '',
-      endDate: '',
-    },
-    image: null,
-  });
+  const [createGoalItem, setCreateGoalItem] = useState<string | null>('title');
+
+  const params = useSearchParams();
+  const item = params.get('item');
 
   const router = useRouter();
 
@@ -63,8 +57,8 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setCreateGoalId(parseInt(params.createGoalId));
-  }, [params.createGoalId]);
+    setCreateGoalItem(item);
+  }, [item]);
 
   useEffect(() => {
     setDate({
@@ -89,15 +83,18 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
 
   const handleSaveGoalData = (e: any) => {
     e.preventDefault();
-    if (createGoalId === 1) {
+    if (createGoalItem === 'title') {
       if (titleValue.length > 0) {
         dispatch(setTitle(titleValue));
-        router.push(`/create-goal/${createGoalId + 1}`);
+        router.push(`/create-goal/?item=description`);
       } else {
         return alert('목표를 입력하세요.');
       }
-    } else if (createGoalId === 2) {
-      router.push(`/create-goal/${createGoalId + 1}`);
+    } else if (createGoalItem === 'description') {
+      router.push(`/create-goal/?item=date`);
+      dispatch(setDescription(descriptionValue));
+    } else if (createGoalItem === 'date') {
+      router.push(`/create-goal/?item=image`);
       let formatStartDate =
         date.startDate.year && date.startDate.month && date.startDate.day
           ? `${date.startDate.year}-${String(date.startDate.month).padStart(
@@ -114,9 +111,6 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
           : '';
       dispatch(setStartDate(formatStartDate));
       dispatch(setEndDate(formatEndDate));
-    } else if (createGoalId === 3) {
-      router.push(`/create-goal/${createGoalId + 1}`);
-      dispatch(setDescription(descriptionValue));
     }
   };
 
@@ -151,7 +145,7 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
   return (
     <>
       <section className="h-96	w-full flex flex-col	items-center">
-        {params.createGoalId === '1' ? (
+        {item === 'title' ? (
           <>
             <h1 className="gk-primary-h1">목표의 이름을 설정하세요*</h1>
             <input
@@ -164,7 +158,7 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
               onChange={(e) => setTitleValue(e.target.value)}
             ></input>
           </>
-        ) : params.createGoalId === '4' ? (
+        ) : item === 'image' ? (
           <>
             <h1 className="gk-primary-h1">이미지를 선택하세요(선택)</h1>
             <div className="border w-full h-40">
@@ -177,7 +171,7 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
               ></input>
             </div>
           </>
-        ) : params.createGoalId === '2' ? (
+        ) : item === 'date' ? (
           <>
             <h1 className="gk-primary-h1">기간을 설정하세요(선택)</h1>
             <div className="border w-full h-8 rounded-md flex justify-center align-bottom">
@@ -283,7 +277,7 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
             </div>
             <DayPicker mode="range" selected={range} onSelect={setRange} />
           </>
-        ) : params.createGoalId === '3' ? (
+        ) : item === 'description' ? (
           <>
             <h1 className="gk-primary-h1">상세내용을 입력하세요(선택)</h1>
             <textarea
@@ -299,20 +293,20 @@ const CreateGoal = ({ params }: { params: { createGoalId: string } }) => {
           <></>
         )}
       </section>
-      {createGoalId >= 4 ? (
+      {createGoalItem === 'image' ? (
         <Link className="gk-primary-next-a" href={'/'}>
           <button className="w-full h-full" onClick={handleCreateGoal}>
             완료
           </button>
         </Link>
       ) : (
-        <Link
+        <div
           className="gk-primary-next-a"
-          href={`${createGoalId + 1}`}
+          // href={`${createGoalItem + 1}`}
           onClick={handleSaveGoalData}
         >
           <button className="w-full h-full">다음</button>
-        </Link>
+        </div>
       )}
     </>
   );

@@ -1,7 +1,8 @@
 'use server';
 
 import axios from 'axios';
-import { handleGetToken } from '@/utils/getToken';
+import { handleGetEventId, handleGetToken } from '@/utils/getCookie';
+import { cookies } from 'next/headers';
 
 // const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
 
@@ -169,6 +170,18 @@ export const handleGetAGoal = async (getData: { goalId: number }) => {
   }
 };
 
-export const handleCloseEventSource = () => {
-  return console.log('close event source');
+export const setEventIdCookie = (eventIdValue: string) => {
+  cookies().set({
+    name: 'eventId',
+    value: eventIdValue,
+    httpOnly: true,
+    path: '/',
+    secure: process.env.NEXT_PUBLIC_ENV === 'production',
+    sameSite: process.env.NEXT_PUBLIC_ENV === 'production' ? 'none' : 'lax',
+  });
+};
+export const deleteEventIdCookie = async () => {
+  const cookieStore = handleGetEventId().cookieStore;
+  cookieStore.delete('eventId');
+  return { ok: true };
 };
