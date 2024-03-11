@@ -56,7 +56,7 @@ public class QSetting extends EntityPathBase<Setting> {
 
     public QSetting(Class<? extends Setting> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
+        this.member = inits.isInitialized("member") ? new QMember(forProperty("member"), inits.get("member")) : null;
     }
 
 }

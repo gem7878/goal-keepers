@@ -53,7 +53,7 @@ public class PostContent {
     @OneToMany(mappedBy = "postContent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostLike> likes;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "post_id")
     private Post post;
 

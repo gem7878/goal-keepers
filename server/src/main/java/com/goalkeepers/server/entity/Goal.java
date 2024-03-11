@@ -10,6 +10,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -71,12 +72,16 @@ public class Goal {
     @Column(columnDefinition = "boolean default false")
     private boolean completed;
 
-    @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY)
-    private Set<GoalShare> shareList;
-
     @OneToOne
     @JoinColumn(name = "share_id", nullable = true)
     private GoalShare share;
+
+    @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GoalShare> shareList;
+
+    @OneToOne(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Post post;
+
 
     public static Goal goalUpdate(Goal goal, GoalUpdateRequestDto requestDto, String imageUrl) {
         if (Objects.isNull(requestDto)) {
