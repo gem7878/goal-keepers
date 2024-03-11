@@ -116,7 +116,7 @@ public class MemberService extends ServiceHelper {
 
         // 참여자 있는 목표는 본인 정보만 삭제시키기 
         for (Goal goal : member.getGoals()) {
-            if(Objects.isNull(goal.getShare()) && Objects.nonNull(goal.getShareList())) {
+            if(Objects.nonNull(goal.getShareList())) {
                 goal.setMember(null);
                 Post post = postRepository.findByGoal(goal).orElse(null);
                 if(Objects.nonNull(post)) {
