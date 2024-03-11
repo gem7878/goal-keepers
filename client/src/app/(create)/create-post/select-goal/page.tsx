@@ -119,8 +119,6 @@ const SelectGoal = () => {
       handleFetchGoalListAll(pageNumber);
     }
   };
-
-  console.log(myGoalList);
   
   return (
     <>

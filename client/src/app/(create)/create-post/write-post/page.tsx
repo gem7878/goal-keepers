@@ -18,7 +18,8 @@ const WritePost = () => {
   }>({ title: '', imageUrl: null, content: '' });
   const [editDescription, setEditDescription] = useState('');
   const [postContent, setPostContent] = useState('');
-  const [isPrivate, setIsPrivate] = useState(false)
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [addContent, setAddContent] = useState(false);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -52,7 +53,7 @@ const WritePost = () => {
     await handleCreateContent(postData)
       .then((response) => {
         if (response.success) {
-          router.push('/community');
+          router.push('/');
         }
       })
       .catch((error) => console.log(error));
@@ -75,60 +76,74 @@ const WritePost = () => {
             <h2 className="absolute text-white w-full top-1/5 h-1/4 mt-1.5 text-base text-center font-semibold">
               {goalData.title}
             </h2>
-            <textarea
-              className="absolute bottom-0 m-2 w-[calc(100%-16px)] h-[calc(75%-22px)] bg-inherit border text-white text-xs"
-              defaultValue={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-            ></textarea>
+            <div className="absolute bottom-0 m-2 w-[calc(100%-16px)] h-[calc(75%-22px)] bg-inherit text-white text-xs px-1">
+              {editDescription}
+            </div>
           </div>
         </header>
-        <article className="flex-col px-4 py-5 h-3/4">
-          {/* <input
-            type="text"
-            placeholder="포스트 제목을 입력하세요."
-            className="text-base w-full border-b h-8"
-            value={postTitle}
-            onChange={(e) => setPostTitle(e.target.value)}
-          ></input>
-          <textarea
-            placeholder="포스트 내용을 작성하세요."
-            className="text-sm w-full border h-[calc(100%-40px)] mt-2 p-2"
-            value={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
-          ></textarea> */}
-          <li className="w-full h-9 flex gap-2 items-center">
-            <input
-              className="w-11/12 text-sm border-b p-1 text-gray-600"
-              type="text"
-              autoFocus
-              placeholder="목표의 현재 진행 상황을 기록하세요!"
-              onChange={(e) => setPostContent(e.target.value)}
-            ></input>
-          </li>
+        <article className="flex flex-col px-4 py-5 h-3/4 justify-between items-end">
+          <div className="w-full">
+            <li className="w-full h-9 flex gap-2 items-center">
+              <input
+                className="w-full text-sm border-b p-1 text-gray-600"
+                type="text"
+                autoFocus
+                placeholder="목표의 현재 진행 상황을 기록하세요!"
+                onChange={(e) => {
+                  setPostContent(e.target.value);
+                  setAddContent(true);
+                }}
+              ></input>
+            </li>
 
-          <button
-            onClick={() => {
-              // if (addContent) {
-              //   onCreatePostContent(data.goalId);
-              // } else {
-              //   contentRef.current.scrollTop = 0;
-              //   setAddContent(true);
-              // }
-            }}
-            className="h-[13%] w-full bg-orange-400 rounded-xl text-sm text-white"
-          >
-            {/* {addContent ? '입력' : '기록하기'} */}
-          </button>
+            <button
+              onClick={() => {
+                if (addContent) {
+                  setAddContent(false);
+                }
+              }}
+              className="h-7 w-full bg-orange-400 rounded-xl text-sm text-white mt-4"
+            >
+              {addContent ? '완료' : '입력'}
+            </button>
+          </div>
+
+          <section className="w-[170px] h-7 bg-orange-50 rounded-md flex justify-center items-center gap-1">
+            <button
+              onClick={() => setIsPrivate(false)}
+              className={`${
+                isPrivate
+                  ? 'text-gray-600'
+                  : 'bg-orange-300 text-white rounded-md'
+              } text-xs w-[76px] h-[20px] cursor-pointer`}
+            >
+              포스트 공개
+            </button>
+            <button
+              onClick={() => setIsPrivate(true)}
+              className={`${
+                !isPrivate
+                  ? 'text-gray-600'
+                  : 'bg-orange-300 text-white rounded-md'
+              } text-xs w-[76px] h-[20px] cursor-pointer`}
+            >
+              포스트 비공개
+            </button>
+          </section>
         </article>
       </div>
       <Link
-        // className={
-        //   postTitle.length > 0 && postContent.length > 0
-        //     ? 'gk-primary-next-a'
-        //     : 'gk-primary-next-a-block'
-        // }
-        href={``}
-        onClick={() => onCreatePost()}
+        className={
+          !addContent && postContent.length > 0
+            ? 'gk-primary-next-a'
+            : 'gk-primary-next-a-block'
+        }
+        href={`/`}
+        onClick={() => {
+          !addContent && postContent.length > 0
+            ? onCreatePost()
+            : alert('현재 진행 상황 입력 후 완료 버튼을 눌러주세요.');
+        }}
       >
         <button className="w-full h-full">다음</button>
       </Link>
