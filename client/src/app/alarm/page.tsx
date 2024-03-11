@@ -105,8 +105,8 @@ const Alarm = () => {
     const response = await handleGetAlarm(formData);
 
     if (response.success) {
-      // setAlarmContent(response.data.content);
-      setAlarmContent(testAlarmContent);
+      setAlarmContent(response.data.content);
+      // setAlarmContent(testAlarmContent);
       setPageable({
         pageNumber: response.data.pageable.pageNumber + 1,
         last: response.data.last,

@@ -2,7 +2,6 @@
 
 import axios from 'axios';
 import { cookies } from 'next/headers';
-import Cookies from 'js-cookie';
 
 // 액세스 토큰을 쿠키에 저장하는 함수
 export const setAccessTokenCookie = (token: string) => {

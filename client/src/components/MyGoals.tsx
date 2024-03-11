@@ -210,75 +210,81 @@ const MyGoals: React.FC<{
           </label>
         </div>
       </div>
-      <ul
-        className={`w-full  px-3  overflow-y-scroll h-[calc(100%-24px)] ${
-          goalDoing === 'doing' ? 'flex flex-row flex-wrap gap-2 py-5' : 'pb-5'
-        }`}
-        ref={containerRef}
-      >
-        {goalDoing === 'doing'
-          ? myGoalList.map((list, index) => {
-              if (!list.completed) {
+      <div className="w-full h-[calc(100%-24px)] overflow-y-scroll">
+        <ul
+          className={`w-full  px-3  ${
+            goalDoing === 'doing'
+              ? 'flex flex-row flex-wrap gap-2 py-5'
+              : 'pb-5'
+          }`}
+          ref={containerRef}
+        >
+          {goalDoing === 'doing'
+            ? myGoalList.map((list, index) => {
+                if (!list.completed) {
+                  return (
+                    <li
+                      key={index}
+                      className={` w-[95px] h-[95px] bg-white relative flex items-center justify-center goal-element`}
+                      onClick={() => handleSelectGoalClick(index)}
+                    >
+                      <Image
+                        src={list.imageUrl === null ? Image1 : list.imageUrl}
+                        alt=""
+                        fill
+                        style={{
+                          objectFit: 'cover',
+                          position: 'absolute',
+                        }}
+                      ></Image>
+                      <div className="w-full h-full bg-black opacity-50 absolute"></div>
+                      <h3 className="text-white absolute text-center">{list.title}</h3>
+                    </li>
+                  );
+                }
+              })
+            : doneGoalList?.map((data: any, i: number) => {
                 return (
                   <li
-                    key={index}
-                    className={` w-[95px] h-[95px] bg-white relative flex items-center justify-center goal-element`}
-                    onClick={() => handleSelectGoalClick(index)}
+                    key={i}
+                    className={`text-gray-600 flex flex-col w-full h-[${
+                      95 * Math.floor(data.goals.length / 3) + 1 + 45
+                    }px]`}
                   >
-                    <Image
-                      src={list.imageUrl === null ? Image1 : list.imageUrl}
-                      alt=""
-                      fill
-                      style={{
-                        objectFit: 'cover',
-                        position: 'absolute',
-                      }}
-                    ></Image>
-                    <div className="w-full h-full bg-black opacity-50 absolute"></div>
-                    <h3 className="text-white absolute">{list.title}</h3>
+                    <hr className="my-6 border-dashed" />
+                    <h2 className="h-8 font-semibold">{data.year}</h2>
+                    <ul className="flex w-full flex-wrap gap-2">
+                      {data.goals.map((list: any, index: number) => {
+                        return (
+                          <li
+                            key={index}
+                            className={`w-[95px] h-[95px] bg-white relative flex items-center justify-center goal-element `}
+                            onClick={() => handleSelectGoalClick(index)}
+                          >
+                            <Image
+                              src={
+                                list.imageUrl === null ? Image1 : list.imageUrl
+                              }
+                              alt=""
+                              fill
+                              style={{
+                                objectFit: 'cover',
+                                position: 'absolute',
+                              }}
+                            ></Image>
+                            <div className="w-full h-full bg-black opacity-50 absolute"></div>
+                            <h3 className="text-white absolute">
+                              {list.title}
+                            </h3>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </li>
                 );
-              }
-            })
-          : doneGoalList?.map((data: any, i: number) => {
-              return (
-                <li
-                  key={i}
-                  className={`text-gray-600 flex flex-col w-full h-[${
-                    95 * Math.floor(data.goals.length / 3) + 1 + 45
-                  }px]`}
-                >
-                  <hr className="my-6 border-dashed" />
-                  <h2 className="h-8 font-semibold">{data.year}</h2>
-                  <ul className="flex w-full flex-wrap gap-2">
-                    {data.goals.map((list: any, index: number) => {
-                      return (
-                        <li
-                          key={index}
-                          className={`w-[95px] h-[95px] bg-white relative flex items-center justify-center goal-element `}
-                          onClick={() => handleSelectGoalClick(index)}
-                        >
-                          <Image
-                            src={
-                              list.imageUrl === null ? Image1 : list.imageUrl
-                            }
-                            alt=""
-                            fill
-                            style={{
-                              objectFit: 'cover',
-                              position: 'absolute',
-                            }}
-                          ></Image>
-                          <div className="w-full h-full bg-black opacity-50 absolute"></div>
-                          <h3 className="text-white absolute">{list.title}</h3>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </li>
-              );
-            })}
-      </ul>
+              })}
+        </ul>
+      </div>
     </div>
   );
 };

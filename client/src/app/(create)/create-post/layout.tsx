@@ -10,8 +10,9 @@ const CreatePostLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const reduxCreateButton = useSelector(selectRender);
 
+
   const handleCreatePost = async () => {
-    if (pathname !== '/create-post/ceelst - goal') {
+    if (pathname !== '/create-post/select-goal') {
       const postData = {
         goalId: reduxCreateButton.goalId,
       };

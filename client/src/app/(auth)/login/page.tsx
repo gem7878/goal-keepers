@@ -7,7 +7,6 @@ import { handleLogin } from './actions';
 import Image from 'next/image';
 import kakaoButton from '../../../../public/kakao_login_buttons/kakao_login_medium_wide.png';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 
 interface LoginTypes {
   email: string;
