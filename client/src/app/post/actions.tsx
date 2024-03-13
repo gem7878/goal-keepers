@@ -254,3 +254,26 @@ export const handleSearchPost = async (getData: {
     });
   }
 };
+
+export const handleChangePrivate = async (formData: { postId: number }) => {
+  const token = handleGetToken().token;
+  try {
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_API_URL}/post/privated`,
+      {
+        postId: formData.postId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
+};

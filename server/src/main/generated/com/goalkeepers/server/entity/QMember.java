@@ -20,6 +20,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public static final QMember member = new QMember("member1");
 
+    public final SetPath<PostCheer, QPostCheer> cheers = this.<PostCheer, QPostCheer>createSet("cheers", PostCheer.class, QPostCheer.class, PathInits.DIRECT2);
+
     public final StringPath email = createString("email");
 
     public final ListPath<Goal, QGoal> goals = this.<Goal, QGoal>createList("goals", Goal.class, QGoal.class, PathInits.DIRECT2);
@@ -33,6 +35,8 @@ public class QMember extends EntityPathBase<Member> {
     public final StringPath password = createString("password");
 
     public final ListPath<PostContent, QPostContent> postContents = this.<PostContent, QPostContent>createList("postContents", PostContent.class, QPostContent.class, PathInits.DIRECT2);
+
+    public final ListPath<Post, QPost> posts = this.<Post, QPost>createList("posts", Post.class, QPost.class, PathInits.DIRECT2);
 
     public final EnumPath<Role> role = createEnum("role", Role.class);
 

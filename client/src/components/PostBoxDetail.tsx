@@ -3,6 +3,7 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
 import {
+  handleChangePrivate,
   handleCreatePostContent,
   handleDeletePost,
   handleDeletePostContent,
@@ -82,6 +83,7 @@ const PostBoxDetail: React.FC<{
   const [more, setMore] = useState<boolean>(false);
   const [focusContent, setFocusContent] = useState<null | number>(null);
   const [contentValue, setContentValue] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const likeRef = useRef<HTMLUListElement>(null);
   const contentRef = useRef<any>(null);
@@ -164,6 +166,20 @@ const PostBoxDetail: React.FC<{
     }
   };
 
+  const onChangePrivate = async (postId: number) => {
+    const formData = {
+      postId: postId,
+    };
+    const response = await handleChangePrivate(formData);
+
+    if (response.success) {
+      response.data
+        ? alert('포스트가 비공개로 전환되었습니다.')
+        : alert('포스트가 공개로 전환되었습니다.');
+      return setIsPrivate(response.data);
+    }
+  };
+
   return (
     <article
       className="h-[450px] flex flex-col p-3 mb-4 border rounded-md duration-100	
@@ -189,12 +205,33 @@ const PostBoxDetail: React.FC<{
         <div className="w-full h-full bg-black absolute opacity-50"></div>
         {data.myPost && (
           <div className="flex text-white absolute top-0 right-0 text-xs gap-2 m-2">
-            <>
-              <FontAwesomeIcon
-                onClick={() => onDeletePost()}
-                icon={faTrashAlt}
-              />
-            </>
+            <section className="w-[170px] h-7 bg-orange-50 rounded-md flex justify-center items-center gap-1">
+              <button
+                onClick={() => onChangePrivate(data.postId)}
+                className={`${
+                  isPrivate
+                    ? 'text-gray-600'
+                    : 'bg-orange-300 text-white rounded-md'
+                } text-xs w-[76px] h-[20px] cursor-pointer`}
+              >
+                포스트 공개
+              </button>
+              <button
+                onClick={() => onChangePrivate(data.postId)}
+                className={`${
+                  !isPrivate
+                    ? 'text-gray-600'
+                    : 'bg-orange-300 text-white rounded-md'
+                } text-xs w-[76px] h-[20px] cursor-pointer`}
+              >
+                포스트 비공개
+              </button>
+            </section>
+            <FontAwesomeIcon
+              className="mt-2"
+              onClick={() => onDeletePost()}
+              icon={faTrashAlt}
+            />
           </div>
         )}
         <h3 className="text-center px-1  mx-4	text-white	font-bold absolute top-1/4 -translate-y-1/3 z-10 text-ellipsis	">
