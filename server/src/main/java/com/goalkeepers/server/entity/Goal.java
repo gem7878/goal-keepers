@@ -72,11 +72,11 @@ public class Goal {
     @Column(columnDefinition = "boolean default false")
     private boolean completed;
 
-    @OneToOne
+    @OneToOne(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "share_id", nullable = true)
     private GoalShare share;
 
-    @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY)
     private Set<GoalShare> shareList;
 
     @OneToOne(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
