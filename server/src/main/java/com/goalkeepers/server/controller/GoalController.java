@@ -21,6 +21,7 @@ import com.goalkeepers.server.dto.GoalRequestDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
 import com.goalkeepers.server.dto.GoalShareRequestDto;
 import com.goalkeepers.server.dto.GoalUpdateRequestDto;
+import com.goalkeepers.server.service.BoardService;
 import com.goalkeepers.server.service.FirebaseStorageService;
 import com.goalkeepers.server.service.GoalService;
 import com.goalkeepers.server.service.LikeShareService;
@@ -45,6 +46,7 @@ public class GoalController {
     private final GoalService goalService;
     private final FirebaseStorageService firebaseStorageService;
     private final LikeShareService likeShareService;
+    private final BoardService boardService;
     
     
     @GetMapping("/all/me")
@@ -67,8 +69,9 @@ public class GoalController {
         if (multipartFile != null) {
             imageUrl = firebaseStorageService.upload(multipartFile, "images");
         }
-        Long id = goalService.createMyGoal(requestDto, imageUrl);
-        return ResponseEntity.ok(new CommonResponseDto(true, id + " Goal을 생성하였습니다."));
+        Long goalId = goalService.createMyGoal(requestDto, imageUrl);
+        boardService.createMyPost(goalId);
+        return ResponseEntity.ok(new CommonResponseDto(true, goalId + " Goal을 생성하였습니다."));
     }
 
     @PatchMapping("/completed")

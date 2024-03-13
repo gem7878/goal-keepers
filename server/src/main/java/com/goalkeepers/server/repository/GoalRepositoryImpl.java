@@ -1,13 +1,12 @@
 package com.goalkeepers.server.repository;
 
 import java.lang.Object;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,10 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import com.goalkeepers.server.common.CommonUtils;
+import com.goalkeepers.server.common.RepositoryHelper;
+import com.goalkeepers.server.dto.CommunityContentResponseDto;
 import com.goalkeepers.server.dto.CommunityResponseDto;
 import com.goalkeepers.server.dto.GoalResponseDto;
-import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
@@ -36,6 +35,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import static com.goalkeepers.server.entity.QGoal.goal;
 import static com.goalkeepers.server.entity.QMember.member;
 import static com.goalkeepers.server.entity.QPostContent.postContent;
+import static com.goalkeepers.server.entity.QSetting.setting;
 
 @Repository
 public class GoalRepositoryImpl implements GoalRepositoryCustom {
@@ -63,7 +63,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
     }
 
     @Override
-    public Page<GoalResponseDto> searchMyAllGoal(Pageable pageable, Long memberId) {
+    public Page<GoalResponseDto> getMyAllGoal(Pageable pageable, Long memberId) {
         
         List<Goal> goals = queryFactory
                             .selectFrom(goal)
@@ -77,26 +77,13 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
         List<GoalResponseDto> page = goals
             .stream()
             .map(goal -> {
-                String imageUrl = goal.getImageUrl();
-                if(Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
-                    imageUrl = firebaseStorageService.showFile(imageUrl);
-                }
+                String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
                 Goal shareGoal = goal;
                 GoalShare share = goal.getShare();
                 if(Objects.nonNull(share)) {
                     shareGoal = Optional.ofNullable(share.getGoal()).orElse(null);
                 }
-                // shareGoal에 대한 joinMemberList 가져오기
-                List<Map<String, Object>> joinMemberList = new ArrayList<>();
-                if(Objects.nonNull(shareGoal)) {
-                    for(GoalShare goalShare : shareGoal.getShareList()) {
-                        Map<String, Object> member = new HashMap<>();
-                        member.put("memberId", goalShare.getMember().getId());
-                        member.put("nickname", goalShare.getMember().getNickname());
-                        joinMemberList.add(member);
-                    }
-                }
-                System.out.println("joinMemberList: " + joinMemberList);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(shareGoal);
                 return GoalResponseDto.of(goal, imageUrl, joinMemberList);
             })
             .collect(Collectors.toList());
@@ -126,31 +113,32 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
             .map(goal -> {
 
                 // 이미지 URL
-                String originalGoalImageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
+                String originalGoalImageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
 
                 // 담기했는지
-                Member member = CommonUtils.MemberOrNull(memberRepository);
-                boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
+                Member member = RepositoryHelper.MemberOrNull(memberRepository);
+                boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
 
                 // joinMemberList 가져오기
-                List<Map<String, Object>> joinMemberList = CommonUtils.getJoinMemberList(goal);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
 
                 // PostContent 가져오기
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
-                                                .where(postContent.shareGoal.eq(goal))
+                                                .where(postContent.shareGoal.eq(goal)
+                                                    .and(postContent.post.privated.eq(false)))
                                                 .orderBy(postContent.createdAt.desc())
                                                 .offset(contentPageable.getOffset())
                                                 .limit(contentPageable.getPageSize())
                                                 .fetch();
                                             
-                List<PostContentResponseDto> contentList = contents
+                List<CommunityContentResponseDto> contentList = contents
                                                 .stream()
-                                                .map(content -> PostContentResponseDto.of(
+                                                .map(content -> CommunityContentResponseDto.of(
                                                                 content, 
                                                                 content.getPost().getGoal(), 
                                                                 content.getMember().getNickname(), 
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                                 null))
                                                 .collect(Collectors.toList());
 
@@ -186,25 +174,26 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 Goal goal = tuple.get(postContent.shareGoal);
                 Long count = tuple.get(postContent.count());
 
-                String originalGoalImageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                Member member = CommonUtils.MemberOrNull(memberRepository);
-                boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                List<Map<String, Object>> joinMemberList = CommonUtils.getJoinMemberList(goal);
+                String originalGoalImageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                Member member = RepositoryHelper.MemberOrNull(memberRepository);
+                boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
 
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
-                                                .where(postContent.shareGoal.eq(goal))
+                                                .where(postContent.shareGoal.eq(goal)
+                                                    .and(postContent.post.privated.eq(false)))
                                                 .orderBy(postContent.createdAt.desc())
                                                 .offset(contentPageable.getOffset())
                                                 .limit(contentPageable.getPageSize())
                                                 .fetch();
-                List<PostContentResponseDto> contentList = contents
+                List<CommunityContentResponseDto> contentList = contents
                                                 .stream()
-                                                .map(content -> PostContentResponseDto.of(
+                                                .map(content -> CommunityContentResponseDto.of(
                                                                 content, 
                                                                 content.getPost().getGoal(), 
                                                                 content.getMember().getNickname(), 
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                                 null))
                                                 .collect(Collectors.toList());
                 
@@ -296,25 +285,26 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
             .stream()
             .map(goal -> {
 
-                String originalGoalImageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                Member member = CommonUtils.MemberOrNull(memberRepository);
-                boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                List<Map<String, Object>> joinMemberList = CommonUtils.getJoinMemberList(goal);
+                String originalGoalImageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                Member member = RepositoryHelper.MemberOrNull(memberRepository);
+                boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
-                                                .where(postContent.shareGoal.eq(goal))
+                                                .where(postContent.shareGoal.eq(goal)
+                                                    .and(postContent.post.privated.eq(false)))
                                                 .orderBy(postContent.createdAt.desc())
                                                 .offset(contentPageable.getOffset())
                                                 .limit(contentPageable.getPageSize())
                                                 .fetch();
                                             
-                List<PostContentResponseDto> contentList = contents
+                List<CommunityContentResponseDto> contentList = contents
                                                 .stream()
-                                                .map(content -> PostContentResponseDto.of(
+                                                .map(content -> CommunityContentResponseDto.of(
                                                                 content, 
                                                                 content.getPost().getGoal(), 
                                                                 content.getMember().getNickname(), 
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository), 
                                                                 null))
                                                 .collect(Collectors.toList());
 
@@ -323,4 +313,24 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
 	}
+
+    @Override
+    public List<Goal> findAllByEndDate(LocalDate endDate) {
+        return queryFactory
+            .selectFrom(goal)
+            .join(goal.member, member).fetchJoin()
+            .join(member, setting.member).on(setting.ddayAlarm.eq(true)).fetchJoin()
+            .where(goal.endDate.eq(endDate))
+            .fetch();
+    }
+
+    @Override
+    public List<Goal> findAllByCompleteDateBetween(LocalDateTime startTime, LocalDateTime endTime) {
+        return queryFactory
+                .selectFrom(goal)
+                .join(goal.member, member).fetchJoin()
+                .join(member, setting.member).on(setting.todayAlarm.eq(true)).fetchJoin()
+                .where(goal.completeDate.between(startTime, endTime))
+                .fetch();
+    }
 }

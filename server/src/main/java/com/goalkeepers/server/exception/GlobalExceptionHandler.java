@@ -6,17 +6,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.cloud.storage.StorageException;
 
 import jakarta.validation.ConstraintViolationException;
@@ -97,7 +103,25 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	protected ResponseEntity<ErrorResponseDto> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST, "RequestParams가 비어있습니다.");
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.REQUEST_PARAMS_MISSING_ERROR);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/**
+	 * @RequestBody null error
+	 */
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	protected ResponseEntity<ErrorResponseDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.REQUEST_BODY_MISSING_ERROR);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/**
+	 * 헤더 null error
+	 */
+	@ExceptionHandler(MissingRequestHeaderException.class)
+	protected ResponseEntity<ErrorResponseDto> handleMissingRequestHeaderException(MissingRequestHeaderException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.REQUEST_HEADER_MISSING_ERROR);
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 
@@ -107,6 +131,15 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(value = IOException.class)
 	protected ResponseEntity<ErrorResponseDto> handleIOException(IOException e) {
 		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.FILE_ERROR, e.getLocalizedMessage());
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/*
+	 * RestTemplate error
+	 */
+	@ExceptionHandler(HttpClientErrorException.class)
+	protected ResponseEntity<ErrorResponseDto> handleHttpClientErrorException(HttpClientErrorException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.PRECONDITION_FAILED);
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 
@@ -133,7 +166,16 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(value = { CustomException.class })
 	protected ResponseEntity<ErrorResponseDto> handleCustomException(CustomException e) {
-		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.BAD_REQUEST, e.getMessage());
+		ErrorResponseDto response = new ErrorResponseDto(e.getErrorCode(), e.getMessage());
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/**
+	 * findById 조회 실패
+	 */
+	@ExceptionHandler(value = { EmptyResultDataAccessException.class })
+	protected ResponseEntity<ErrorResponseDto> handleEmptyResultDataAccessException(EmptyResultDataAccessException e) {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.RESOURCE_NOT_FOUND);
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 	
@@ -144,6 +186,25 @@ public class GlobalExceptionHandler {
 	protected ResponseEntity<ErrorResponseDto> handleException(Exception e) {
 		e.printStackTrace();
 		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.SERVER_ERROR);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/*
+	 * Null 발생했을 대
+	 */
+	@ExceptionHandler(NullPointerException.class)
+	protected ResponseEntity<ErrorResponseDto> handleNullPointerException(NullPointerException e) {
+		e.printStackTrace();
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.NULL_POINT_ERROR);
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+
+	/*
+	 *  JSON Parsing Error
+	 */
+	@ExceptionHandler(value = { JsonProcessingException.class, JsonMappingException.class})
+	public ResponseEntity<ErrorResponseDto> handleJsonProcessingException() {
+		ErrorResponseDto response = new ErrorResponseDto(ErrorCode.JSON_PARSE_ERROR);
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 

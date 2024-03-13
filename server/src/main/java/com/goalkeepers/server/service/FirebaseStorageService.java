@@ -34,6 +34,7 @@ public class FirebaseStorageService {
         log.info("FirebaseStorageService initialized");
     }
 
+    // 파일 업로드
     public String upload(MultipartFile file, String dirName) throws IOException, StorageException{
         InputStream content = new ByteArrayInputStream(file.getBytes());
         String fileName = convertName(file, dirName);
@@ -41,12 +42,14 @@ public class FirebaseStorageService {
         return fileName;
     }
 
+    // 파일 삭제
     public void deleteFile(String fileName) throws StorageException{
         if (Objects.nonNull(fileName) && !fileName.isEmpty()) {
             bucket.get(fileName).delete();
         }
     }
 
+    // 목표 담기할 때 이미지 복제
     public String copyAndRenameFile(String fileName, String dirName) throws StorageException{
         Blob blob = bucket.get(fileName);
         String newName = rename(fileName, dirName);
@@ -54,6 +57,7 @@ public class FirebaseStorageService {
         return newName;
     }
 
+    // 이미지 링크 가져오기
     public String showFile(String fileName) {
         if (Objects.isNull(fileName)) {
             return null;
@@ -63,12 +67,15 @@ public class FirebaseStorageService {
         return signedUrl.toString();
     }
     
+    // 난수 + 이미지 이름
     private String convertName(MultipartFile uploadFile, String dirName) {
         String originName = uploadFile.getOriginalFilename();
-        String newName = UUID.randomUUID() + "_" + originName.replaceAll("_","");
+        String subOriginName = originName.substring(0, Math.min(originName.length(), 13));
+        String newName = UUID.randomUUID() + "_" + subOriginName.replaceAll("_","");
         return dirName + "/" + newName;
     }
 
+    // 이미지 복제할 때 난수 부분 바꾸기
     private String rename(String fileName, String dirName) {
         String[] nameArray = fileName.split("_");
         String originName = nameArray[nameArray.length - 1];

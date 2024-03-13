@@ -1,6 +1,6 @@
 'use server';
 
-import { handleGetToken } from '@/utils/getToken';
+import { handleGetToken } from '@/utils/getCookie';
 import axios from 'axios';
 
 export const handleGetPostAll = async (getData: {
@@ -228,5 +228,29 @@ export const handleLikeContent = async (contentId: number) => {
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal Server Error' }),
     };
+  }
+};
+
+export const handleSearchPost = async (getData: {
+  pageNum: number;
+  query: string;
+  sort: string;
+}) => {
+  const token = handleGetToken().token;
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/post/search?page=${getData.pageNum}&query=${getData.query}&sort=${getData.sort}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
   }
 };

@@ -1,6 +1,5 @@
 package com.goalkeepers.server.service;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +26,7 @@ import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Role;
 import com.goalkeepers.server.entity.SNS;
 import com.goalkeepers.server.exception.CustomException;
+import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.repository.MemberRepository;
 
 import jakarta.transaction.Transactional;
@@ -65,7 +65,7 @@ public class KakaoService {
 
 
 	@Transactional
-	public TokenDto createKakaoUser(String kakaoAccessToken) throws IOException {
+	public TokenDto createKakaoUser(String kakaoAccessToken) {
 
 		/*
 		 * 카카오 서버에서 로그인한 유저 정보 가져오기 -> kakaoAccountDto
@@ -87,10 +87,10 @@ public class KakaoService {
 
 			kakaoAccountDto = kakaoJsonParsing(accountInfoResponse.getBody(), KakaoAccountDto.class);
 		} catch (HttpClientErrorException e) {
-			throw new CustomException("------------RestTemplate Error------------" + e.getMessage());
+			throw new CustomException(ErrorCode.PRECONDITION_FAILED);
 			
 		} catch (Exception e) {
-			throw new CustomException("------------Exception------------" + e.getMessage());
+			throw new CustomException(ErrorCode.SERVER_ERROR, e.getMessage());
 		}
 		
 
@@ -128,7 +128,7 @@ public class KakaoService {
 
 			// 만약 10번을 랜덤을 돌려도 존재하는 닉네임이면 Exception 보내기
 			if (attempts == maxAttempts) {
-				throw new CustomException("닉네임 오류입니다. 다시 소셜 로그인을 진행해주세요.");
+				throw new CustomException(ErrorCode.DUPLICATE_RESOURCE, "닉네임 오류입니다. 다시 소셜 로그인을 진행해주세요.");
 			} else {
 				nickname = tempNickname;
 			}
@@ -183,19 +183,19 @@ public class KakaoService {
 			return kakaoTokenDto;
 		
 		} catch (HttpClientErrorException e) {
-			throw new CustomException("------------RestTemplate Error------------" + e.getMessage());
+			throw new CustomException(ErrorCode.PRECONDITION_FAILED);
 			
 		} catch (Exception e) {
-			throw new CustomException("------------Exception------------" + e.getMessage());
+			throw new CustomException(ErrorCode.SERVER_ERROR, e.getMessage());
 		}
 	}
 
-	private <T> T kakaoJsonParsing(String json, Class<T> valueType) {
+	private <T> T kakaoJsonParsing(String json, Class<T> valueType){
 		try {
-			return objectMapper.readValue(json, valueType);
-		} catch (JsonProcessingException e) {
-			throw new CustomException("------------Json Error------------" + e.getMessage());
-		}
+            return objectMapper.readValue(json, valueType);
+        } catch (JsonProcessingException e) {
+            throw new CustomException(ErrorCode.JSON_PARSE_ERROR);
+        }
 	}
 
 	private String randomString(int size) {

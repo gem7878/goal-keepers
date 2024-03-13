@@ -4,6 +4,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.goalkeepers.server.entity.Role;
 
+import java.util.Objects;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -32,12 +34,14 @@ public class MemberRequestDto {
     @Size(min = 3, max = 15, message = "닉네임은 3 ~ 15자 입니다.")
     private String nickname;
 
+    private Role role;
+
     public Member toMember(PasswordEncoder passwordEncoder) {
         return Member.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
                 .nickname(nickname)
-                .role(Role.ROLE_USER)
+                .role(Objects.nonNull(role) && Role.ROLE_ADMIN.equals(role) ? Role.ROLE_ADMIN : Role.ROLE_USER)
                 .build();     
     }
 }

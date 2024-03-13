@@ -1,7 +1,8 @@
 'use server';
 
 import axios from 'axios';
-import { handleGetToken } from '@/utils/getToken';
+import { handleGetEventId, handleGetToken } from '@/utils/getCookie';
+import { cookies } from 'next/headers';
 
 // const token: string | undefined = cookieStore.get('_vercel_jwt')?.value;
 
@@ -147,4 +148,40 @@ export const handleCompleteGoal = async (completeData: {
       status: 500,
     });
   }
+};
+export const handleGetAGoal = async (getData: { goalId: number }) => {
+  const token = handleGetToken().token;
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/goal?id=${getData.goalId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
+};
+
+export const setEventIdCookie = (eventIdValue: string) => {
+  cookies().set({
+    name: 'eventId',
+    value: eventIdValue,
+    httpOnly: true,
+    path: '/',
+    secure: process.env.NEXT_PUBLIC_ENV === 'production',
+    sameSite: process.env.NEXT_PUBLIC_ENV === 'production' ? 'none' : 'lax',
+  });
+};
+export const deleteEventIdCookie = async () => {
+  const cookieStore = handleGetEventId().cookieStore;
+  cookieStore.delete('eventId');
+  return { ok: true };
 };

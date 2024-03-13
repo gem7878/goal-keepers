@@ -15,7 +15,13 @@ public enum ErrorCode {
 	BAD_CREDENTIALS(400, "BAD_CREDENTIALS", "아이디 또는 비밀번호가 올바르지 않습니다."),
 	FILE_ERROR(400, "FILE_ERROR", "파일을 저장하거나 불러오는데 실패했습니다."),
 	FILE_NOT_FOUND(400, "FILE_NOT_FOUND", "파일을 찾을 수 없습니다."),
+	PRECONDITION_FAILED(400, "PRECONDITION_FAILED", "RestTemplate Error"),
 	FIREBASE_FILE_NOT_FOUND(400, "FIREBASE_FILE_NOT_FOUND", "스토리지에서 파일을 찾을 수 없습니다."),
+	REQUEST_PARAMS_MISSING_ERROR(400, "REQUEST_MISSING_ERROR", "RequestParmas가 비어있습니다."),
+	REQUEST_BODY_MISSING_ERROR(400, "REQUEST_MISSING_ERROR", "RequestBody가 비었습니다."),
+	REQUEST_HEADER_MISSING_ERROR(400, "REQUEST_MISSING_ERROR", "Request Header가 비었습니다."),
+	JSON_PARSE_ERROR(400, "JSON_PARSE_ERROR", "json parsing error"),
+	MAIL_ERROR(400,"MAIL_ERROR","send mail error"),
 
 	/* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
 	UNAUTHENTICATED_USERS(401, "UNAUTHORIZED","인증이 필요합니다."),
@@ -26,6 +32,7 @@ public enum ErrorCode {
 	/* 404 NOT_FOUND : Resource 를 찾을 수 없음 */
 	MEMBER_NOT_FOUND(404, "NOT_FOUND","해당 유저 정보를 찾을 수 없습니다."),
 	RESOURCE_NOT_FOUND(404, "NOT_FOUND","해당 정보를 찾을 수 없습니다."),
+	NULL_POINT_ERROR(404, "NULL_POINT_ERROR", "Null 값이 발생하였습니다."),
 
 	/* 405 METHOD_NOT_ALLOWED : 지원하지 않는 HTTP Method */
 	METHOD_NOT_ALLOWED(405, "METHOD_NOT_ALLOWED","허용되지 않은 요청입니다."),

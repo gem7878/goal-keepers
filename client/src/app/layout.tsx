@@ -5,10 +5,17 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Navbar } from '@/components/index.js';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { handleConfirmToken } from './actions';
+import { useEffect, useState } from 'react';
+import {
+  deleteEventIdCookie,
+  handleConfirmToken,
+  setEventIdCookie,
+} from './actions';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
+import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
+import { tokenValue } from './alarm/actions';
+import { handleGetEventId, handleGetToken } from '@/utils/getCookie';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,6 +25,8 @@ const inter = Inter({ subsets: ['latin'] });
 // };
 
 function RootLayout({ children }: { children: React.ReactNode }) {
+  const [eventId, setEventId] = useState<string>('');
+
   const pathname = usePathname();
   const router = useRouter();
   const loginPath = [
@@ -42,6 +51,75 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setScreenSize();
   }, []);
+
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        const result = await tokenValue();
+        return result;
+      } catch (error) {
+        console.error('Error fetching token:', error);
+        return null;
+      }
+    };
+
+    let eventSource: any;
+
+    const initializeEventSource = async () => {
+      const token = await getToken();
+      if (!token) {
+        console.error('Token is null');
+        return;
+      }
+
+      console.log('Last-Event-Id: ' + eventId);
+      const EventSource = EventSourcePolyfill || NativeEventSource;
+      const eventSource = new EventSource(
+        `${process.env.NEXT_PUBLIC_API_URL}/subscribe`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Connetction: 'keep-alive',
+            Accept: 'text/event-stream',
+            'Last-Event-Id': eventId,
+          },
+          heartbeatTimeout: 86400000,
+        },
+      );
+
+      try {
+        eventSource.addEventListener('sse', (event: any) => {
+          const { lastEventId: lastEventId, data: receivedConnectData } = event;
+          console.log('Current Event Id: ' + lastEventId);
+          console.log(receivedConnectData);
+          setEventId(lastEventId); // 임시로 해둔 것, 쿠키같은곳에 저장
+          setEventIdCookie(lastEventId);
+        });
+
+        eventSource.onerror = (e: any) => {
+          // 종료 또는 에러 발생 시 할 일
+          eventSource.close();
+
+          if (e.error) {
+            // 에러 발생 시 할 일
+          }
+
+          if (e.target.readyState === EventSource.CLOSED) {
+            // 종료 시 할 일
+          }
+        };
+      } catch (error) {}
+    };
+
+    initializeEventSource();
+    return () => {
+      console.log('SSE CLOSED 2');
+
+      deleteEventIdCookie();
+
+      eventSource !== undefined && eventSource.close(); // 로그아웃 될 때 eventId 삭제와 eventSource.close()도 실행되게 하기
+    };
+  }, [pathname]);
 
   function setScreenSize() {
     const wrapElement: any = document.querySelector('.wrap');

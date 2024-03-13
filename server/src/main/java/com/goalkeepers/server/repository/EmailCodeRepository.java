@@ -10,5 +10,5 @@ import com.goalkeepers.server.entity.EmailCode;
 public interface EmailCodeRepository extends JpaRepository<EmailCode, Long> {
     Optional<EmailCode> findByEmail(String email);
     Boolean existsByEmail(String email);
-    void deleteByEmail(String email);
+    void deleteAllByEmail(String email);
 }

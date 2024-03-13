@@ -15,6 +15,7 @@ import com.goalkeepers.server.dto.CommentRequestDto;
 import com.goalkeepers.server.dto.CommentResponseDto;
 import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.CommunityResponseDto;
+import com.goalkeepers.server.dto.PostSelectResponseDto;
 import com.goalkeepers.server.dto.PostCheerRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
 import com.goalkeepers.server.entity.SORT;
@@ -39,6 +40,7 @@ public class BoardController {
     /*
      * 모든 포스트 가져오기
      * 나의 모든 포스트 가져오기
+     * 선택할 포스트 가져오기
      */
 
     @GetMapping("/post/all")
@@ -51,6 +53,12 @@ public class BoardController {
     @GetMapping("/post/all/me")
     public ResponseEntity<CommonResponseDto> getMyAllPost(@RequestParam(name = "page") int pageNumber) {
         Page<PostResponseDto> response = contentService.getMyAllPost(pageNumber);
+        return ResponseEntity.ok(new CommonResponseDto(true, response));
+    }
+
+    @GetMapping("/post/all/me/select")
+    public ResponseEntity<CommonResponseDto> getSelectAllPost(@RequestParam(name = "page") int pageNumber) {
+        Page<PostSelectResponseDto> response = boardService.getSelectAllPost(pageNumber);
         return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 
@@ -108,14 +116,14 @@ public class BoardController {
 
     @PostMapping("/comment")
     public ResponseEntity<CommonResponseDto> createMyComment(@RequestParam(name = "post-id") Long postId, @Valid @RequestBody CommentRequestDto requestDto) {
-        CommentResponseDto response = commentService.createMyComment(requestDto, postId);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
+        Long commentId = commentService.createMyComment(requestDto, postId);
+        return ResponseEntity.ok(new CommonResponseDto(true, commentId + " 댓글을 생성하였습니다."));
     }
 
     @PutMapping("/comment")
     public ResponseEntity<CommonResponseDto> updateMyComment(@RequestParam(name = "comment-id") Long commentId, @Valid @RequestBody CommentRequestDto requestDto) {
-        CommentResponseDto response = commentService.updateMyComment(requestDto, commentId);
-        return ResponseEntity.ok(new CommonResponseDto(true, response));
+        commentService.updateMyComment(requestDto, commentId);
+        return ResponseEntity.ok(new CommonResponseDto(true, commentId + " 댓글을 수정하였습니다."));
     }
 
     @DeleteMapping("/comment")
@@ -132,5 +140,15 @@ public class BoardController {
     public ResponseEntity<CommonResponseDto> cheerPost(@Valid @RequestBody PostCheerRequestDto requestDto) {
         String response = likeShareService.addPostCheer(requestDto);
         return ResponseEntity.ok(new CommonResponseDto(true, "Post " + requestDto.getPostId() + response));
+    }
+
+    /*
+     * 포스트 공개/비공개 업데이트
+     */
+    
+    @PutMapping("/post/privated")
+    public ResponseEntity<CommonResponseDto> updatePostPrivated(@Valid @RequestBody PostCheerRequestDto requestDto) {
+        Boolean response = boardService.updatePostPrivated(requestDto.getPostId());
+        return ResponseEntity.ok(new CommonResponseDto(true, response));
     }
 }

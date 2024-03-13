@@ -1,0 +1,20 @@
+ALTER TABLE member_tb
+ALTER COLUMN email TYPE varchar(50);
+
+ALTER TABLE member_tb
+ALTER COLUMN password TYPE varchar(60);
+
+ALTER TABLE member_tb
+ALTER COLUMN email SET NOT NULL;
+
+ALTER TABLE member_tb
+ALTER COLUMN password SET NOT NULL;
+
+ALTER TABLE member_tb
+ALTER COLUMN nickname SET NOT NULL;
+
+ALTER TABLE member_tb
+ALTER COLUMN role SET NOT NULL;
+
+ALTER TABLE member_tb
+ALTER COLUMN nickname SET NOT NULL;

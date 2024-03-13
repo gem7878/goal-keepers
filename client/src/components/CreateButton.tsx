@@ -1,22 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle, faPen } from '@fortawesome/free-solid-svg-icons';
 
-const CreateButton = () => {
-  const pathname = usePathname();
-
+const CreateButton: React.FC<{ isMyGoals: boolean }> = ({ isMyGoals }) => {
   return (
     <div
       className={`w-14 h-14 rounded-full fixed bottom-20 right-2 flex flex-col items-center justify-center ${
-        pathname === '/' ? 'bg-orange-400' : 'bg-gray-600'
+        isMyGoals ? 'bg-orange-400' : 'bg-gray-600'
       }`}
     >
-      {pathname === '/' ? (
-        <Link href={'/create-goal/1'}>
+      {isMyGoals ? (
+        <Link href={'/create-goal/?item=title'}>
           <FontAwesomeIcon
             icon={faPlusCircle}
             className="w-full h-full text-gray-600"

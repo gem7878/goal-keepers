@@ -10,19 +10,17 @@ import React, {
 import Image1 from '../../../../../public/assets/images/goalKeepers.png';
 import Image2 from '../../../../../public/assets/images/gem.png';
 import Image from 'next/image';
-import { handleGetGoalListAll } from '@/app/actions';
 import { useDispatch } from 'react-redux';
 import { setCreateButton } from '@/redux/renderSlice';
 import Link from 'next/link';
+import { handleSelectMyPost } from '../actions';
 
 interface goalListTypes {
   goalId: number;
   title: string;
   description: string;
-  startDate: string;
-  endDate: string;
+  privated: boolean;
   imageUrl: string;
-  shareCnt: number;
 }
 
 const SelectGoal = () => {
@@ -77,7 +75,7 @@ const SelectGoal = () => {
 
   const handleFetchGoalListAll = async (pageParam: number) => {
     const form = { pageNum: pageParam };
-    await handleGetGoalListAll(form)
+    await handleSelectMyPost(form)
       .then((response) => {
         if (more) {
           setMyGoalList((prevPostData: any) => [
@@ -121,6 +119,7 @@ const SelectGoal = () => {
       handleFetchGoalListAll(pageNumber);
     }
   };
+  
   return (
     <>
       <h1 className="gk-primary-h1">나의 목표를 선택하세요</h1>

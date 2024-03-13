@@ -14,22 +14,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CommunityResponseDto {
-	private Long originalGoalId; // Goal : origianl goal id
-    private String originalGoalTitle; // Goal : origianl goal title
-    private String originalGoalDescription; // Goal : origianl goal description
-    private String originalGoalImageUrl; // Goal : origianl goal image_url
-    private int originalGoalshareCnt; // Goal : original goal share_cnt
-    private boolean isShare; // Goal : original goal, Member
+	private long originalGoalId;
+    private String originalGoalTitle;
+    private String originalGoalDescription;
+    private String originalGoalImageUrl;
+    private int originalGoalshareCnt;
+    private boolean isShare;
     private List<Map<String, Object>> joinMemberList;
-    private List<PostContentResponseDto> contentList;
-    private Long count;
+    private List<CommunityContentResponseDto> contentList;
+    private Long count; // null or long
 
     
     public static CommunityResponseDto of(Goal goal, 
                             String originalGoalImageUrl, 
                             boolean isShare,
                             List<Map<String, Object>> joinMemberList,
-                            List<PostContentResponseDto> contentList,
+                            List<CommunityContentResponseDto> contentList,
                             Long count) {
 
         return CommunityResponseDto.builder()

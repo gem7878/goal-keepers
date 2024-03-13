@@ -5,6 +5,7 @@ import static com.goalkeepers.server.entity.QGoal.goal;
 import static com.goalkeepers.server.entity.QPost.post;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -12,17 +13,24 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.goalkeepers.server.common.CommonUtils;
+import com.goalkeepers.server.common.RepositoryHelper;
+import com.goalkeepers.server.config.SecurityUtil;
+import com.goalkeepers.server.dto.CommunityContentResponseDto;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.PostResponseDto;
+import com.goalkeepers.server.dto.TargetResponseDto;
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostContent;
 import com.goalkeepers.server.entity.SORT;
+import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.service.FirebaseStorageService;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager entityManager;
     private final FirebaseStorageService firebaseStorageService;
     private final GoalShareRepository shareRepository;
     private final MemberRepository memberRepository;
@@ -56,27 +65,26 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
             page = posts
                 .stream()
                 .map(post -> {
-                    Member member = CommonUtils.MemberOrNull(memberRepository);
+                    Member member = RepositoryHelper.MemberOrNull(memberRepository);
                     Goal goal = post.getGoal();
                     PostContent content = queryFactory
                                             .selectFrom(postContent)
-                                            .where(postContent.post.eq(post))
+                                            .where(postContent.post.eq(post)
+                                                .and(postContent.post.privated.eq(false)))
                                             .orderBy(postContent.createdAt.desc())
                                             .limit(1)
                                             .fetchOne();
 
-                    String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                    boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                    boolean isCheer = CommonUtils.isCheerPost(post, member, cheerRepository);
+                    String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                    boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
+                    boolean isCheer = RepositoryHelper.isCheerPost(post, member, cheerRepository);
                     boolean isMyPost = goal.getMember().equals(member);
-                    int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(goal);
-                    Member writer = CommonUtils.getWriter(content);
+                    int goalShareCnt = RepositoryHelper.getOriginalGoalShareCnt(goal);
+                    Member writer = RepositoryHelper.getWriter(content);
                     PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
                                                                 content, 
-                                                                null, 
                                                                 writer.getNickname(),
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
-                                                                null);
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository));
                                                                 
                     return PostResponseDto.of(post, writer, isCheer, isMyPost, goal, imageUrl, isShare, goalShareCnt, contentResponseDto);
                 }).collect(Collectors.toList());
@@ -90,6 +98,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
             List<PostContent> contents = queryFactory
                                         .selectFrom(postContent)
+                                        .where(postContent.post.privated.eq(false))
                                         .orderBy(isNewSort ? postContent.createdAt.desc() : postContent.likeCnt.desc())
                                         .orderBy(isNewSort ? postContent.likeCnt.desc() : postContent.createdAt.desc())
                                         .offset(pageable.getOffset())
@@ -99,20 +108,18 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
             page = contents
                 .stream()
                 .map(content -> {
-                    Member member = CommonUtils.MemberOrNull(memberRepository);
+                    Member member = RepositoryHelper.MemberOrNull(memberRepository);
                     Goal goal = content.getPost().getGoal();
-                    Member writer = CommonUtils.getWriter(content);
+                    Member writer = RepositoryHelper.getWriter(content);
                     PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
-                                                                content,
-                                                                null, 
+                                                                content, 
                                                                 writer.getNickname(), 
-                                                                CommonUtils.isLikeContent(content, member, likeRepository), 
-                                                                null);
-                    String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                    boolean isShare = CommonUtils.isShareGoal(goal, member, shareRepository);
-                    boolean isCheer = CommonUtils.isCheerPost(content.getPost(), member, cheerRepository);
+                                                                RepositoryHelper.isLikeContent(content, member, likeRepository));
+                    String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                    boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
+                    boolean isCheer = RepositoryHelper.isCheerPost(content.getPost(), member, cheerRepository);
                     boolean isMyPost = goal.getMember().equals(member);
-                    int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(goal);
+                    int goalShareCnt = RepositoryHelper.getOriginalGoalShareCnt(goal);
                     return PostResponseDto.of(content.getPost(), writer, isCheer, isMyPost, goal, imageUrl, isShare, goalShareCnt, contentResponseDto);
                 }).collect(Collectors.toList());
 
@@ -124,6 +131,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
     }
+
     @Override
     public Page<PostResponseDto> getMyAllContentAndGoal(Pageable pageable, Member member) {
 
@@ -148,16 +156,14 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                     .limit(1)
                                     .fetchOne();
 
-                String imageUrl = CommonUtils.getImageUrl(goal, firebaseStorageService);
-                Member writer = CommonUtils.getWriter(content);
+                String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                Member writer = RepositoryHelper.getWriter(content);
                 PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
-                                                            content, 
-                                                            null, 
+                                                            content,
                                                             writer.getNickname(), 
-                                                            CommonUtils.isLikeContent(content, member, likeRepository), 
-                                                            null);
-                boolean isCheer = CommonUtils.isCheerPost(post, member, cheerRepository);
-                int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(goal);
+                                                            RepositoryHelper.isLikeContent(content, member, likeRepository));
+                boolean isCheer = RepositoryHelper.isCheerPost(post, member, cheerRepository);
+                int goalShareCnt = RepositoryHelper.getOriginalGoalShareCnt(goal);
                 return PostResponseDto.of(post, writer, isCheer, true, goal, imageUrl, false, goalShareCnt, contentResponseDto);
             }).collect(Collectors.toList());
 
@@ -169,11 +175,13 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
     }
+
     @Override
     public Page<PostContentResponseDto> getPostContents(Pageable pageable, Post post) {
         List<PostContent> contents = queryFactory
                                     .selectFrom(postContent)
-                                    .where(postContent.post.eq(post))
+                                    .where(postContent.post.eq(post)
+                                        .and(postContent.post.privated.eq(false)))
                                     .orderBy(postContent.createdAt.desc())
                                     .offset(pageable.getOffset())
                                     .limit(pageable.getPageSize())
@@ -182,14 +190,11 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         List<PostContentResponseDto> page = contents
             .stream()
             .map(content -> {
-                Goal goal = content.getPost().getGoal();
-                Member writer = CommonUtils.getWriter(content);
+                Member writer = RepositoryHelper.getWriter(content);
                 return PostContentResponseDto.of(
                         content,
-                        goal,
                         writer.getNickname(), 
-                        CommonUtils.isLikeContent(content, CommonUtils.MemberOrNull(memberRepository), likeRepository), 
-                        null); // CommonUtils.getImageUrl(goal, firebaseStorageService)
+                        RepositoryHelper.isLikeContent(content, RepositoryHelper.MemberOrNull(memberRepository), likeRepository));
             }).collect(Collectors.toList());
 
         int totalSize = queryFactory
@@ -200,6 +205,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
     }
+
     @Override
     public Page<PostResponseDto> searchPost(Pageable pageable, String query, SORT sort) {
 
@@ -232,28 +238,26 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                     .limit(1)
                                     .fetchOne();
 
-                Member member = CommonUtils.MemberOrNull(memberRepository);
-                Member writer = CommonUtils.getWriter(content);               
+                Member member = RepositoryHelper.MemberOrNull(memberRepository);
+                Member writer = RepositoryHelper.getWriter(content);               
                 PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
                                                             content, 
-                                                            null, 
                                                             writer.getNickname(), 
-                                                            CommonUtils.isLikeContent(content, member, likeRepository), 
-                                                            null);
+                                                            RepositoryHelper.isLikeContent(content, member, likeRepository));
                 Post onePost = queryFactory
                             .selectFrom(post)
                             .where(post.id.eq(tuple.get(post.id)))
                             .fetchFirst();
                 boolean isMyPost = oneGoal.getMember().equals(member);
-                int goalShareCnt = CommonUtils.getOriginalGoalShareCnt(oneGoal);
+                int goalShareCnt = RepositoryHelper.getOriginalGoalShareCnt(oneGoal);
                 return PostResponseDto.of(
                     onePost,
                     writer,
-                    CommonUtils.isCheerPost(onePost, member, cheerRepository),
+                    RepositoryHelper.isCheerPost(onePost, member, cheerRepository),
                     isMyPost,
                     oneGoal, 
-                    CommonUtils.getImageUrl(oneGoal, firebaseStorageService), 
-                    CommonUtils.isShareGoal(oneGoal, member, shareRepository), 
+                    RepositoryHelper.getImageUrl(oneGoal, firebaseStorageService), 
+                    RepositoryHelper.isShareGoal(oneGoal, member, shareRepository), 
                     goalShareCnt,
                     contentResponseDto);
 
@@ -267,24 +271,26 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         
         return new PageImpl<>(page, pageable, totalSize);
     }
+
     @Override
-    public Page<PostContentResponseDto> getCommunityContents(Pageable pageable, Goal goal) {
+    public Page<CommunityContentResponseDto> getCommunityContents(Pageable pageable, Goal goal) {
         List<PostContent> contents = queryFactory
                                     .selectFrom(postContent)
-                                    .where(postContent.shareGoal.eq(goal))
+                                    .where(postContent.shareGoal.eq(goal)
+                                        .and(postContent.post.privated.eq(false)))
                                     .orderBy(postContent.createdAt.desc())
                                     .offset(pageable.getOffset())
                                     .limit(pageable.getPageSize())
                                     .fetch();
         
-        Member member = CommonUtils.MemberOrNull(memberRepository);
-        List<PostContentResponseDto> page = contents
+        Member member = RepositoryHelper.MemberOrNull(memberRepository);
+        List<CommunityContentResponseDto> page = contents
             .stream()
-            .map(content -> PostContentResponseDto.of(
+            .map(content -> CommunityContentResponseDto.of(
                             content, 
                             content.getPost().getGoal(), 
                             content.getMember().getNickname(), 
-                            CommonUtils.isLikeContent(content, member, likeRepository), 
+                            RepositoryHelper.isLikeContent(content, member, likeRepository), 
                             null))
             .collect(Collectors.toList());
 
@@ -295,5 +301,75 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                         .size();
 
         return new PageImpl<>(page, pageable, totalSize);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public TargetResponseDto findTarget(TYPE type, Long targetId, Long commentId) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Integer targetPage = null;
+        Integer commentPage = null;
+        String targetQuery = null;
+        String commentQuery = null;
+
+        switch (type) {
+            case COMMENT:
+                targetQuery = postQuery(targetId, memberId);
+                commentQuery = commentQuery(targetId, commentId);
+                break;
+            case LIKE:
+            case CHEER:
+                targetQuery = postQuery(targetId, memberId);
+                break;
+            case SHARE:
+                targetQuery = null;
+                break;
+            case NOTIFY:
+                targetQuery = null;
+            default:
+                break;
+        }
+
+        if(Objects.nonNull(targetQuery)) {
+            Query targetResult = entityManager.createNativeQuery(targetQuery);
+            List<Long> targetResultList = targetResult.getResultList();
+            Long index = targetResultList.isEmpty() ? null : targetResultList.get(0);
+            targetPage = (int) ((index / 20) + 1);
+        }
+        
+        
+        if(Objects.nonNull(commentQuery)) {
+            Query commentResult = entityManager.createNativeQuery(commentQuery);
+            List<Long> commentResultList = commentResult.getResultList();
+            Long commentIndex = commentResultList.isEmpty() ? null : commentResultList.get(0);
+            commentPage = (int) ((commentIndex / 20) + 1);
+        }
+
+        return TargetResponseDto.of(targetId, targetPage, commentId, commentPage);
+
+    }
+    
+    private String postQuery(Long targetId, Long memberId) {
+        return "SELECT index " +
+            "FROM (SELECT *, ROW_NUMBER() OVER () AS index " +
+            "FROM (SELECT content_tb.post_id, post_tb.goal_id, MAX(content_tb.content_id) " +
+            "FROM content_tb " +
+            "JOIN post_tb ON post_tb.post_id = content_tb.post_id " +
+            "JOIN goal_tb ON post_tb.goal_id = goal_tb.goal_id " +
+            "WHERE content_tb.member_id = " + memberId +
+            " GROUP BY content_tb.post_id, post_tb.goal_id " +
+            "ORDER BY MAX(content_tb.content_id) DESC) AS foo) AS soo " +
+            "WHERE soo.post_id = " + targetId +
+            " LIMIT 1";
+    }
+
+    private String commentQuery(Long targetId, Long commentId) {
+        return "SELECT index " +
+                "FROM (SELECT ROW_NUMBER() OVER () AS index, * " +
+                "FROM comment_tb " +
+                "WHERE post_id = " + targetId +
+                " ORDER BY comment_id asc) AS foo " +
+                "WHERE comment_id = " + commentId +
+                " LIMIT 1";
     }
 }

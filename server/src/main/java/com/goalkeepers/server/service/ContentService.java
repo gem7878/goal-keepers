@@ -1,7 +1,6 @@
 package com.goalkeepers.server.service;
 
 import java.util.Objects;
-import java.util.List;
 
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
@@ -9,6 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalkeepers.server.common.ServiceHelper;
+import com.goalkeepers.server.dto.CommunityContentResponseDto;
 import com.goalkeepers.server.dto.PostContentResponseDto;
 import com.goalkeepers.server.dto.PostRequestDto;
 import com.goalkeepers.server.dto.PostResponseDto;
@@ -28,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 @DependsOn("firebaseStorageService")
-public class ContentService extends CommonService {
+public class ContentService extends ServiceHelper {
 
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;
@@ -38,7 +39,7 @@ public class ContentService extends CommonService {
 
 
     /*
-     * 게시글 쓰기 (처음 생성할 때 postId 생성)*
+     * 게시글 쓰기
      * 게시글 삭제하기*
      */
 
@@ -48,9 +49,11 @@ public class ContentService extends CommonService {
         Goal goal = isMyGoal(memberRepository, goalRepository, requestDto.getGoalId());
 
         Post post = postRepository.findByGoal(goal).orElse(null);
-        // 처음 컨텐트 작성할 때 postId 생성
+
         if(Objects.isNull(post)) {
-            post = postRepository.save(new Post(goal));
+            post = postRepository.save(new Post(goal, requestDto.getPrivated()));
+        } else if (post.isPrivated() != requestDto.getPrivated()) {
+            post.setPrivated(requestDto.getPrivated());
         }
 
         // 담기한 Goal이면 shareGoal로 바꾸기
@@ -83,18 +86,15 @@ public class ContentService extends CommonService {
     }
 
     /*
-     * 포스트의 모든 컨텐트 가져오기
+     * 포스트 컨텐트 가져오기
+     * 커뮤니티 컨텐츠 가져오기
      */
 
     public Page<PostContentResponseDto> getPostContents(Long postId, int pageNumber) {
         return contentRepository.getPostContents(PageRequest.of(pageNumber - 1, 10), isPost(postRepository, postId));
     }
 
-    public Page<PostContentResponseDto> getCommunityContents(Long goalId, int pageNumber) {
+    public Page<CommunityContentResponseDto> getCommunityContents(Long goalId, int pageNumber) {
         return contentRepository.getCommunityContents(PageRequest.of(pageNumber - 1, 10), isGoal(goalRepository, goalId));
-    }
-
-    public List<PostContent> getMyPostContentWithGoal(Goal goal) {
-        return contentRepository.findAllByShareGoal(goal);
     }
 }

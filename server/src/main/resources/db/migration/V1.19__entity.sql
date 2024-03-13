@@ -1,0 +1,1 @@
+ALTER TABLE email_code RENAME TO email_code_tb;

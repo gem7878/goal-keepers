@@ -148,7 +148,13 @@ const Post = () => {
   };
   return (
     <div className="w-full h-full pt-[40px] flex flex-col">
-      <SearchBox sort={sort} onChangeSort={onChangeSort}></SearchBox>
+      <SearchBox
+        pageNumber={pageable.pageNumber}
+        sort={sort}
+        onChangeSort={onChangeSort}
+        setData={setPostData}
+        setPageable={setPageable}
+      ></SearchBox>
       <section className="z-0 h-full overflow-y-scroll w-full py-4">
         {postData.map((data, index) => {
           if (focusNum === index) {
@@ -207,7 +213,7 @@ const Post = () => {
           />
         </section>
       </section>
-      <CreateButton></CreateButton>
+      <CreateButton isMyGoals={false}></CreateButton>
     </div>
   );
 };

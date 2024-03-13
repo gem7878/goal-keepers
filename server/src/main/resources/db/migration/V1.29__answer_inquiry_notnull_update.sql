@@ -1,0 +1,14 @@
+ALTER TABLE answer_tb
+ALTER COLUMN content SET NOT NULL;
+
+ALTER TABLE answer_tb
+ALTER COLUMN inquiry_id SET NOT NULL;
+
+ALTER TABLE answer_tb
+ALTER COLUMN admin_id SET NOT NULL;
+
+ALTER TABLE inquiry_tb
+ALTER COLUMN member_id SET NOT NULL;
+
+ALTER TABLE goal_tb
+ALTER COLUMN image_url TYPE varchar(60);

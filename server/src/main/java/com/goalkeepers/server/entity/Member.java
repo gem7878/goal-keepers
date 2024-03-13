@@ -26,14 +26,16 @@ public class Member {
     private Long id;
 
     @Email
-    @Column(unique = true)
+    @Column(unique = true, length = 50, nullable = false)
     private String email;
 
+    @Column(length = 20, nullable = false)
     private String password;
 
-    @Column(unique = true, length = 15)
+    @Column(unique = true, length = 15, nullable = false)
     private String nickname;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -46,6 +48,9 @@ public class Member {
     private List<Goal> goals;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostContent> postContents;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -53,4 +58,7 @@ public class Member {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostLike> likes;
-}
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PostCheer> cheers;
+}   

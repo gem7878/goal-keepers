@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostResponseDto {
-    private Long postId;
+    private long postId;
     private String nickname;
     private int postCheerCnt;
     private boolean isCheer;
-	private Long goalId;
+	private long goalId;
     private String goalTitle;
     private String goalDescription;
     private String goalImageUrl;
@@ -26,6 +26,7 @@ public class PostResponseDto {
     private boolean isShare;
     private boolean isMyPost;
     private PostContentResponseDto content;
+    private boolean isPrivated;
     
     public static PostResponseDto of(
                     Post post,
@@ -51,6 +52,7 @@ public class PostResponseDto {
             .isShare(isShare)
             .isMyPost(isMyPost)
             .content(content)
+            .isPrivated(post.isPrivated())
             .build();
     }
 }

@@ -50,7 +50,7 @@ public class Goal {
     @NotNull
     private String title;
 
-    @Column(length = 65)
+    @Column(length = 60)
     private String description;
 
     @Column
@@ -62,7 +62,7 @@ public class Goal {
     @Column
     private LocalDateTime completeDate;
 
-    @Column
+    @Column(length = 50)
     private String imageUrl;
 
     @ColumnDefault("0")
@@ -97,6 +97,7 @@ public class Goal {
         goal.member = null;
         goal.completed = false;
         goal.share = null;
+        goal.completeDate = null;
         return goal;
     }
 

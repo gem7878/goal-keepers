@@ -80,6 +80,7 @@ export default function Home() {
   const [myPostList, setMyPostList] = useState<myPostListTypes[]>([]);
   const containerEl = useRef<any>();
   const [goalDoing, setGoalDoing] = useState<string>('doing');
+  const [token, setToken] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     selectGoalNum !== null ? setOpen(true) : setOpen(false);
@@ -106,7 +107,6 @@ export default function Home() {
   //   // 상태 업데이트
   //   setMyGoalList(updatedList);
   // }, []);
-
   const handleTab = (boolean: boolean) => {
     setIsMyGoals(boolean);
   };
@@ -166,7 +166,7 @@ export default function Home() {
           <MyPosts></MyPosts>
         )}
       </section>
-      <CreateButton></CreateButton>
+      <CreateButton isMyGoals={isMyGoals}></CreateButton>
       {isOpen && portalElement
         ? createPortal(
             <GoalModal
