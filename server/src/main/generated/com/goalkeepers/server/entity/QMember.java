@@ -22,7 +22,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public static final QMember member = new QMember("member1");
 
-    public final SetPath<PostCheer, QPostCheer> cheers = this.<PostCheer, QPostCheer>createSet("cheers", PostCheer.class, QPostCheer.class, PathInits.DIRECT2);
+    public final ListPath<PostComment, QPostComment> comments = this.<PostComment, QPostComment>createList("comments", PostComment.class, QPostComment.class, PathInits.DIRECT2);
 
     public final StringPath email = createString("email");
 
@@ -32,23 +32,15 @@ public class QMember extends EntityPathBase<Member> {
 
     public final ListPath<Inquiry, QInquiry> inquiries = this.<Inquiry, QInquiry>createList("inquiries", Inquiry.class, QInquiry.class, PathInits.DIRECT2);
 
-    public final SetPath<PostLike, QPostLike> likes = this.<PostLike, QPostLike>createSet("likes", PostLike.class, QPostLike.class, PathInits.DIRECT2);
-
     public final StringPath nickname = createString("nickname");
 
     public final ListPath<Notification, QNotification> notifications = this.<Notification, QNotification>createList("notifications", Notification.class, QNotification.class, PathInits.DIRECT2);
 
     public final StringPath password = createString("password");
 
-    public final ListPath<PostContent, QPostContent> postContents = this.<PostContent, QPostContent>createList("postContents", PostContent.class, QPostContent.class, PathInits.DIRECT2);
-
-    public final ListPath<Post, QPost> posts = this.<Post, QPost>createList("posts", Post.class, QPost.class, PathInits.DIRECT2);
-
     public final EnumPath<Role> role = createEnum("role", Role.class);
 
     public final QSetting setting;
-
-    public final SetPath<GoalShare, QGoalShare> shares = this.<GoalShare, QGoalShare>createSet("shares", GoalShare.class, QGoalShare.class, PathInits.DIRECT2);
 
     public final EnumPath<SNS> sns = createEnum("sns", SNS.class);
 

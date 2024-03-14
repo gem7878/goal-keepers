@@ -1,6 +1,5 @@
 package com.goalkeepers.server.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "SHARE_TB")
+@Table(name = "SHARE_TB", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"member_id", "goal_id"})
+})
 public class GoalShare {
     
     @Id
@@ -32,7 +34,7 @@ public class GoalShare {
     @NotNull
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id")
     @NotNull
     private Goal goal;

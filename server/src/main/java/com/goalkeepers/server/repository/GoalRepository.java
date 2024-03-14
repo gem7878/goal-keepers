@@ -8,6 +8,7 @@ import com.goalkeepers.server.entity.GoalShare;
 import com.goalkeepers.server.entity.Member;
 
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface GoalRepository extends JpaRepository<Goal, Long>, GoalRepositoryCustom {
@@ -15,4 +16,5 @@ public interface GoalRepository extends JpaRepository<Goal, Long>, GoalRepositor
     Optional<Goal> findByShare(GoalShare share);
     Optional<Goal> findByIdAndMember(Long id, Member member);
     boolean existsByShare(GoalShare share);
+    List<Goal> findAllByMember(Member member);
 }

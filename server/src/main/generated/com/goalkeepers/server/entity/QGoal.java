@@ -42,8 +42,6 @@ public class QGoal extends EntityPathBase<Goal> {
 
     public final NumberPath<Integer> shareCnt = createNumber("shareCnt", Integer.class);
 
-    public final SetPath<GoalShare, QGoalShare> shareList = this.<GoalShare, QGoalShare>createSet("shareList", GoalShare.class, QGoalShare.class, PathInits.DIRECT2);
-
     public final DatePath<java.time.LocalDate> startDate = createDate("startDate", java.time.LocalDate.class);
 
     public final StringPath title = createString("title");

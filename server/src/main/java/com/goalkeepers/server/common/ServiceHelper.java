@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.entity.Goal;
@@ -24,6 +25,7 @@ import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.repository.CommentRepository;
 import com.goalkeepers.server.repository.GoalRepository;
+import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostRepository;
@@ -79,8 +81,8 @@ public class ServiceHelper {
                     .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST, "나의 Comment Id가 아닙니다."));
     }
 
-    // 목표 공유 참여자 리스트 가져오기
-    public List<Map<String, Object>> findJoinMemberList(Goal currentGoal) {
+    // joinMemberList 가져오기
+    public List<Map<String, Object>> findJoinMemberList(Goal currentGoal, GoalShareRepository shareRepository) {
         // currentGoal
         Goal goal = currentGoal;
         // shareGoal로 바꾸기
@@ -93,11 +95,20 @@ public class ServiceHelper {
             return null;
         }
         List<Map<String, Object>> joinMemberList = new ArrayList<>();
-        for(GoalShare goalShare : goal.getShareList()) {
-            Map<String, Object> member = new HashMap<>();
-            member.put("memberId", goalShare.getMember().getId());
-            member.put("nickname", goalShare.getMember().getNickname());
-            joinMemberList.add(member);
+        if(Objects.nonNull(goal) && Objects.nonNull(goal.getMember())) {
+            Map<String, Object> owner = new HashMap<>();
+            owner.put("memberId", goal.getMember().getId());
+            owner.put("nickname", goal.getMember().getNickname());
+            owner.put("isOwner", true);
+            joinMemberList.add(owner);
+        }
+        Set<GoalShare> shares = shareRepository.findAllByGoal(goal);
+        for(GoalShare goalShare : shares) {
+            Map<String, Object> joinMember = new HashMap<>();
+            joinMember.put("memberId", goalShare.getMember().getId());
+            joinMember.put("nickname", goalShare.getMember().getNickname());
+            joinMember.put("isOwner", false);
+            joinMemberList.add(joinMember);
         }
         return joinMemberList;
     }

@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -19,7 +18,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -72,12 +70,9 @@ public class Goal {
     @Column(columnDefinition = "boolean default false")
     private boolean completed;
 
-    @OneToOne(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "share_id", nullable = true)
     private GoalShare share;
-
-    @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY)
-    private Set<GoalShare> shareList;
 
     @OneToOne(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Post post;
@@ -103,6 +98,7 @@ public class Goal {
         goal.completed = false;
         goal.share = null;
         goal.completeDate = null;
+        goal.imageUrl = null;
         return goal;
     }
 

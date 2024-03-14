@@ -138,7 +138,7 @@ public class LikeShareService extends ServiceHelper {
                 copyImageName = firebaseStorageService.copyAndRenameFile(originImageUrl, "images");
             }
             LocalDate startDate = LocalDate.now();
-            goalRepository.save(new Goal(
+            Goal newGoal = goalRepository.save(new Goal(
                                 share,
                                 goal.getTitle(),
                                 goal.getDescription(),
@@ -146,6 +146,7 @@ public class LikeShareService extends ServiceHelper {
                                 startDate,
                                 startDate.plusYears(1),
                                 member));
+            postRepository.save(new Post(newGoal));
 
             // 알림 보내기
             Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.SHARE);
@@ -166,8 +167,12 @@ public class LikeShareService extends ServiceHelper {
         GoalShare share = goal.getShare();
         if (Objects.nonNull(share)) {
             Goal sharedGoal = share.getGoal();
-            sharedGoal.setShareCnt(sharedGoal.getShareCnt()-1);
-            goal.setShare(null);
+            if(Objects.nonNull(sharedGoal)) {
+                sharedGoal.setShareCnt(sharedGoal.getShareCnt() - 1);
+            }
+            if(Objects.nonNull(goal)) {
+                goal.setShare(null);
+            }
             shareRepository.delete(share);
         }
     }
