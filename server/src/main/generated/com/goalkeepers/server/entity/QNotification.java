@@ -56,8 +56,8 @@ public class QNotification extends EntityPathBase<Notification> {
 
     public QNotification(Class<? extends Notification> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.giver = inits.isInitialized("giver") ? new QMember(forProperty("giver")) : null;
-        this.receiver = inits.isInitialized("receiver") ? new QMember(forProperty("receiver")) : null;
+        this.giver = inits.isInitialized("giver") ? new QMember(forProperty("giver"), inits.get("giver")) : null;
+        this.receiver = inits.isInitialized("receiver") ? new QMember(forProperty("receiver"), inits.get("receiver")) : null;
     }
 
 }

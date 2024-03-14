@@ -40,12 +40,12 @@ public class GoalService extends ServiceHelper{
     
     private final GoalRepository goalRepository;
     private final MemberRepository memberRepository;
-    private final LikeShareService shareService;
     private final GoalShareRepository shareRepository;
     private final SettingRepository settingRepository;
     private final PostRepository postRepository;
     private final FirebaseStorageService firebaseStorageService;
     private final NotificationService notificationService;
+    private final LikeShareService likeShareService;
     
 
     /*
@@ -71,10 +71,10 @@ public class GoalService extends ServiceHelper{
             imageUrl = firebaseStorageService.showFile(imageUrl);
         }
         if(member == null) {
-            return GoalResponseDto.of(goal, imageUrl, findJoinMemberList(goal));
+            return GoalResponseDto.of(goal, imageUrl, findJoinMemberList(goal, shareRepository));
         }
         Boolean isShare = shareRepository.existsByMemberAndGoal(member, goal);
-        return GoalResponseDto.of(goal, imageUrl, isShare, findJoinMemberList(goal));
+        return GoalResponseDto.of(goal, imageUrl, isShare, findJoinMemberList(goal, shareRepository));
     }
 
     public Long createMyGoal(GoalRequestDto requestDto, String imageUrl) {
@@ -122,33 +122,52 @@ public class GoalService extends ServiceHelper{
 
     public String deleteMyGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
-        Member member = isMemberCurrent(memberRepository);
-
-        // 포스트 삭제 (응원해요, 컨텐트 좋아요, 컨텐트 삭제)
-        Post post = postRepository.findByGoal(goal).orElse(null);
-        if(Objects.nonNull(post)) {
-            postRepository.delete(post);
-        }
 
         // 이미지 지우기
         String imageUrl = goal.getImageUrl();
         if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
             firebaseStorageService.deleteFile(imageUrl);
+            goal.setImageUrl(null);
         }
 
         // 참여한 사람들이 없을 때
-        if(goal.getShareCnt() == 0 && !shareRepository.existsByMemberAndGoal(member, goal)) {
-            if(Objects.nonNull(goal.getShare())) {
-                // 담기 정보 삭제
-                shareService.deleteShare(goal);
-            }
-            // 목표 삭제
+        if(!shareRepository.existsByGoal(goal)) {
+            likeShareService.deleteShare(goal);
             goalRepository.delete(goal);
             return "삭제";
         } else { // 참여한 사람들이 있을 때
+            // 포스트 삭제 (응원해요, 컨텐트 좋아요, 컨텐트 삭제)
+            Post post = postRepository.findByGoal(goal).orElse(null);
+            if(Objects.nonNull(post)) {
+                post.setGoal(null);
+                postRepository.delete(post);
+            }
             // title, share_cnt 제외 정보 지우기
             Goal.disconnectedGoal(goal);
             return "정보 삭제";
+        }
+    }
+
+    // 탈퇴할 때
+    public void deleteGoal(Goal goal) {
+        // 이미지 지우기
+        String imageUrl = goal.getImageUrl();
+        if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
+            firebaseStorageService.deleteFile(imageUrl);
+            goal.setImageUrl(null);
+        }
+
+        // 참여한 사람들이 있음
+        if (shareRepository.existsByGoal(goal)) {
+            Post post = postRepository.findByGoal(goal).orElse(null);
+            if(Objects.nonNull(post)) {
+                post.setGoal(null);
+                postRepository.delete(post);
+            }
+            Goal.disconnectedGoal(goal);
+        } else {
+            likeShareService.deleteShare(goal);
+            goalRepository.delete(goal);
         }
     }
 

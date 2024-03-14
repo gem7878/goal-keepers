@@ -46,7 +46,7 @@ public class MemberController {
     // 탈퇴
     @DeleteMapping("/me")
     public ResponseEntity<CommonResponseDto> setMemberNickname(@Valid @RequestBody LoginRequestDto requestDto) {
-        memberService.deleteMember(requestDto.getEmail(), requestDto.getPassword());
+        memberService.deleteData(requestDto.getEmail(), requestDto.getPassword());
         return ResponseEntity.ok(new CommonResponseDto(true, "탈퇴되었습니다."));
     }
 }

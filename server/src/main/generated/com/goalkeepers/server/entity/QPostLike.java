@@ -46,7 +46,7 @@ public class QPostLike extends EntityPathBase<PostLike> {
 
     public QPostLike(Class<? extends PostLike> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
+        this.member = inits.isInitialized("member") ? new QMember(forProperty("member"), inits.get("member")) : null;
         this.postContent = inits.isInitialized("postContent") ? new QPostContent(forProperty("postContent"), inits.get("postContent")) : null;
     }
 

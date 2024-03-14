@@ -1,7 +1,8 @@
 package com.goalkeepers.server.service;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,10 @@ import com.goalkeepers.server.entity.PostLike;
 import com.goalkeepers.server.exception.CustomException;
 import com.goalkeepers.server.exception.ErrorCode;
 import com.goalkeepers.server.repository.GoalRepository;
+import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
-import com.goalkeepers.server.repository.PostContentRepository;
-import com.goalkeepers.server.repository.PostRepository;
+import com.goalkeepers.server.repository.PostCheerRepository;
+import com.goalkeepers.server.repository.PostLikeRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,10 +36,12 @@ public class MemberService extends ServiceHelper {
     
     private final MemberRepository memberRepository;
     private final GoalRepository goalRepository;
-    private final PostContentRepository contentRepository;
-    private final PostRepository postRepository;
+    private final GoalShareRepository shareRepository;
+    private final PostLikeRepository likeRepository;
+    private final PostCheerRepository cheerRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
+    private final GoalService goalService;
 
     @Transactional(readOnly = true)
     public MemberResponseDto getMyInfoBySecurity() {
@@ -77,9 +81,9 @@ public class MemberService extends ServiceHelper {
 		return authService.login(requestDto);
     }
 
-    // 탈퇴
+    // 탈퇴 데이터 정리
     @Transactional
-    public void deleteMember(String email, String password) {
+    public void deleteData(String email, String password) {
         Member member = isMemberCurrent(memberRepository);
 
         if(!member.getEmail().equals(email)) {
@@ -91,40 +95,59 @@ public class MemberService extends ServiceHelper {
         }
 
         // 쉐어 카운트 -1
-        for (GoalShare share : member.getShares()) {
-            Optional<Goal> goal = goalRepository.findById(share.getGoal().getId());
-            if(goal.isPresent()) {
-                goal.get().setShareCnt(goal.get().getShareCnt() - 1);
+        Set<GoalShare> shares = shareRepository.findAllByMember(member);
+        if (!shares.isEmpty()) {
+            for (GoalShare share : shares) {
+                Goal sharedGoal = share.getGoal();
+                if(Objects.nonNull(sharedGoal)) {
+                    sharedGoal.setShareCnt(sharedGoal.getShareCnt() - 1);
+                }
+                Goal goal = goalRepository.findByShare(share).orElse(null);
+                if(Objects.nonNull(goal)) {
+                    goal.setShare(null);
+                }
+                shareRepository.delete(share);
             }
         }
 
         // 라이크 카운트 -1
-        for (PostLike like : member.getLikes()) {
-            Optional<PostContent> content = contentRepository.findById(like.getPostContent().getId());
-            if(content.isPresent()) {
-                content.get().setLikeCnt(content.get().getLikeCnt() - 1);
+        List<PostLike> likes = likeRepository.findAllByMember(member);
+        if(!likes.isEmpty()) {
+            for (PostLike like : likes) {
+                PostContent content = like.getPostContent();
+                if(Objects.nonNull(content)) {
+                    content.setLikeCnt(content.getLikeCnt() - 1);
+                }
+                likeRepository.delete(like);
             }
         }
 
         // 응원해요 카운트 -1
-        for (PostCheer cheer : member.getCheers()) {
-            Optional<Post> post = postRepository.findById(cheer.getPost().getId());
-            if(post.isPresent()) {
-                post.get().setCheerCnt(post.get().getCheerCnt() - 1);
+        List<PostCheer> cheers = cheerRepository.findAllByMember(member);
+        if(!cheers.isEmpty()) {
+            for (PostCheer cheer : cheers) {
+                Post post = cheer.getPost();
+                if(Objects.nonNull(post)) {
+                    post.setCheerCnt(post.getCheerCnt() - 1);
+                }
+                cheerRepository.delete(cheer);
             }
         }
 
         // 참여자 있는 목표는 본인 정보만 삭제시키기 
-        for (Goal goal : member.getGoals()) {
-            if(Objects.isNull(goal.getShare()) && Objects.nonNull(goal.getShareList())) {
-                goal.setMember(null);
-                Post post = postRepository.findByGoal(goal).orElse(null);
-                if(Objects.nonNull(post)) {
-                    postRepository.delete(post);
-                }
+        List<Goal> goals = goalRepository.findAllByMember(member);
+        if(!goals.isEmpty()) {
+            for (Goal goal : goals) {
+                goalService.deleteGoal(goal);
             }
         }
-        
+        // 멤버 삭제
+        memberRepository.delete(member);
+    }
+
+    @Transactional
+    public void deleteMember() {
+        Member member = isMemberCurrent(memberRepository);
         memberRepository.delete(member);
     }
 }

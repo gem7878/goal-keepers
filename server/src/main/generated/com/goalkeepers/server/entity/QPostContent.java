@@ -56,7 +56,7 @@ public class QPostContent extends EntityPathBase<PostContent> {
 
     public QPostContent(Class<? extends PostContent> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
+        this.member = inits.isInitialized("member") ? new QMember(forProperty("member"), inits.get("member")) : null;
         this.post = inits.isInitialized("post") ? new QPost(forProperty("post"), inits.get("post")) : null;
         this.shareGoal = inits.isInitialized("shareGoal") ? new QGoal(forProperty("shareGoal"), inits.get("shareGoal")) : null;
     }

@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 
 import com.goalkeepers.server.dto.GoalUpdateRequestDto;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,7 +18,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -71,12 +70,13 @@ public class Goal {
     @Column(columnDefinition = "boolean default false")
     private boolean completed;
 
-    @OneToMany(mappedBy = "goal", fetch = FetchType.LAZY)
-    private Set<GoalShare> shareList;
-
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "share_id", nullable = true)
     private GoalShare share;
+
+    @OneToOne(mappedBy = "goal", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Post post;
+
 
     public static Goal goalUpdate(Goal goal, GoalUpdateRequestDto requestDto, String imageUrl) {
         if (Objects.isNull(requestDto)) {
@@ -98,6 +98,7 @@ public class Goal {
         goal.completed = false;
         goal.share = null;
         goal.completeDate = null;
+        goal.imageUrl = null;
         return goal;
     }
 

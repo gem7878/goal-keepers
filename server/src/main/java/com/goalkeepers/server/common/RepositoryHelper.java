@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import com.goalkeepers.server.config.SecurityUtil;
 import com.goalkeepers.server.entity.Goal;
@@ -56,7 +57,7 @@ public class RepositoryHelper {
     }
     
     // joinMemberList 가져오기
-    public static List<Map<String, Object>> getJoinMemberList(Goal goal) {
+    public static List<Map<String, Object>> getJoinMemberList(Goal goal, GoalShareRepository shareRepository) {
         List<Map<String, Object>> joinMemberList = new ArrayList<>();
         if(Objects.nonNull(goal) && Objects.nonNull(goal.getMember())) {
             Map<String, Object> owner = new HashMap<>();
@@ -66,8 +67,9 @@ public class RepositoryHelper {
             joinMemberList.add(owner);
         }
 
-        if(Objects.nonNull(goal) && Objects.nonNull(goal.getShareList())) {
-            for(GoalShare goalShare : goal.getShareList()) {
+        Set<GoalShare> shares = shareRepository.findAllByGoal(goal);
+        if(Objects.nonNull(goal) && Objects.nonNull(shares)) {
+            for(GoalShare goalShare : shares) {
                 Map<String, Object> joinMember = new HashMap<>();
                 joinMember.put("memberId", goalShare.getMember().getId());
                 joinMember.put("nickname", goalShare.getMember().getNickname());
