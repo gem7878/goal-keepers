@@ -26,6 +26,7 @@ public class NotificationResponseDto {
     private String targetTitle;
     private String message;
     private Long commentId;
+    private boolean isRead;
     
 
     public static NotificationResponseDto of(Notification notification, String title) {
@@ -39,6 +40,7 @@ public class NotificationResponseDto {
                     .targetTitle(title)
                     .message(notification.getMessage())
                     .commentId(notification.getCommentId())
+                    .isRead(notification.getIsRead())
                     .build();
     }
 }
