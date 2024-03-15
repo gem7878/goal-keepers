@@ -26,7 +26,6 @@ import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
-import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostRepository;
 import com.goalkeepers.server.repository.SettingRepository;
 import com.google.firebase.FirebaseException;
@@ -43,7 +42,6 @@ public class GoalService extends ServiceHelper{
     private final GoalShareRepository shareRepository;
     private final SettingRepository settingRepository;
     private final PostRepository postRepository;
-    private final PostContentRepository contentRepository;
     private final FirebaseStorageService firebaseStorageService;
     private final NotificationService notificationService;
     private final LikeShareService likeShareService;
@@ -148,7 +146,6 @@ public class GoalService extends ServiceHelper{
             }
             // title, share_cnt 제외 정보 지우기
             Goal.disconnectedGoal(goal);
-            goalRepository.flush();
             return "정보 삭제";
         }
     }

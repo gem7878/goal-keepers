@@ -24,6 +24,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final ListPath<PostComment, QPostComment> comments = this.<PostComment, QPostComment>createList("comments", PostComment.class, QPostComment.class, PathInits.DIRECT2);
 
+    public final ListPath<PostContent, QPostContent> contents = this.<PostContent, QPostContent>createList("contents", PostContent.class, QPostContent.class, PathInits.DIRECT2);
+
     public final StringPath email = createString("email");
 
     public final ListPath<Goal, QGoal> goals = this.<Goal, QGoal>createList("goals", Goal.class, QGoal.class, PathInits.DIRECT2);

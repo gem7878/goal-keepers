@@ -26,7 +26,6 @@ import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostCheerRepository;
-import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostLikeRepository;
 import com.goalkeepers.server.repository.PostRepository;
 
@@ -42,7 +41,6 @@ public class MemberService extends ServiceHelper {
     private final PostLikeRepository likeRepository;
     private final PostCheerRepository cheerRepository;
     private final PostRepository postRepository;
-    private final PostContentRepository contentRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
     private final FirebaseStorageService firebaseStorageService;
@@ -185,7 +183,6 @@ public class MemberService extends ServiceHelper {
 
     @Transactional
     public void deleteMember(Member member) {
-        contentRepository.deleteAllByMember(member);
         memberRepository.delete(member);
     }
 }
