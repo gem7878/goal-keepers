@@ -160,7 +160,8 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
 		List<Tuple> popularGoalAndCountList = queryFactory
                             .select(postContent.shareGoal, postContent.count())
                             .from(postContent)
-                            .where(postContent.createdAt.after(sixHoursAgo))
+                            .where(postContent.createdAt.after(sixHoursAgo)
+                                .and(postContent.post.privated.isFalse()))
                             .groupBy(postContent.shareGoal)
                             .orderBy(postContent.count().desc())
                             .offset(pageable.getOffset())
