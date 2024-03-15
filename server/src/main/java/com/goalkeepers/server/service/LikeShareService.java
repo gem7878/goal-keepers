@@ -35,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class LikeShareService extends ServiceHelper {
     
     private final PostLikeRepository likeRepository;
@@ -50,6 +49,7 @@ public class LikeShareService extends ServiceHelper {
     private final NotificationService notificationService;
 
     // 컨텐트 좋아요
+    @Transactional
     public String addLike(ContentLikeRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
         PostContent content = isPostContent(contentRepository, requestDto.getContentId());
@@ -75,6 +75,7 @@ public class LikeShareService extends ServiceHelper {
     }
 
     // 포스트 응원해요
+    @Transactional
     public String addPostCheer(PostCheerRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
         Post post = isPost(postRepository, requestDto.getPostId());
@@ -99,6 +100,7 @@ public class LikeShareService extends ServiceHelper {
     }
 
     // 연결된 목표 찾기
+    @Transactional
     public GoalResponseDto findGoal(Long goalId) {
         Member member = isMemberCurrent(memberRepository);
         Goal goal = isGoal(goalRepository, goalId);
@@ -112,6 +114,7 @@ public class LikeShareService extends ServiceHelper {
     }
 
     // 담기하기 -> 목표 만들기
+    @Transactional
     public void addShare(GoalShareRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
         
@@ -157,6 +160,7 @@ public class LikeShareService extends ServiceHelper {
     }
 
     // 담기 취소 - 참여 제외
+    @Transactional
     public void disconnecteOriginGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
         deleteShare(goal);

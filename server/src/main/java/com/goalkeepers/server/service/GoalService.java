@@ -26,6 +26,7 @@ import com.goalkeepers.server.entity.TYPE;
 import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
+import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostRepository;
 import com.goalkeepers.server.repository.SettingRepository;
 import com.google.firebase.FirebaseException;
@@ -34,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @DependsOn("firebaseStorageService")
 public class GoalService extends ServiceHelper{
     
@@ -43,6 +43,7 @@ public class GoalService extends ServiceHelper{
     private final GoalShareRepository shareRepository;
     private final SettingRepository settingRepository;
     private final PostRepository postRepository;
+    private final PostContentRepository contentRepository;
     private final FirebaseStorageService firebaseStorageService;
     private final NotificationService notificationService;
     private final LikeShareService likeShareService;
@@ -55,13 +56,14 @@ public class GoalService extends ServiceHelper{
         버킷 삭제
         버킷 수정
      */
-
+    @Transactional
     public Page<GoalResponseDto> getMyGoalList(int pageNumber) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         return goalRepository.getMyAllGoal(PageRequest.of(pageNumber - 1, 18), memberId);
     }
 
     // 모든 유저가 접근 가능
+    @Transactional
     public GoalResponseDto getSelectedGoal(Long goalId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberId != null ? memberRepository.findById(memberId).get() : null;
@@ -77,6 +79,7 @@ public class GoalService extends ServiceHelper{
         return GoalResponseDto.of(goal, imageUrl, isShare, findJoinMemberList(goal, shareRepository));
     }
 
+    @Transactional
     public Long createMyGoal(GoalRequestDto requestDto, String imageUrl) {
         Member member = isMemberCurrent(memberRepository);
         Goal goal = goalRepository.save(requestDto.toGoal(member, imageUrl));
@@ -84,6 +87,7 @@ public class GoalService extends ServiceHelper{
         //return GoalResponseDto.of(goalRepository.save(requestDto.toGoal(member, imageUrl)), null);
     }
 
+    @Transactional
     public void updateMyGoal(GoalUpdateRequestDto requestDto, Long goalId, MultipartFile multipartFile) throws IOException, FirebaseException {
         Goal currentGoal = isMyGoal(memberRepository, goalRepository, goalId);
         
@@ -120,6 +124,7 @@ public class GoalService extends ServiceHelper{
         }
     }
 
+    @Transactional
     public String deleteMyGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
 
@@ -139,11 +144,11 @@ public class GoalService extends ServiceHelper{
             // 포스트 삭제 (응원해요, 컨텐트 좋아요, 컨텐트 삭제)
             Post post = postRepository.findByGoal(goal).orElse(null);
             if(Objects.nonNull(post)) {
-                post.setGoal(null);
                 postRepository.delete(post);
             }
             // title, share_cnt 제외 정보 지우기
             Goal.disconnectedGoal(goal);
+            goalRepository.flush();
             return "정보 삭제";
         }
     }
@@ -161,16 +166,17 @@ public class GoalService extends ServiceHelper{
         if (shareRepository.existsByGoal(goal)) {
             Post post = postRepository.findByGoal(goal).orElse(null);
             if(Objects.nonNull(post)) {
-                post.setGoal(null);
                 postRepository.delete(post);
             }
             Goal.disconnectedGoal(goal);
+            goalRepository.flush();
         } else {
             likeShareService.deleteShare(goal);
             goalRepository.delete(goal);
         }
     }
 
+    @Transactional
     public String completeMyGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
         if(goal.isCompleted()) {
@@ -189,6 +195,7 @@ public class GoalService extends ServiceHelper{
     /*
      * 알림
      */
+    @Transactional
     public void notifyOneWeekLeftGoal() {
         List<Goal> goals = goalRepository.findAllByEndDate(LocalDate.now().plusWeeks(1));
         for (Goal goal : goals) {
@@ -199,6 +206,7 @@ public class GoalService extends ServiceHelper{
         }
     }
 
+    @Transactional
     public void notifyOneDayLeftGoal() {
         List<Goal> goals = goalRepository.findAllByEndDate(LocalDate.now().plusDays(1));
         for (Goal goal : goals) {
@@ -209,6 +217,7 @@ public class GoalService extends ServiceHelper{
         }
     }
 
+    @Transactional
     public void notifyCompletedGoalNumber() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime yesterdayStart = LocalDateTime.of(now.minusDays(1).toLocalDate(), LocalTime.MIN);

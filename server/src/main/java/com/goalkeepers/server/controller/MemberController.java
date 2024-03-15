@@ -11,6 +11,7 @@ import com.goalkeepers.server.dto.CommonResponseDto;
 import com.goalkeepers.server.dto.ConfirmNicknameRequestDto;
 import com.goalkeepers.server.dto.LoginRequestDto;
 import com.goalkeepers.server.dto.MemberResponseDto;
+import com.goalkeepers.server.entity.Member;
 import com.goalkeepers.server.service.MemberService;
 
 import jakarta.validation.Valid;
@@ -46,7 +47,10 @@ public class MemberController {
     // 탈퇴
     @DeleteMapping("/me")
     public ResponseEntity<CommonResponseDto> setMemberNickname(@Valid @RequestBody LoginRequestDto requestDto) {
-        memberService.deleteData(requestDto.getEmail(), requestDto.getPassword());
+        Member member = memberService.confirmLogin(requestDto);
+        memberService.deleteCount(member);
+        memberService.deleteData(member);
+        memberService.deleteMember(member);
         return ResponseEntity.ok(new CommonResponseDto(true, "탈퇴되었습니다."));
     }
 }

@@ -26,7 +26,9 @@ import com.goalkeepers.server.repository.GoalRepository;
 import com.goalkeepers.server.repository.GoalShareRepository;
 import com.goalkeepers.server.repository.MemberRepository;
 import com.goalkeepers.server.repository.PostCheerRepository;
+import com.goalkeepers.server.repository.PostContentRepository;
 import com.goalkeepers.server.repository.PostLikeRepository;
+import com.goalkeepers.server.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,9 +41,11 @@ public class MemberService extends ServiceHelper {
     private final GoalShareRepository shareRepository;
     private final PostLikeRepository likeRepository;
     private final PostCheerRepository cheerRepository;
+    private final PostRepository postRepository;
+    private final PostContentRepository contentRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
-    private final GoalService goalService;
+    private final FirebaseStorageService firebaseStorageService;
 
     @Transactional(readOnly = true)
     public MemberResponseDto getMyInfoBySecurity() {
@@ -81,19 +85,25 @@ public class MemberService extends ServiceHelper {
 		return authService.login(requestDto);
     }
 
-    // 탈퇴 데이터 정리
+    // 이메일과 비밀번호와 로그인한 계정이 같은지 확인
     @Transactional
-    public void deleteData(String email, String password) {
+    public Member confirmLogin(LoginRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
 
-        if(!member.getEmail().equals(email)) {
+        if(!member.getEmail().equals(requestDto.getEmail())) {
             throw new CustomException(ErrorCode.BAD_REQUEST, "이메일을 확인해주세요.");
         }
 
-        if (!passwordEncoder.matches(password, member.getPassword())) {
+        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
             throw new CustomException(ErrorCode.BAD_REQUEST, "비밀번호를 확인해주세요.");
         }
 
+        return member;
+    }
+
+    // 카운트 데이터 정리
+    @Transactional
+    public void deleteCount(Member member) {
         // 쉐어 카운트 -1
         Set<GoalShare> shares = shareRepository.findAllByMember(member);
         if (!shares.isEmpty()) {
@@ -133,21 +143,49 @@ public class MemberService extends ServiceHelper {
                 cheerRepository.delete(cheer);
             }
         }
+    }
 
-        // 참여자 있는 목표는 본인 정보만 삭제시키기 
+    // 참여자 있는 목표는 본인 정보만 삭제시키기 or 목표 삭제
+    @Transactional
+    public void deleteData(Member member) {
         List<Goal> goals = goalRepository.findAllByMember(member);
         if(!goals.isEmpty()) {
             for (Goal goal : goals) {
-                goalService.deleteGoal(goal);
+                // 이미지 지우기
+                String imageUrl = goal.getImageUrl();
+                if (Objects.nonNull(imageUrl) && !imageUrl.isEmpty()) {
+                    firebaseStorageService.deleteFile(imageUrl);
+                    goal.setImageUrl(null);
+                }
+
+                // 참여한 사람들이 있음
+                if (shareRepository.existsByGoal(goal)) {
+                    Post post = postRepository.findByGoal(goal).orElse(null);
+                    if(Objects.nonNull(post)) {
+                        postRepository.delete(post);
+                    }
+                    Goal.disconnectedGoal(goal);
+                } else { // 참여한 사람들이 없음
+                    GoalShare share = goal.getShare();
+                    if (Objects.nonNull(share)) {
+                        Goal sharedGoal = share.getGoal();
+                        if(Objects.nonNull(sharedGoal)) {
+                            sharedGoal.setShareCnt(sharedGoal.getShareCnt() - 1);
+                        }
+                        if(Objects.nonNull(goal)) {
+                            goal.setShare(null);
+                        }
+                        shareRepository.delete(share);
+                    }
+                    goalRepository.delete(goal);
+                }
             }
         }
-        // 멤버 삭제
-        memberRepository.delete(member);
     }
 
     @Transactional
-    public void deleteMember() {
-        Member member = isMemberCurrent(memberRepository);
+    public void deleteMember(Member member) {
+        contentRepository.deleteAllByMember(member);
         memberRepository.delete(member);
     }
 }
