@@ -13,10 +13,7 @@ import Image1 from '../../public/assets/images/goalKeepers.png';
 import Image2 from '@/public/assets/images/gem.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
-import {
-  handleGetMyPostAll,
-  handleGetPostAll,
-} from '@/app/post/actions';
+import { handleGetMyPostAll, handleGetPostAll } from '@/app/post/actions';
 import { setStateGoal } from '@/redux/renderSlice';
 import { PostBox, PostBoxDetail } from './index';
 import { handleGetUserInfo } from '@/app/actions';
@@ -31,21 +28,17 @@ import {
   handleGetShare,
 } from '@/app/community/share/actions';
 
-interface postContentContentTypes {
+interface postContentTypes {
   content: string;
   createdAt: string;
-  goalDescription: null | string;
-  goalId: null | number;
-  goalImageUrl: null | string;
-  goalTitle: null | string;
   like: boolean;
   likeCnt: number;
   nickname: string;
   contentId: number;
 }
 
-interface postContentTypes {
-  content: postContentContentTypes;
+interface postTypes {
+  content: postContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -57,10 +50,10 @@ interface postContentTypes {
   myPost: false;
   nickname: string;
   postCheerCnt: number;
+  privated: boolean;
 }
 
-const MyPosts: React.FC<{
-}> = ({  }) => {
+const MyPosts: React.FC<{}> = ({}) => {
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
@@ -68,7 +61,7 @@ const MyPosts: React.FC<{
   const [nickname, setNickname] = useState('');
   const [focusNum, setFocusNum] = useState<number | null>(null);
   const [page, setPage] = useState(pageable.pageNumber);
-  const [postData, setPostData] = useState<postContentTypes[]>([]);
+  const [postData, setPostData] = useState<postTypes[]>([]);
 
   const containerRef = useRef<any>(null);
 
@@ -81,19 +74,21 @@ const MyPosts: React.FC<{
 
   useEffect(() => {
     onGetMyAllPost(page);
-  }, [page, reduxPostData.postBoolean]);
+  }, [page, reduxPostData.postBoolean, reduxPostData.privateBoolean]);
 
   const onGetMyAllPost = async (pageParam: number) => {
+
     const form = { pageNum: pageParam };
-    await handleGetMyPostAll(form)
-      .then((response) => {
-        setPostData(response.content);
-        setPageable({
-          pageNumber: response.pageable.pageNumber + 1,
-          last: response.last,
-        });
-      })
-      .catch((error) => console.log(error));
+
+    const response = await handleGetMyPostAll(form);
+
+    if (response.success) {
+      setPostData(response.data.content);
+      setPageable({
+        pageNumber: response.data.pageable.pageNumber + 1,
+        last: response.data.last,
+      });
+    }
   };
 
   const onGetUserInfo = async () => {

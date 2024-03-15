@@ -9,6 +9,9 @@ const renderSlice = createSlice({
     commentBoolean: false,
     goalId: null,
     contentBoolean: false,
+    privateBoolean: false,
+    alarmBoolean: false,
+    alarmTargetBoolean: false,
     logOutBoolean: false,
   },
   reducers: {
@@ -33,6 +36,15 @@ const renderSlice = createSlice({
     setStateContent: (state, action) => {
       state.contentBoolean = action.payload;
     },
+    setStatePrivate: (state, action) => {
+      state.privateBoolean = action.payload;
+    },
+    setStateAlarm: (state, action) => {
+      state.alarmBoolean = action.payload;
+    },
+    setStateAlarmTarget: (state, action) => {
+      state.alarmBoolean = action.payload;
+    },
     setStateLogOut: (state, action) => {
       state.logOutBoolean = action.payload;
     },
@@ -47,6 +59,9 @@ export const {
   setStateComment,
   setShareGoal,
   setStateContent,
+  setStatePrivate,
+  setStateAlarm,
+  setStateAlarmTarget,
   setStateLogOut,
 } = renderSlice.actions;
 export const selectRender = (state: any) => state.render; // 선택자(selectors) 추가

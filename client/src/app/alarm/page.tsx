@@ -1,4 +1,6 @@
 'use client';
+
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -7,7 +9,24 @@ import {
   faCog,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import { handleGetAlarm, handleReadAlarm } from './actions';
+import {
+  handleDeleteAlarm,
+  handleGetAlarm,
+  handlePostCommentAlarm,
+  handleReadAlarm,
+} from './actions';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectRender,
+  setStateAlarm,
+  setStateAlarmTarget,
+} from '@/redux/renderSlice';
+import {
+  setCommentId,
+  setCommentPage,
+  setTargetId,
+  setTargetPage,
+} from '@/redux/alarmDataSlice';
 
 interface alarmContentTypes {
   notificationId: number;
@@ -23,14 +42,22 @@ interface alarmContentTypes {
 
 const Alarm = () => {
   const [focusMenu, setFocusMenu] = useState(0);
-  const [focusList, setFocusList] = useState<number | null>(null);
   const [alarmContent, setAlarmContent] = useState<alarmContentTypes[]>([]);
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
   });
   const [isDeleteCheck, setIsDeleteCheck] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
   const [deleteList, setDeleteList] = useState<number[]>([]);
+
+  const dispatch = useDispatch();
+  const reduxAlarmData = useSelector(selectRender);
+  const router = useRouter();
+
+  useEffect(() => {
+    onGetAlarmData();
+  }, [focusMenu, reduxAlarmData.alarmBoolean]);
 
   const menu = [
     { name: '전체', type: 'ALL' },
@@ -49,64 +76,17 @@ const Alarm = () => {
     { color: 'bg-rose-400', type: 'COMMENT' },
     { color: 'bg-violet-400', type: 'SHARE' },
   ];
-  const testAlarmContent = [
-    {
-      notificationId: 67,
-      receiverId: 1,
-      giverId: null,
-      giverNickname: null,
-      type: 'ALARM',
-      targetId: null,
-      targetTitle: null,
-      message: '어제 완료된 목표는 2개 입니다.',
-      commentId: null,
-    },
-    {
-      notificationId: 66,
-      receiverId: 1,
-      giverId: 2,
-      giverNickname: '테스트2',
-      type: 'COMMENT',
-      targetId: 5,
-      targetTitle: '골 제목1',
-      message: null,
-      commentId: 56,
-    },
-    {
-      notificationId: 65,
-      receiverId: 1,
-      giverId: 2,
-      giverNickname: '테스트2',
-      type: 'COMMENT',
-      targetId: 5,
-      targetTitle: '골 제목1',
-      message: null,
-      commentId: 55,
-    },
-  ];
-
-  useEffect(() => {
-    onGetAlarmData();
-  }, []);
-
-  useEffect(() => {
-    if (isDeleteCheck) {
-    }
-  }, [isDeleteCheck]);
-
-  
 
   const onGetAlarmData = async () => {
     const formData = {
-      pageNum: 1,
-      type: 'NOTIFY',
+      pageNum: pageable.pageNumber,
+      type: menu[focusMenu].type,
     };
 
     const response = await handleGetAlarm(formData);
 
     if (response.success) {
       setAlarmContent(response.data.content);
-      // setAlarmContent(testAlarmContent);
       setPageable({
         pageNumber: response.data.pageable.pageNumber + 1,
         last: response.data.last,
@@ -125,14 +105,53 @@ const Alarm = () => {
   };
 
   const onDeleteAlarm = async () => {
-    const confirm = window.confirm('알림을 모두 읽으시겠습니까?');
-    if (confirm) {
-      const response = await handleReadAlarm();
-      if (response.success) {
-        window.alert(response.message);
+    if (deleteList.length === 0) {
+      alert('삭제할 알림을 선택해주세요.');
+    } else {
+      const confirm = window.confirm('선택한 알림을 삭제하시겠습니까?');
+      let isAll;
+      if (focusMenu == 0) {
+        alarmContent.length === deleteList.length
+          ? (isAll = true)
+          : (isAll = false);
+      } else {
+        isAll = false;
+      }
+      const formData = {
+        all: isAll,
+        deleteList: deleteList,
+      };
+      if (confirm) {
+        const response = await handleDeleteAlarm(formData);
+        if (response.success) {
+          window.alert(response.message);
+          return dispatch(setStateAlarm(!reduxAlarmData.alarmBoolean));
+        }
       }
     }
   };
+
+  const onGetAlarmTarget = async (
+    targetId: number | null,
+    commentId: number | null,
+  ) => {
+    const formData = {
+      type: 'COMMENT',
+      targetId: targetId,
+      commentId: commentId,
+    };
+    const response = await handlePostCommentAlarm(formData);
+    if (response.success) {
+      const targetData = response.data;
+      dispatch(setTargetId(targetData.targetId));
+      dispatch(setTargetPage(targetData.targetPage));
+      dispatch(setCommentId(targetData.commentId));
+      dispatch(setCommentPage(targetData.commentPage));
+      dispatch(setStateAlarmTarget(true));
+      router.push('/');
+    }
+  };
+
   const existNumber = (notificationId: number) => {
     const isNumberExist = (number: number) => deleteList.includes(number);
 
@@ -140,6 +159,7 @@ const Alarm = () => {
       const updatedNumbers = deleteList.filter(
         (number) => number !== numberToRemove,
       );
+
       setDeleteList(updatedNumbers);
     };
 
@@ -157,22 +177,27 @@ const Alarm = () => {
         >
           <input
             type="checkbox"
-            checked={isDeleteCheck}
+            checked={
+              notificationId === null
+                ? isDeleteCheck
+                : deleteList.includes(notificationId)
+            }
             className=" peer relative h-4 w-4 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all  checked:border-gray-400 checked:bg-gray-400 checked:before:bg-gray-400 hover:before:opacity-10"
             id="check"
             onChange={(e) => {
-              if (e.target.checked) {
-                if (notificationId === null) {
-                  setIsDeleteCheck(e.target.checked);
+              if (notificationId === null) {
+                setIsDeleteCheck(e.target.checked);
+                if (e.target.checked) {
+                  setDeleteList(
+                    alarmContent.map((item) => item.notificationId),
+                  );
                 } else {
-                  !deleteList.includes(notificationId) &&
-                    setDeleteList([...deleteList, notificationId]);
+                  setDeleteList([]);
                 }
               } else {
-                if (notificationId === null) {
-                } else {
-                  existNumber(notificationId);
-                }
+                deleteList.includes(notificationId)
+                  ? existNumber(notificationId)
+                  : setDeleteList([...deleteList, notificationId]);
               }
             }}
           />
@@ -226,10 +251,30 @@ const Alarm = () => {
             모두 읽음
           </button>
           <div className="flex items-center gap-1">
-            <CheckBox notificationId={null}></CheckBox>
-            <button className={`px-2 py-[3px] text-xs text-white bg-gray-400`}>
-              삭제
-            </button>
+            {isEdit ? (
+              <>
+                <CheckBox notificationId={null}></CheckBox>
+                <button
+                  className={`px-2 py-[3px] text-xs text-white bg-red-400`}
+                  onClick={() => onDeleteAlarm()}
+                >
+                  삭제
+                </button>
+                <button
+                  className={`px-2 py-[3px] text-xs text-white bg-gray-400`}
+                  onClick={() => setIsEdit(false)}
+                >
+                  취소
+                </button>
+              </>
+            ) : (
+              <button
+                className={`px-2 py-[3px] text-xs text-white bg-gray-400`}
+                onClick={() => setIsEdit(true)}
+              >
+                편집
+              </button>
+            )}
           </div>
         </section>
         <section className="h-full overflow-y-scroll w-full px-[6%]">
@@ -242,16 +287,16 @@ const Alarm = () => {
                 );
                 return (
                   <li key={index} className="w-full flex">
-                    {isDeleteCheck && (
+                    {isEdit && (
                       <CheckBox notificationId={data.notificationId}></CheckBox>
                     )}
 
                     <div
                       className="h-20 w-full bg-neutral-100 rounded-xl flex items-center px-[5%] py-[3%] gap-2 justify-between"
                       onClick={() => {
-                        focusList === index
-                          ? setFocusList(null)
-                          : setFocusList(index);
+                        if (data.type === 'COMMENT') {
+                          onGetAlarmTarget(data.targetId, data.commentId);
+                        }
                       }}
                     >
                       <div className="w-[18%]">
@@ -285,13 +330,6 @@ const Alarm = () => {
                             : data.targetTitle}
                         </h3>
                       </div>
-                      {/* <div className="w-[10%] flex justify-end">
-                        {focusList === index ? (
-                          <FontAwesomeIcon icon={faCaretUp} />
-                        ) : (
-                          <FontAwesomeIcon icon={faCaretDown} />
-                        )}
-                      </div> */}
                     </div>
                   </li>
                 );
@@ -309,9 +347,9 @@ const Alarm = () => {
                         <div
                           className="h-20 bg-neutral-100 rounded-xl flex items-center px-[5%] py-[3%] gap-2 justify-between"
                           onClick={() => {
-                            focusList === index
-                              ? setFocusList(null)
-                              : setFocusList(index);
+                            if (data.type === 'COMMENT') {
+                              onGetAlarmTarget(data.targetId, data.commentId);
+                            }
                           }}
                         >
                           <div className="w-[18%]">
@@ -345,13 +383,6 @@ const Alarm = () => {
                                 : data.targetTitle}
                             </h3>
                           </div>
-                          {/* <div className="w-[10%] flex justify-end">
-                            {focusList === index ? (
-                              <FontAwesomeIcon icon={faCaretUp} />
-                            ) : (
-                              <FontAwesomeIcon icon={faCaretDown} />
-                            )}
-                          </div> */}
                         </div>
                       </li>
                     );
