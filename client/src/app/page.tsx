@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { StaticImageData } from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectRender } from '@/redux/renderSlice';
+import { selectRender, setStateAlarmTarget } from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
@@ -81,6 +81,16 @@ export default function Home() {
   const containerEl = useRef<any>();
   const [goalDoing, setGoalDoing] = useState<string>('doing');
   const [token, setToken] = useState<string | undefined>(undefined);
+
+  const dispatch = useDispatch();
+  const reduxAlarmData = useSelector(selectRender);
+
+  useEffect(() => {
+    if (reduxAlarmData.alarmBoolean) {
+      setIsMyGoals(false);
+      dispatch(setStateAlarmTarget(false));
+    }
+  }, [reduxAlarmData.alarmBoolean]);
 
   useEffect(() => {
     selectGoalNum !== null ? setOpen(true) : setOpen(false);

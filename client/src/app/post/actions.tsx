@@ -121,7 +121,7 @@ export const handleGetMyPostAll = async (getData: { pageNum: number }) => {
       },
     );
 
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.log('error', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
@@ -156,6 +156,7 @@ export const handleGetAllPostContent = async (getData: {
 export const handleCreatePostContent = async (formData: {
   content: string;
   goalId: number;
+  privated: boolean;
 }) => {
   const token = handleGetToken().token;
   try {
@@ -164,6 +165,7 @@ export const handleCreatePostContent = async (formData: {
       {
         content: formData.content,
         goalId: formData.goalId,
+        privated: formData.privated,
       },
       {
         headers: {

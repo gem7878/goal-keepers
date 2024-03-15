@@ -41,7 +41,6 @@ export const handleReadAlarm = async () => {
         withCredentials: true,
       },
     );
-    console.log(response);
 
     return response.data;
   } catch (error: any) {
@@ -81,8 +80,8 @@ export const handleDeleteAlarm = async (formData: {
 
 export const handlePostCommentAlarm = async (formData: {
   type: string;
-  targetId: number;
-  commentId: number;
+  targetId: number | null;
+  commentId: number | null;
 }) => {
   const token = handleGetToken().token;
   try {

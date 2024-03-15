@@ -28,21 +28,17 @@ import {
   faChevronCircleLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
-interface postContentContentTypes {
+interface postContentTypes {
   content: string;
   createdAt: string;
-  goalDescription: null | string;
-  goalId: null | number;
-  goalImageUrl: null | string;
-  goalTitle: null | string;
   like: boolean;
   likeCnt: number;
   nickname: string;
   contentId: number;
 }
 
-interface postContentTypes {
-  content: postContentContentTypes;
+interface postTypes {
+  content: postContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -54,11 +50,12 @@ interface postContentTypes {
   myPost: false;
   nickname: string;
   postCheerCnt: number;
+  privated: boolean;
 }
 
 const Post = () => {
   const [focusNum, setFocusNum] = useState<number | null>(null);
-  const [postData, setPostData] = useState<postContentTypes[]>([]);
+  const [postData, setPostData] = useState<postTypes[]>([]);
   const [nickname, setNickname] = useState('');
   const [pageable, setPageable] = useState({
     pageNumber: 1,
@@ -76,7 +73,7 @@ const Post = () => {
 
   useEffect(() => {
     onGetAllPost(page);
-  }, [page, reduxPostData.postBoolean, sort]);
+  }, [page, reduxPostData.postBoolean, sort, reduxPostData.privateBoolean]);
 
   const onGetAllPost = async (pageParam: number) => {
     const formData = {
@@ -146,6 +143,7 @@ const Post = () => {
       last: false,
     });
   };
+
   return (
     <div className="w-full h-full pt-[40px] flex flex-col">
       <SearchBox
