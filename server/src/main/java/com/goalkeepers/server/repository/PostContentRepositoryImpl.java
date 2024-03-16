@@ -102,6 +102,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                         .from(postContent)
                         .where(postContent.post.privated.eq(false))
                         .groupBy(postContent.post)
+                        .orderBy(postContent.createdAt.max().desc())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
                         .fetch();
@@ -148,6 +149,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                         .from(postContent)
                         .where(postContent.member.eq(member))
                         .groupBy(postContent.post)
+                        .orderBy(postContent.createdAt.min().desc())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
                         .fetch();
@@ -227,7 +229,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                                 .or(post.goal.title.contains(query))
                                 .or(post.goal.description.contains(query))))
                             .groupBy(post.id, post.goal.id)
-                            .orderBy(isNewSort ? postContent.id.max().desc() : post.cheerCnt.desc(),
+                            .orderBy(isNewSort ? postContent.createdAt.max().desc() : post.cheerCnt.desc(),
                                     post.id.desc())
                             .fetch();
 
