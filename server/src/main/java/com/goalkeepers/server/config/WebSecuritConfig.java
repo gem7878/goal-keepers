@@ -36,7 +36,7 @@ public class WebSecuritConfig {
         http
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/auth/**", "/api/kakao/login", "/public/**", "/subscribe").permitAll()
-                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/admin/**", "/management/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
             )
             .csrf((csrf) -> csrf.disable())
