@@ -65,7 +65,7 @@ public class LikeShareService extends ServiceHelper {
             likeRepository.save(new PostLike(member, content));
 
             // 알림 보내기
-            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.LIKE);
+            Member receiver = alarmTrueReceiver(settingRepository, content.getMember(), TYPE.LIKE);
             if(Objects.nonNull(receiver) && !member.equals(receiver)) {
                 Post post = content.getPost();
                 notificationService.send(receiver, member, TYPE.LIKE, post.getId(), post.getGoal().getTitle(), null, null);
@@ -91,7 +91,7 @@ public class LikeShareService extends ServiceHelper {
             cheerRepository.save(new PostCheer(member, post));
 
             // 알림 보내기
-            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.CHEER);
+            Member receiver = alarmTrueReceiver(settingRepository, post.getGoal().getMember(), TYPE.CHEER);
             if(Objects.nonNull(receiver) && !member.equals(receiver)) {
                 notificationService.send(receiver, member, TYPE.CHEER, post.getId(), post.getGoal().getTitle(), null, null);
             }
@@ -152,7 +152,7 @@ public class LikeShareService extends ServiceHelper {
             postRepository.save(new Post(newGoal));
 
             // 알림 보내기
-            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.SHARE);
+            Member receiver = alarmTrueReceiver(settingRepository, goal.getMember(), TYPE.SHARE);
             if(Objects.nonNull(receiver) && !member.equals(receiver)) {
                 notificationService.send(receiver, member, TYPE.SHARE, goal.getId(), goal.getTitle(), null, null);
             }            
