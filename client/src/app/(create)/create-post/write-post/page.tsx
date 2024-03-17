@@ -132,21 +132,23 @@ const WritePost = () => {
           </section>
         </article>
       </div>
-      <Link
+      <div
         className={
           !addContent && postContent.length > 0
             ? 'gk-primary-next-a'
             : 'gk-primary-next-a-block'
         }
-        href={`/`}
         onClick={() => {
-          !addContent && postContent.length > 0
-            ? onCreatePost()
-            : alert('현재 진행 상황 입력 후 완료 버튼을 눌러주세요.');
+          if (!addContent && postContent.length > 0) {
+            onCreatePost();
+            router.push('/');
+          } else {
+            alert('현재 진행 상황 입력 후 완료 버튼을 눌러주세요.');
+          }
         }}
       >
         <button className="w-full h-full">다음</button>
-      </Link>
+      </div>
     </>
   );
 };

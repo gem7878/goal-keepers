@@ -16,6 +16,9 @@ import { store } from '../redux/store';
 import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
 import { tokenValue } from './alarm/actions';
 import { handleGetEventId, handleGetToken } from '@/utils/getCookie';
+import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,6 +29,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 function RootLayout({ children }: { children: React.ReactNode }) {
   const [eventId, setEventId] = useState<string>('');
+  const [markAlarm, setMarkAlarm] = useState<boolean>(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -92,6 +96,11 @@ function RootLayout({ children }: { children: React.ReactNode }) {
           const { lastEventId: lastEventId, data: receivedConnectData } = event;
           console.log('Current Event Id: ' + lastEventId);
           console.log(receivedConnectData);
+          if (receivedConnectData.charAt(0) !== 'E') {
+            setMarkAlarm(true);
+          } else {
+            setMarkAlarm(false);
+          }
           setEventId(lastEventId); // 임시로 해둔 것, 쿠키같은곳에 저장
           setEventIdCookie(lastEventId);
         });
@@ -119,7 +128,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
 
       eventSource !== undefined && eventSource.close(); // 로그아웃 될 때 eventId 삭제와 eventSource.close()도 실행되게 하기
     };
-  }, [pathname]);
+  }, []);
 
   function setScreenSize() {
     const wrapElement: any = document.querySelector('.wrap');
@@ -131,6 +140,23 @@ function RootLayout({ children }: { children: React.ReactNode }) {
       <html lang="en">
         <body className={`${inter.className} wrap`}>
           <main className="h-[calc(100%-56px)] w-screen flex flex-col	items-center justify-center">
+            {pathname === '/' && (
+              <header className="w-full flex flex-col items-end mr-5 mb-6">
+                <Link href={'/alarm'}>
+                  <div className="flex mr-2">
+                    <FontAwesomeIcon
+                      icon={faBell}
+                      className="w-5 h-5 text-gray-500"
+                    />
+                    {markAlarm ? (
+                      <div className="w-1 h-1 bg-red-500 rounded-full"></div>
+                    ) : (
+                      <div className="w-1 h-1"></div>
+                    )}
+                  </div>
+                </Link>
+              </header>
+            )}
             {children}
           </main>
           {loginPath.includes(pathname) || <Navbar></Navbar>}

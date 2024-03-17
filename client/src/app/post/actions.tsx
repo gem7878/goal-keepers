@@ -110,6 +110,7 @@ export const handleCheerPost = async (postId: number) => {
 };
 
 export const handleGetMyPostAll = async (getData: { pageNum: number }) => {
+
   const token = handleGetToken().token;
   try {
     const response = await axios.get(

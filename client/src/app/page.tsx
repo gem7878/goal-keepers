@@ -11,8 +11,6 @@ import { createPortal } from 'react-dom';
 import { StaticImageData } from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStateAlarmTarget } from '@/redux/renderSlice';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
 interface postContentTypes {
@@ -88,7 +86,7 @@ export default function Home() {
   useEffect(() => {
     if (reduxAlarmData.alarmBoolean) {
       setIsMyGoals(false);
-      dispatch(setStateAlarmTarget(false));
+      
     }
   }, [reduxAlarmData.alarmBoolean]);
 
@@ -123,15 +121,10 @@ export default function Home() {
 
   return (
     <div
-      className="flex flex-col	w-full h-full items-center justify-center"
+      className="flex flex-col	w-full h-5/6 items-center justify-center"
       ref={containerEl}
     >
-      <header className="w-full flex flex-col items-end mr-5 mb-6">
-        <Link href={'/alarm'}>
-          <FontAwesomeIcon icon={faBell} className="w-5 h-5 text-gray-500" />
-        </Link>
-      </header>
-      <section className="w-11/12 h-5/6 text-white">
+      <section className="w-11/12 h-full text-white">
         <nav className="w-full h-10">
           <ul className="flex h-full">
             <li

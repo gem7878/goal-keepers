@@ -147,6 +147,7 @@ const Alarm = () => {
       dispatch(setTargetPage(targetData.targetPage));
       dispatch(setCommentId(targetData.commentId));
       dispatch(setCommentPage(targetData.commentPage));
+
       dispatch(setStateAlarmTarget(true));
       router.push('/');
     }
@@ -195,6 +196,7 @@ const Alarm = () => {
                   setDeleteList([]);
                 }
               } else {
+                setIsDeleteCheck(false);
                 deleteList.includes(notificationId)
                   ? existNumber(notificationId)
                   : setDeleteList([...deleteList, notificationId]);
@@ -243,13 +245,13 @@ const Alarm = () => {
         </ul>
       </header>
       <main className="px-[3%] h-[calc(90%-52px)] w-full pb-5">
-        <section className="w-full h-6 my-4 flex justify-between px-4 items-center">
-          <button
+        <section className="w-full h-6 my-4 flex justify-end px-4 items-center">
+          {/* <button
             className="h-6 w-14 text-xs font-bold"
             onClick={() => onReadAlarm()}
           >
             모두 읽음
-          </button>
+          </button> */}
           <div className="flex items-center gap-1">
             {isEdit ? (
               <>
@@ -277,7 +279,7 @@ const Alarm = () => {
             )}
           </div>
         </section>
-        <section className="h-full overflow-y-scroll w-full px-[6%]">
+        <section className="h-full overflow-y-scroll w-full px-[6%] pb-10">
           <ul className=" flex flex-col gap-4 ">
             {focusMenu === 0 ? (
               alarmContent.map((data, index) => {
