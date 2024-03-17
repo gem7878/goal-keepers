@@ -83,7 +83,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 if(Objects.nonNull(share)) {
                     shareGoal = Optional.ofNullable(share.getGoal()).orElse(null);
                 }
-                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(shareGoal);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(shareGoal, shareRepository);
                 return GoalResponseDto.of(goal, imageUrl, joinMemberList);
             })
             .collect(Collectors.toList());
@@ -120,7 +120,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
 
                 // joinMemberList 가져오기
-                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal, shareRepository);
 
                 // PostContent 가져오기
                 List<PostContent> contents = queryFactory
@@ -160,7 +160,8 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
 		List<Tuple> popularGoalAndCountList = queryFactory
                             .select(postContent.shareGoal, postContent.count())
                             .from(postContent)
-                            .where(postContent.createdAt.after(sixHoursAgo))
+                            .where(postContent.createdAt.after(sixHoursAgo)
+                                .and(postContent.post.privated.isFalse()))
                             .groupBy(postContent.shareGoal)
                             .orderBy(postContent.count().desc())
                             .offset(pageable.getOffset())
@@ -177,7 +178,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 String originalGoalImageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
                 Member member = RepositoryHelper.MemberOrNull(memberRepository);
                 boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
-                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal, shareRepository);
 
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
@@ -288,7 +289,7 @@ public class GoalRepositoryImpl implements GoalRepositoryCustom {
                 String originalGoalImageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
                 Member member = RepositoryHelper.MemberOrNull(memberRepository);
                 boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
-                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal);
+                List<Map<String, Object>> joinMemberList = RepositoryHelper.getJoinMemberList(goal, shareRepository);
                 List<PostContent> contents = queryFactory
                                                 .selectFrom(postContent)
                                                 .where(postContent.shareGoal.eq(goal)

@@ -12,11 +12,12 @@ import React, {
 import Image1 from '../../public/assets/images/goalKeepers.png';
 import Image2 from '@/public/assets/images/gem.png';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setStatePost } from '@/redux/renderSlice';
 import {
-  handleGetMyPostAll,
-  handleGetPostAll,
-} from '@/app/post/actions';
+  selectRender,
+  setStateAlarmTarget,
+  setStatePost,
+} from '@/redux/renderSlice';
+import { handleGetMyPostAll, handleGetPostAll } from '@/app/post/actions';
 import { setStateGoal } from '@/redux/renderSlice';
 import { PostBox, PostBoxDetail } from './index';
 import { handleGetUserInfo } from '@/app/actions';
@@ -30,22 +31,19 @@ import {
   handleDeleteShare,
   handleGetShare,
 } from '@/app/community/share/actions';
+import { selectAlarmData } from '@/redux/alarmDataSlice';
 
-interface postContentContentTypes {
+interface postContentTypes {
   content: string;
   createdAt: string;
-  goalDescription: null | string;
-  goalId: null | number;
-  goalImageUrl: null | string;
-  goalTitle: null | string;
   like: boolean;
   likeCnt: number;
   nickname: string;
   contentId: number;
 }
 
-interface postContentTypes {
-  content: postContentContentTypes;
+interface postTypes {
+  content: postContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -57,10 +55,10 @@ interface postContentTypes {
   myPost: false;
   nickname: string;
   postCheerCnt: number;
+  privated: boolean;
 }
 
-const MyPosts: React.FC<{
-}> = ({  }) => {
+const MyPosts: React.FC<{}> = ({}) => {
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
@@ -68,12 +66,13 @@ const MyPosts: React.FC<{
   const [nickname, setNickname] = useState('');
   const [focusNum, setFocusNum] = useState<number | null>(null);
   const [page, setPage] = useState(pageable.pageNumber);
-  const [postData, setPostData] = useState<postContentTypes[]>([]);
+  const [postData, setPostData] = useState<postTypes[]>([]);
 
   const containerRef = useRef<any>(null);
 
   const dispatch = useDispatch();
   const reduxPostData = useSelector(selectRender);
+  const reduxAlarmData = useSelector(selectAlarmData);
 
   useEffect(() => {
     onGetUserInfo();
@@ -81,19 +80,46 @@ const MyPosts: React.FC<{
 
   useEffect(() => {
     onGetMyAllPost(page);
-  }, [page, reduxPostData.postBoolean]);
+  }, [page, reduxPostData.postBoolean, reduxPostData.privateBoolean]);
+
+  useEffect(() => {
+    if (reduxPostData.alarmBoolean) {
+      onGetMyTargetPost(reduxAlarmData.targetPage, reduxAlarmData.targetId);
+    }
+  }, [reduxPostData.alarmBoolean]);
 
   const onGetMyAllPost = async (pageParam: number) => {
     const form = { pageNum: pageParam };
-    await handleGetMyPostAll(form)
-      .then((response) => {
-        setPostData(response.content);
-        setPageable({
-          pageNumber: response.pageable.pageNumber + 1,
-          last: response.last,
-        });
-      })
-      .catch((error) => console.log(error));
+    const response = await handleGetMyPostAll(form);
+
+    if (response.success) {
+      setPostData(response.data.content);
+      setPageable({
+        pageNumber: response.data.pageable.pageNumber + 1,
+        last: response.data.last,
+      });
+    }
+  };
+
+  const onGetMyTargetPost = async (pageParam: number, targetId: number) => {
+    const form = { pageNum: pageParam };
+    const response = await handleGetMyPostAll(form);
+
+    if (response.success) {
+      const responseData = response.data.content;
+      const index = responseData.findIndex(
+        (item: { postId: number }) => item.postId === targetId,
+      );
+
+      setPostData(responseData);
+      setFocusNum(index);
+      setPageable({
+        pageNumber: response.data.pageable.pageNumber + 1,
+        last: response.data.last,
+      });
+
+      return containerRef.current.scrollTo({ top: 176 * index });
+    }
   };
 
   const onGetUserInfo = async () => {
@@ -146,7 +172,7 @@ const MyPosts: React.FC<{
         className="w-full max-h-full flex flex-wrap pr-2 pl-4 py-6 overflow-y-scroll gap-2"
         ref={containerRef}
       >
-        <section className="z-0 h-full overflow-y-scroll w-full postList">
+        <section className="z-0 h-full w-full postList">
           {postData.map((data, index) => {
             if (focusNum === index) {
               return (

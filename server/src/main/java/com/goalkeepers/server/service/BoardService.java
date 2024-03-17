@@ -65,7 +65,7 @@ public class BoardService extends ServiceHelper {
      * 선택할 포스트 가져오기
      */
     public Page<PostSelectResponseDto> getSelectAllPost(int pageNumber) {
-        return postRepository.getSelectedAllPost(PageRequest.of(pageNumber - 1, 10), SecurityUtil.getCurrentMemberId());
+        return postRepository.getSelectedAllPost(PageRequest.of(pageNumber - 1, 15), SecurityUtil.getCurrentMemberId());
     }
 
     /*

@@ -50,6 +50,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
     public Page<PostResponseDto> getAllContentAndGoal(Pageable pageable, SORT sort) {
 
         boolean isCheerSort = SORT.CHEER.equals(sort);
+        Member member = RepositoryHelper.MemberOrNull(memberRepository);
         
         List<PostResponseDto> page = null;
         int totalSize = 0;
@@ -57,6 +58,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
         if(isCheerSort) {
             List<Post> posts = queryFactory
                                 .selectFrom(post)
+                                .where(post.privated.eq(false)
+                                    .and(post.contentList.isNotEmpty()))
                                 .orderBy(post.cheerCnt.desc(), post.id.desc())
                                 .offset(pageable.getOffset())
                                 .limit(pageable.getPageSize())
@@ -65,12 +68,10 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
             page = posts
                 .stream()
                 .map(post -> {
-                    Member member = RepositoryHelper.MemberOrNull(memberRepository);
                     Goal goal = post.getGoal();
                     PostContent content = queryFactory
                                             .selectFrom(postContent)
-                                            .where(postContent.post.eq(post)
-                                                .and(postContent.post.privated.eq(false)))
+                                            .where(postContent.post.eq(post))
                                             .orderBy(postContent.createdAt.desc())
                                             .limit(1)
                                             .fetchOne();
@@ -91,40 +92,48 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
             totalSize = queryFactory
                         .selectFrom(post)
+                        .where(post.privated.eq(false)
+                            .and(post.contentList.isNotEmpty()))
                         .fetch()
                         .size();
         } else {
-            boolean isNewSort = SORT.NEW.equals(sort); // LIKE OR NEW
-
-            List<PostContent> contents = queryFactory
-                                        .selectFrom(postContent)
-                                        .where(postContent.post.privated.eq(false))
-                                        .orderBy(isNewSort ? postContent.createdAt.desc() : postContent.likeCnt.desc())
-                                        .orderBy(isNewSort ? postContent.likeCnt.desc() : postContent.createdAt.desc())
-                                        .offset(pageable.getOffset())
-                                        .limit(pageable.getPageSize())
-                                        .fetch();
+            List<Tuple> tuples = queryFactory
+                        .select(postContent.post, postContent.id.max())
+                        .from(postContent)
+                        .where(postContent.post.privated.eq(false))
+                        .groupBy(postContent.post)
+                        .orderBy(postContent.createdAt.max().desc())
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize())
+                        .fetch();
             
-            page = contents
+            page = tuples
                 .stream()
-                .map(content -> {
-                    Member member = RepositoryHelper.MemberOrNull(memberRepository);
-                    Goal goal = content.getPost().getGoal();
+                .map(tuple -> {
+                    Post post = tuple.get(postContent.post);
+                    Goal goal = post.getGoal();
+                    PostContent content = queryFactory
+                                        .selectFrom(postContent)
+                                        .where(postContent.id.eq(tuple.get(postContent.id.max())))
+                                        .limit(1)
+                                        .fetchOne();
+
+                    String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
                     Member writer = RepositoryHelper.getWriter(content);
                     PostContentResponseDto contentResponseDto = PostContentResponseDto.of(
-                                                                content, 
+                                                                content,
                                                                 writer.getNickname(), 
                                                                 RepositoryHelper.isLikeContent(content, member, likeRepository));
-                    String imageUrl = RepositoryHelper.getImageUrl(goal, firebaseStorageService);
+                    boolean isCheer = RepositoryHelper.isCheerPost(post, member, cheerRepository);
                     boolean isShare = RepositoryHelper.isShareGoal(goal, member, shareRepository);
-                    boolean isCheer = RepositoryHelper.isCheerPost(content.getPost(), member, cheerRepository);
                     boolean isMyPost = goal.getMember().equals(member);
                     int goalShareCnt = RepositoryHelper.getOriginalGoalShareCnt(goal);
-                    return PostResponseDto.of(content.getPost(), writer, isCheer, isMyPost, goal, imageUrl, isShare, goalShareCnt, contentResponseDto);
+                    return PostResponseDto.of(post, writer, isCheer, isMyPost, goal, imageUrl, isShare, goalShareCnt, contentResponseDto);
                 }).collect(Collectors.toList());
 
-            totalSize = queryFactory
-                            .selectFrom(postContent)
+                totalSize = queryFactory
+                            .selectFrom(post)
+                            .where(post.privated.eq(false))
                             .fetch()
                             .size();
         }
@@ -140,6 +149,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
                         .from(postContent)
                         .where(postContent.member.eq(member))
                         .groupBy(postContent.post)
+                        .orderBy(postContent.createdAt.min().desc())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
                         .fetch();
@@ -168,8 +178,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
             }).collect(Collectors.toList());
 
         int totalSize = queryFactory
-                        .selectFrom(postContent)
-                        .where(postContent.member.eq(member))
+                        .selectFrom(post)
+                        .where(post.goal.member.eq(member))
                         .fetch()
                         .size();
         
@@ -180,8 +190,7 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
     public Page<PostContentResponseDto> getPostContents(Pageable pageable, Post post) {
         List<PostContent> contents = queryFactory
                                     .selectFrom(postContent)
-                                    .where(postContent.post.eq(post)
-                                        .and(postContent.post.privated.eq(false)))
+                                    .where(postContent.post.eq(post))
                                     .orderBy(postContent.createdAt.desc())
                                     .offset(pageable.getOffset())
                                     .limit(pageable.getPageSize())
@@ -209,17 +218,18 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
     @Override
     public Page<PostResponseDto> searchPost(Pageable pageable, String query, SORT sort) {
 
-        boolean isNewSort = SORT.NEW.equals(sort); // LIKE OR NEW
+        boolean isNewSort = SORT.NEW.equals(sort); // Cheer or New
 
         List<Tuple> tuples = queryFactory
                             .select(post.id, post.goal.id, postContent.id.max())
                             .from(post)
                             .rightJoin(postContent).on(post.id.eq(postContent.post.id))
-                            .where(postContent.content.contains(query)
+                            .where(post.privated.isFalse()
+                                .and(postContent.content.contains(query)
                                 .or(post.goal.title.contains(query))
-                                .or(post.goal.description.contains(query)))
+                                .or(post.goal.description.contains(query))))
                             .groupBy(post.id, post.goal.id)
-                            .orderBy(isNewSort ? postContent.id.max().desc() : postContent.likeCnt.max().desc(),
+                            .orderBy(isNewSort ? postContent.createdAt.max().desc() : post.cheerCnt.desc(),
                                     post.id.desc())
                             .fetch();
 
@@ -296,7 +306,8 @@ public class PostContentRepositoryImpl implements PostContentRepositoryCustom {
 
         int totalSize = queryFactory
                         .selectFrom(postContent)
-                        .where(postContent.shareGoal.eq(goal))
+                        .where(postContent.shareGoal.eq(goal)
+                            .and(postContent.post.privated.eq(false)))
                         .fetch()
                         .size();
 

@@ -35,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class LikeShareService extends ServiceHelper {
     
     private final PostLikeRepository likeRepository;
@@ -50,6 +49,7 @@ public class LikeShareService extends ServiceHelper {
     private final NotificationService notificationService;
 
     // 컨텐트 좋아요
+    @Transactional
     public String addLike(ContentLikeRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
         PostContent content = isPostContent(contentRepository, requestDto.getContentId());
@@ -65,7 +65,7 @@ public class LikeShareService extends ServiceHelper {
             likeRepository.save(new PostLike(member, content));
 
             // 알림 보내기
-            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.LIKE);
+            Member receiver = alarmTrueReceiver(settingRepository, content.getMember(), TYPE.LIKE);
             if(Objects.nonNull(receiver) && !member.equals(receiver)) {
                 Post post = content.getPost();
                 notificationService.send(receiver, member, TYPE.LIKE, post.getId(), post.getGoal().getTitle(), null, null);
@@ -75,6 +75,7 @@ public class LikeShareService extends ServiceHelper {
     }
 
     // 포스트 응원해요
+    @Transactional
     public String addPostCheer(PostCheerRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
         Post post = isPost(postRepository, requestDto.getPostId());
@@ -90,7 +91,7 @@ public class LikeShareService extends ServiceHelper {
             cheerRepository.save(new PostCheer(member, post));
 
             // 알림 보내기
-            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.CHEER);
+            Member receiver = alarmTrueReceiver(settingRepository, post.getGoal().getMember(), TYPE.CHEER);
             if(Objects.nonNull(receiver) && !member.equals(receiver)) {
                 notificationService.send(receiver, member, TYPE.CHEER, post.getId(), post.getGoal().getTitle(), null, null);
             }
@@ -99,6 +100,7 @@ public class LikeShareService extends ServiceHelper {
     }
 
     // 연결된 목표 찾기
+    @Transactional
     public GoalResponseDto findGoal(Long goalId) {
         Member member = isMemberCurrent(memberRepository);
         Goal goal = isGoal(goalRepository, goalId);
@@ -112,6 +114,7 @@ public class LikeShareService extends ServiceHelper {
     }
 
     // 담기하기 -> 목표 만들기
+    @Transactional
     public void addShare(GoalShareRequestDto requestDto) {
         Member member = isMemberCurrent(memberRepository);
         
@@ -138,7 +141,7 @@ public class LikeShareService extends ServiceHelper {
                 copyImageName = firebaseStorageService.copyAndRenameFile(originImageUrl, "images");
             }
             LocalDate startDate = LocalDate.now();
-            goalRepository.save(new Goal(
+            Goal newGoal = goalRepository.save(new Goal(
                                 share,
                                 goal.getTitle(),
                                 goal.getDescription(),
@@ -146,9 +149,10 @@ public class LikeShareService extends ServiceHelper {
                                 startDate,
                                 startDate.plusYears(1),
                                 member));
+            postRepository.save(new Post(newGoal));
 
             // 알림 보내기
-            Member receiver = alarmTrueReceiver(settingRepository, member, TYPE.SHARE);
+            Member receiver = alarmTrueReceiver(settingRepository, goal.getMember(), TYPE.SHARE);
             if(Objects.nonNull(receiver) && !member.equals(receiver)) {
                 notificationService.send(receiver, member, TYPE.SHARE, goal.getId(), goal.getTitle(), null, null);
             }            
@@ -156,6 +160,7 @@ public class LikeShareService extends ServiceHelper {
     }
 
     // 담기 취소 - 참여 제외
+    @Transactional
     public void disconnecteOriginGoal(Long goalId) {
         Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
         deleteShare(goal);
@@ -166,8 +171,12 @@ public class LikeShareService extends ServiceHelper {
         GoalShare share = goal.getShare();
         if (Objects.nonNull(share)) {
             Goal sharedGoal = share.getGoal();
-            sharedGoal.setShareCnt(sharedGoal.getShareCnt()-1);
-            goal.setShare(null);
+            if(Objects.nonNull(sharedGoal)) {
+                sharedGoal.setShareCnt(sharedGoal.getShareCnt() - 1);
+            }
+            if(Objects.nonNull(goal)) {
+                goal.setShare(null);
+            }
             shareRepository.delete(share);
         }
     }

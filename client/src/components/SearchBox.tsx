@@ -7,20 +7,17 @@ import { handleSearchPost } from '@/app/post/actions';
 import { usePathname } from 'next/navigation';
 import { handleSearchCommunity } from '@/app/community/actions';
 
-interface postContentContentTypes {
+interface postContentTypes {
   content: string;
   createdAt: string;
-  goalDescription: null | string;
-  goalId: null | number;
-  goalImageUrl: null | string;
-  goalTitle: null | string;
   like: boolean;
   likeCnt: number;
   nickname: string;
   contentId: number;
 }
-interface postContentTypes {
-  content: postContentContentTypes;
+
+interface postTypes {
+  content: postContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -32,6 +29,7 @@ interface postContentTypes {
   myPost: false;
   nickname: string;
   postCheerCnt: number;
+  privated: boolean;
 }
 interface communityContentList {
   content: string;
@@ -67,7 +65,7 @@ const SearchBox: React.FC<{
   sort: string;
   onChangeSort: (sort: string) => void;
   setData:
-    | React.Dispatch<React.SetStateAction<postContentTypes[]>>
+    | React.Dispatch<React.SetStateAction<postTypes[]>>
     | React.Dispatch<React.SetStateAction<communityContentTypes[]>>;
   setPageable: React.Dispatch<
     React.SetStateAction<{ pageNumber: number; last: boolean }>

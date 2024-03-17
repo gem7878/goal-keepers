@@ -14,7 +14,11 @@ import {
   handleUpdateComment,
 } from '@/app/post/comment/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setStateComment } from '@/redux/renderSlice';
+import {
+  selectRender,
+  setStateAlarmTarget,
+  setStateComment,
+} from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faEdit,
@@ -23,6 +27,7 @@ import {
   faCheckSquare,
   faCheck,
 } from '@fortawesome/free-solid-svg-icons';
+import { selectAlarmData } from '@/redux/alarmDataSlice';
 
 interface CommentBoxTypes {
   postId: number;
@@ -44,15 +49,24 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
     last: false,
   });
   const [more, setMore] = useState<boolean>(false);
+  const [focusComment, setFocusComment] = useState<number | null>(null);
 
   const containerRef = useRef<any>(null);
 
   const reduxCommentData = useSelector(selectRender);
+  const reduxAlarmData = useSelector(selectAlarmData);
   const dispatch = useDispatch();
 
   useEffect(() => {
     onGetComment(pageable.pageNumber, false);
   }, [reduxCommentData.commentBoolean]);
+
+  useEffect(() => {
+    if (reduxCommentData.alarmBoolean) {
+      onGetTargetComment(reduxAlarmData.commentPage, reduxAlarmData.commentId);
+      dispatch(setStateAlarmTarget(false));
+    }
+  }, [reduxCommentData.alarmBoolean]);
 
   useEffect(() => {
     if (more) {
@@ -116,6 +130,35 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
         pageNumber: response.data.pageable.pageNumber + 1,
         last: response.data.last,
       });
+    }
+  };
+
+  const onGetTargetComment = async (
+    pageNumber: number,
+    targetCommentId: number,
+  ) => {
+    const formData = {
+      postId: postId,
+      page: pageNumber,
+    };
+
+    const response = await handleGetComment(formData);
+
+    if (response.success) {
+      const responseData = response.data.content;
+
+      const index = responseData.findIndex(
+        (item: { commentId: number }) => item.commentId === targetCommentId,
+      );
+
+      setCommentList(response.data.content);
+      setPageable({
+        pageNumber: response.data.pageable.pageNumber + 1,
+        last: response.data.last,
+      });
+
+      containerRef.current.scrollTo({ top: 36 * index });
+      setFocusComment(index);
     }
   };
 
@@ -189,7 +232,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
             return (
               <li
                 key={index}
-                className={`flex-col w-full comment-element text-gray-700`}
+                className={`flex-col w-full h-9 p-[2px] comment-element text-gray-700 ${focusComment === index && 'bg-orange-100'}`}
               >
                 <div className="flex text-xs w-full justify-between">
                   <h4 className=" font-bold">{list.nickname}</h4>
@@ -241,7 +284,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
         <div className="w-full flex justify-between h-[25px]">
           <input
             type="text"
-            className="border rounded-lg w-5/6 pl-2 text-xs"
+            className="border rounded-lg w-5/6 pl-2 text-xs text-gray-800"
             placeholder="댓글을 입력하세요."
             value={inputContent}
             onChange={(e) => setInputContent(e.target.value)}

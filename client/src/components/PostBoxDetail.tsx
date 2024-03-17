@@ -3,6 +3,7 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
 import {
+  handleChangePrivate,
   handleCreatePostContent,
   handleDeletePost,
   handleDeletePostContent,
@@ -13,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   selectRender,
   setStateContent,
+  setStatePrivate,
   setStatePost,
 } from '@/redux/renderSlice';
 import { CommentBox } from './index';
@@ -29,21 +31,17 @@ import {
   faThumbsUp,
   faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
-interface postContentContentTypes {
+interface postContentTypes {
   content: string;
   createdAt: string;
-  goalDescription: null | string;
-  goalId: null | number;
-  goalImageUrl: null | string;
-  goalTitle: null | string;
   like: boolean;
   likeCnt: number;
   nickname: string;
   contentId: number;
 }
 
-interface postContentTypes {
-  content: postContentContentTypes;
+interface postTypes {
+  content: postContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -55,9 +53,10 @@ interface postContentTypes {
   myPost: false;
   nickname: string;
   postCheerCnt: number;
+  privated: boolean;
 }
 const PostBoxDetail: React.FC<{
-  data: postContentTypes;
+  data: postTypes;
   myNickname: string;
   index: number;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
@@ -74,7 +73,7 @@ const PostBoxDetail: React.FC<{
   onGetShareData,
 }) => {
   const [addContent, setAddContent] = useState(false);
-  const [contentList, setContentList] = useState<postContentContentTypes[]>([]);
+  const [contentList, setContentList] = useState<postContentTypes[]>([]);
   const [pageable, setPageable] = useState({
     pageNumber: 1,
     last: false,
@@ -82,6 +81,7 @@ const PostBoxDetail: React.FC<{
   const [more, setMore] = useState<boolean>(false);
   const [focusContent, setFocusContent] = useState<null | number>(null);
   const [contentValue, setContentValue] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const likeRef = useRef<HTMLUListElement>(null);
   const contentRef = useRef<any>(null);
@@ -140,6 +140,7 @@ const PostBoxDetail: React.FC<{
     const formData = {
       content: contentValue,
       goalId: goalId,
+      privated: isPrivate,
     };
     const response = await handleCreatePostContent(formData);
 
@@ -164,12 +165,27 @@ const PostBoxDetail: React.FC<{
     }
   };
 
+  const onChangePrivate = async (postId: number) => {
+    const formData = {
+      postId: postId,
+    };
+    const response = await handleChangePrivate(formData);
+
+    if (response.success) {
+      response.data
+        ? alert('포스트가 비공개로 전환되었습니다.')
+        : alert('포스트가 공개로 전환되었습니다.');
+      setIsPrivate(response.data);
+      return setStatePrivate(!reduxPostData.privateBoolean);
+    }
+  };
+
   return (
     <article
       className="h-[450px] flex flex-col p-3 mb-4 border rounded-md duration-100	
       w-11/12
       inset-x-0
-      mx-auto justify-between
+      mx-auto justify-between items-end
       "
     >
       <div className="w-full h-1/4 relative z-0 flex rounded-md">
@@ -189,12 +205,11 @@ const PostBoxDetail: React.FC<{
         <div className="w-full h-full bg-black absolute opacity-50"></div>
         {data.myPost && (
           <div className="flex text-white absolute top-0 right-0 text-xs gap-2 m-2">
-            <>
-              <FontAwesomeIcon
-                onClick={() => onDeletePost()}
-                icon={faTrashAlt}
-              />
-            </>
+            <FontAwesomeIcon
+              className="mt-2"
+              onClick={() => onDeletePost()}
+              icon={faTrashAlt}
+            />
           </div>
         )}
         <h3 className="text-center px-1  mx-4	text-white	font-bold absolute top-1/4 -translate-y-1/3 z-10 text-ellipsis	">
@@ -239,8 +254,34 @@ const PostBoxDetail: React.FC<{
           </li>
         </ul>
       </div>
+      {data.myPost ? (
+        <section className=" w-[170px] h-7 bg-orange-50 rounded-md flex justify-center items-center gap-1 mt-1">
+          <button
+            onClick={() => onChangePrivate(data.postId)}
+            className={`${
+              isPrivate
+                ? 'text-gray-600'
+                : 'bg-orange-300 text-white rounded-md'
+            } text-xs w-[76px] h-[20px] cursor-pointer`}
+          >
+            포스트 공개
+          </button>
+          <button
+            onClick={() => onChangePrivate(data.postId)}
+            className={`${
+              !isPrivate
+                ? 'text-gray-600'
+                : 'bg-orange-300 text-white rounded-md'
+            } text-xs w-[76px] h-[20px] cursor-pointer`}
+          >
+            포스트 비공개
+          </button>
+        </section>
+      ) : (
+        <div className="h-7"></div>
+      )}
 
-      <div className="w-full	mt-2 flex flex-col flex-1">
+      <div className="w-full	mt-1 flex flex-col flex-1">
         <ul className="flex-1 overflow-y-auto w-full p-2 pb-4" ref={contentRef}>
           {addContent && (
             <li className="w-full h-9 flex gap-2 items-center">
@@ -267,7 +308,7 @@ const PostBoxDetail: React.FC<{
                 onMouseLeave={() => setFocusContent(null)}
                 className={`text-gray-600 font-semibold	 text-sm ${
                   focusContent === index ? 'bg-orange-200' : 'bg-orange-100'
-                } mt-3 py-1 rounded-md px-2 drop-shadow-md flex justify-between`}
+                } mt-1 mb-1 py-1 rounded-md px-2 drop-shadow-md flex justify-between`}
               >
                 <span>{list.content}</span>
                 <button>

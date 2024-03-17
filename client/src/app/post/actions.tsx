@@ -110,6 +110,7 @@ export const handleCheerPost = async (postId: number) => {
 };
 
 export const handleGetMyPostAll = async (getData: { pageNum: number }) => {
+
   const token = handleGetToken().token;
   try {
     const response = await axios.get(
@@ -121,7 +122,7 @@ export const handleGetMyPostAll = async (getData: { pageNum: number }) => {
       },
     );
 
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.log('error', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
@@ -156,6 +157,7 @@ export const handleGetAllPostContent = async (getData: {
 export const handleCreatePostContent = async (formData: {
   content: string;
   goalId: number;
+  privated: boolean;
 }) => {
   const token = handleGetToken().token;
   try {
@@ -164,6 +166,7 @@ export const handleCreatePostContent = async (formData: {
       {
         content: formData.content,
         goalId: formData.goalId,
+        privated: formData.privated,
       },
       {
         headers: {
@@ -240,6 +243,29 @@ export const handleSearchPost = async (getData: {
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/post/search?page=${getData.pageNum}&query=${getData.query}&sort=${getData.sort}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.log('error', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+    });
+  }
+};
+
+export const handleChangePrivate = async (formData: { postId: number }) => {
+  const token = handleGetToken().token;
+  try {
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_API_URL}/post/privated`,
+      {
+        postId: formData.postId,
+      },
       {
         headers: {
           Authorization: `Bearer ${token}`,

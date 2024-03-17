@@ -8,10 +8,13 @@ import org.springframework.stereotype.Repository;
 
 import com.goalkeepers.server.entity.Goal;
 import com.goalkeepers.server.entity.Member;
+import com.goalkeepers.server.entity.Post;
 import com.goalkeepers.server.entity.PostContent;
 
 @Repository
 public interface PostContentRepository extends JpaRepository<PostContent, Long>, PostContentRepositoryCustom {
     Optional<PostContent> findByIdAndMember(Long id, Member member);
     List<PostContent> findAllByShareGoal(Goal goal);
+    void deleteAllByPost(Post post);
+    void deleteAllByMember(Member member);
 }

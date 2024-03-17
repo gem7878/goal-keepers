@@ -6,21 +6,17 @@ import Image1 from '../../public/assets/images/goalKeepers.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faShare, faPlus } from '@fortawesome/free-solid-svg-icons';
 
-interface postContentContentTypes {
+interface postContentTypes {
   content: string;
   createdAt: string;
-  goalDescription: null | string;
-  goalId: null | number;
-  goalImageUrl: null | string;
-  goalTitle: null | string;
   like: boolean;
   likeCnt: number;
   nickname: string;
   contentId: number;
 }
 
-interface postContentTypes {
-  content: postContentContentTypes;
+interface postTypes {
+  content: postContentTypes;
   goalDescription: string;
   goalId: number;
   goalImageUrl: null | string;
@@ -32,31 +28,11 @@ interface postContentTypes {
   myPost: false;
   nickname: string;
   postCheerCnt: number;
-}
-
-interface myPostListTypes {
-  content: postContentTypes[];
-  empty: boolean;
-  first: boolean;
-  last: boolean;
-  number: number;
-  numberOfElements: number;
-  pageable: {
-    offset: number;
-    pageNumber: number;
-    pageSize: number;
-    paged: boolean;
-    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-    unpaged: boolean;
-  };
-  size: number;
-  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-  totalElements: number;
-  totalPages: number;
+  privated: boolean;
 }
 
 const PostBox: React.FC<{
-  data: postContentTypes;
+  data: postTypes;
   index: number;
   focusNum: number | null;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
