@@ -90,6 +90,7 @@ const PostBoxDetail: React.FC<{
 
   useEffect(() => {
     onGetAllPostContent(pageable.pageNumber);
+    setIsPrivate(data.privated)
   }, [reduxPostData.contentBoolean]);
 
   const onGetAllPostContent = async (pageNumber: number) => {
@@ -106,17 +107,13 @@ const PostBoxDetail: React.FC<{
           ...prevPostData,
           ...response.data.content,
         ]);
-        setPageable({
-          pageNumber: response.data.pageable.pageNumber + 1,
-          last: response.data.last,
-        });
       } else {
         setContentList(response.data.content);
-        setPageable({
-          pageNumber: response.data.pageable.pageNumber + 1,
-          last: response.data.last,
-        });
       }
+      setPageable({
+        pageNumber: response.data.pageable.pageNumber + 1,
+        last: response.data.last,
+      });
       setMore(false);
     }
   };

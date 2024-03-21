@@ -166,6 +166,7 @@ const MyPosts: React.FC<{}> = ({}) => {
       })
       .catch((error) => console.log(error));
   };
+
   return (
     <div className="w-full h-[calc(100%-40px)] border-x border-b border-orange-300">
       <ul

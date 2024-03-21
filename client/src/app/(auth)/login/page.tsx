@@ -15,6 +15,7 @@ interface LoginTypes {
 
 const Login = () => {
   const router = useRouter();
+
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
@@ -22,16 +23,12 @@ const Login = () => {
       email: form.email?.value,
       password: form.password?.value,
     };
-    await handleLogin(postData)
-      .then((response) => {
-        if (response?.ok) {
-          router.push('/');
-        } else {
-          alert('이메일 또는 비밀번호가 일치하지 않습니다.');
-        }
-      })
-
-      .catch((error) => console.log(error));
+    const response = await handleLogin(postData);
+    if (response?.ok) {
+      router.push('/');
+    } else {
+      alert('이메일 또는 비밀번호가 일치하지 않습니다.');
+    }
   };
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY; // 추가
@@ -39,7 +36,6 @@ const Login = () => {
   const KakaoLoginAPI = `https://kauth.kakao.com/oauth/authorize?client_id=${API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
 
   const openKakaoLogin = () => {
-
     window.open(KakaoLoginAPI, '_self');
   };
 

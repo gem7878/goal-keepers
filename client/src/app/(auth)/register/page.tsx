@@ -5,6 +5,8 @@ import {
   handleConfirmEmail,
   handleConfirmNickName,
   handleSubmitForm,
+  handleVerifyEmail,
+  handleVerifyEmailCode,
 } from './actions';
 import shortid from 'shortid';
 import { useRouter } from 'next/navigation';
@@ -25,6 +27,7 @@ const Register = () => {
     getValues,
     setError,
     watch,
+    resetField,
   } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -38,6 +41,8 @@ const Register = () => {
     email: false,
     nickname: false,
   });
+  const [isInputEmailCode, setIsInputEmailCode] = useState<boolean>(false);
+  const [emailCode, setEmailCode] = useState<string>('');
 
   const router = useRouter();
 
@@ -46,25 +51,49 @@ const Register = () => {
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[!@#])[\da-zA-Z!@#]{8,20}$/;
 
-  // 이메일 중복 확인
-  const handleConfirmDuplicationEmail = async () => {
+  // 이메일 인증
+  const onVerifyEmail = async () => {
     const emailValue = getValues('email');
     if (emailValue.length > 0) {
-      await handleConfirmEmail(emailValue)
-        .then((response) => {
-          setIsCheckingDuplicate({
-            ...isCheckingDuplicate,
-            email: response.success,
-          });
-          alert(response.message);
-        })
-        .catch((error) => console.log(error));
+      const formData = {
+        email: emailValue,
+      };
+      const response = await handleVerifyEmail(formData);
+
+      if (response.success) {
+        setIsInputEmailCode(true);
+      } else {
+        resetField('email');
+      }
     } else {
       setError('email', {
         type: 'required',
       });
     }
   };
+
+  // 이메일 코드 확인
+  const onVerifyEmailCode = async () => {
+    const emailValue = getValues('email');
+    if (emailValue.length > 0) {
+      const formData = {
+        email: emailValue,
+        code: emailCode,
+      };
+      const response = await handleVerifyEmailCode(formData);
+
+      setIsCheckingDuplicate({
+        ...isCheckingDuplicate,
+        email: response.success,
+      });
+      alert(response.message);
+    } else {
+      setError('email', {
+        type: 'required',
+      });
+    }
+  };
+
   // 닉네임 중복 확인
   const handleConfirmDuplicationNickname = async () => {
     const nicknameValue = getValues('nickname');
@@ -91,26 +120,27 @@ const Register = () => {
       data.nickname.length > 0 ? data.nickname : shortid.generate();
 
     if (!isCheckingDuplicate.email) {
-      alert('이메일 중복여부를 체크해주세요.');
+      alert('이메일을 인증해주세요.');
     } else if (!isCheckingDuplicate.nickname && data.nickname.length > 0) {
-      alert('닉네임 중복여부를 체크해주세요.');
+      alert('닉네임 중복여부를 확인해주세요.');
     } else {
-      await handleSubmitForm({
+      const response = await handleSubmitForm({
         email: data.email,
         password: data.password,
         nickname: NICK_NAME,
-      })
-        .then((response) => {
-          alert(`${response.data.nickname}님! 회원가입이 완료되었습니다.`);
-          return router.push('/login');
-        })
-        .catch((error) => console.log(error));
+      });
+      if (response.success) {
+        alert(`${response.data.nickname}님! 회원가입이 완료되었습니다.`);
+        return router.push('/login');
+      }
     }
   };
 
   return (
     <>
-      <h2 className="w-full text-center text-xl mt-20 font-bold">회원가입</h2>
+      <h2 className="w-full text-center text-xl mt-[40px] font-bold">
+        회원가입
+      </h2>
       <form
         onSubmit={handleSubmit(hadleConfirmForm)}
         className="flex flex-col w-full gap-4"
@@ -162,7 +192,7 @@ const Register = () => {
                   : 'text-gray-400'
               } text-sm text-center w-18`}
               type="button"
-              onClick={() => handleConfirmDuplicationEmail()}
+              onClick={() => onVerifyEmail()}
               disabled={
                 isCheckingDuplicate.email || errors?.email?.type === 'pattern'
               }
@@ -170,7 +200,32 @@ const Register = () => {
               이메일 인증
             </button>
           </div>
+
+          {isInputEmailCode && (
+            <div className="flex flex-col w-[87%] mt-1">
+              <div className="border-b w-full flex justify-between px-3 py-2">
+                <input
+                  type="text"
+                  value={emailCode}
+                  onChange={(e) => setEmailCode(e.target.value)}
+                  className="w-[calc(100%-50px)] text-sm"
+                  placeholder="이메일 인증코드를 입력해주세요"
+                ></input>
+                <button
+                  className={`${
+                    emailCode.length > 0 ? 'bg-orange-300' : 'bg-neutral-400'
+                  } text-sm text-center w-10 text-white`}
+                  type="button"
+                  onClick={() => onVerifyEmailCode()}
+                  disabled={emailCode.length === 0}
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          )}
         </li>
+
         <li className="flex flex-col w-full">
           <div className="flex items-end">
             <label htmlFor="password_input" className="text-sm w-24">
