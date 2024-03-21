@@ -63,7 +63,7 @@ public class WebSecuritConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // 허용할 오리진 추가
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://goalkeepers.vercel.app")); // 허용할 오리진 추가
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH")); // 허용할 메서드 추가
         configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 자격 증명 허용
