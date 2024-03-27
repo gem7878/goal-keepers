@@ -5,10 +5,7 @@ import {
   PostBoxDetail,
   SearchBox,
 } from '@/components/index.js';
-import React, {
-  useEffect,
-  useState,
-} from 'react';
+import React, { useEffect, useState } from 'react';
 import { handleGetPostAll, handleCheerPost } from './actions';
 import { handleGetUserInfo } from '../actions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -83,11 +80,10 @@ const Post = () => {
   };
 
   const onGetUserInfo = async () => {
-    await handleGetUserInfo()
-      .then((response) => {
-        setNickname(response.nickname);
-      })
-      .catch((error) => console.log(error));
+    const response = await handleGetUserInfo();
+    if (response.success) {
+      setNickname(response.data.nickname);
+    }
   };
 
   const onCheerPost = async (index: number) => {

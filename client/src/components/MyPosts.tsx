@@ -1,14 +1,8 @@
 'use client';
 
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  selectRender,
-} from '@/redux/renderSlice';
+import { selectRender } from '@/redux/renderSlice';
 import { handleGetMyPostAll } from '@/app/post/actions';
 import { PostBox, PostBoxDetail } from './index';
 import { handleGetUserInfo } from '@/app/actions';
@@ -108,15 +102,13 @@ const MyPosts: React.FC<{}> = ({}) => {
   };
 
   const onGetUserInfo = async () => {
-    await handleGetUserInfo()
-      .then((response) => {
-        setNickname(response.nickname);
-      })
-      .catch((error) => console.log(error));
+    const response = await handleGetUserInfo();
+    if (response.success) {
+      setNickname(response.data.nickname);
+    }
   };
 
-  const onCheerPost = async (index: number) => {
-  };
+  const onCheerPost = async (index: number) => {};
 
   return (
     <div className="w-full h-[calc(100%-40px)] border-x border-b border-orange-300">

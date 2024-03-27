@@ -20,11 +20,9 @@ const Find = () => {
     };
     const response = await handleFindPassword(postData)
     if (response.statusCode == 200) {
-      console.log(response.message);
       setMessage(response.message);
       setIsPost(true);
     } else {
-      console.log(response);
       setIsError(true);
       setErrorMessage(response.message);
     }
