@@ -119,8 +119,8 @@ public class GoalController {
     // 담기 취소하기 -> 골 삭제하기
     @DeleteMapping("/share")
     public ResponseEntity<CommonResponseDto> deleteShare(@Valid @RequestBody GoalShareRequestDto requestDto) {
-        likeShareService.disconnecteOriginGoal(requestDto.getGoalId());
-        return ResponseEntity.ok(new CommonResponseDto(true, "담기한 Goal에 대한 참여 리스트에서 제외됐습니다."));
+        goalService.deleteMyGoal(requestDto.getGoalId());
+        return ResponseEntity.ok(new CommonResponseDto(true, requestDto.getGoalId() + " Goal이 삭제되었습니다."));
     }
     
 }
