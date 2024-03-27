@@ -3,11 +3,9 @@
 import React, { useEffect, useState } from 'react';
 
 import Image1 from '../../../../../public/assets/images/goalKeepers.png';
-import Image2 from '../../../../../public/assets/images/gem.png';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { handleGetGoalListAll } from '@/app/actions';
-import Link from 'next/link';
 import { handleCreateContent } from '../actions';
 
 const WritePost = () => {

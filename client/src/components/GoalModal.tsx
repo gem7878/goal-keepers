@@ -1,6 +1,6 @@
 'use client';
 
-import Image, { StaticImageData } from 'next/image';
+import Image from 'next/image';
 import React, { SetStateAction, useEffect, useRef, useState } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
 import {
@@ -8,10 +8,11 @@ import {
   handleUpdateGoal,
   handleCompleteGoal,
 } from '@/app/actions';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setStateGoal } from '@/redux/renderSlice';
+import { useDispatch } from 'react-redux';
+import { setStateGoal } from '@/redux/renderSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+
 interface selectDataTypes {
   imageUrl: any;
   title: string;
@@ -43,7 +44,6 @@ const GoalModal: React.FC<{
   const containerRef = useRef<HTMLElement>(null);
   const [imageFile, setImageFile] = useState<File | null>(selectData?.imageUrl);
 
-  const reduxGoalData = useSelector(selectRender);
   const dispatch = useDispatch();
 
   const handleOutsideClick = (e: any) => {

@@ -6,24 +6,15 @@ import {
   SearchBox,
 } from '@/components/index.js';
 import React, {
-  useCallback,
   useEffect,
-  useLayoutEffect,
-  useRef,
   useState,
 } from 'react';
 import { handleGetPostAll, handleCheerPost } from './actions';
 import { handleGetUserInfo } from '../actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender, setStatePost } from '@/redux/renderSlice';
-import {
-  handleCreateShare,
-  handleDeleteShare,
-  handleGetShare,
-} from './share/actions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faSearch,
   faChevronCircleRight,
   faChevronCircleLeft,
 } from '@fortawesome/free-solid-svg-icons';
@@ -108,33 +99,6 @@ const Post = () => {
       })
       .catch((error) => console.log(error));
   };
-  const onShareGoal = async (index: number) => {
-    await handleCreateShare(postData[index].goalId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStatePost(!reduxPostData.postBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-  const onGetShareData = async (goalId: number) => {
-    await handleGetShare(goalId)
-      .then(async (response) => {
-        if (response.success) {
-          await onDeleteShareGoal(response.data.goalId);
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-  const onDeleteShareGoal = async (goalId: number) => {
-    await handleDeleteShare(goalId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStatePost(!reduxPostData.postBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
-  };
 
   const onChangeSort = async (state: string) => {
     setSort(state);
@@ -164,8 +128,6 @@ const Post = () => {
                 setFocusNum={setFocusNum}
                 index={index}
                 onCheerPost={onCheerPost}
-                onShareGoal={onShareGoal}
-                onGetShareData={onGetShareData}
               ></PostBoxDetail>
             );
           } else {
@@ -177,8 +139,6 @@ const Post = () => {
                 focusNum={focusNum}
                 setFocusNum={setFocusNum}
                 onCheerPost={onCheerPost}
-                onShareGoal={onShareGoal}
-                onGetShareData={onGetShareData}
               ></PostBox>
             );
           }

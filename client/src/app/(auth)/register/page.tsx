@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  handleConfirmEmail,
   handleConfirmNickName,
   handleSubmitForm,
   handleVerifyEmail,
@@ -10,7 +9,7 @@ import {
 } from './actions';
 import shortid from 'shortid';
 import { useRouter } from 'next/navigation';
-import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 interface IFormInput {
   email: string;

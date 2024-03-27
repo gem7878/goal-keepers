@@ -46,10 +46,16 @@ const CommunityBox: React.FC<{
       setFocusNum(index);
     }
   };
+
   return (
     <article
       onClick={(e) => handleFocus(e)}
-      className="h-80
+      className={`
+      ${
+        data.contentList.length === 0
+          ? 'h-48'
+          : `h-${data.contentList.length + 5}0`
+      }
       flex
       justify-between
       p-3
@@ -61,7 +67,7 @@ const CommunityBox: React.FC<{
       inset-x-0
       mx-auto
       community-element
-       "
+       `}
     >
       <div className="w-full relative">
         <Image
@@ -79,9 +85,11 @@ const CommunityBox: React.FC<{
         ></Image>
         <div className="bg-black opacity-40 z-10 w-full h-full absolute"></div>
         <div className="absolute z-20 w-full h-full p-3 flex flex-col">
-          <section className="h-11">
+          <section className="mt-2 mb-3">
             <h3 className="text-white text-xl font-bold">
-              {data.originalGoalTitle}
+              {data.originalGoalTitle.length > 26
+                ? data.originalGoalTitle.slice(0, 26) + '...'
+                : data.originalGoalTitle}
             </h3>
           </section>
           <section className="flex-auto">
@@ -90,7 +98,7 @@ const CommunityBox: React.FC<{
                 return (
                   <li
                     key={listIndex}
-                    className={`text-gray-600 bg-neutral-100 py-1 rounded-md px-2 drop-shadow-lg h-12`}
+                    className={` text-gray-600 bg-neutral-100 py-1 rounded-md px-2 drop-shadow-lg h-12`}
                   >
                     <div className="w-full flex items-center justify-between">
                       <div className="rounded-full h-4 bg-orange-200 px-2 ">

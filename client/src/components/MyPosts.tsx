@@ -1,24 +1,15 @@
 'use client';
 
-import Image from 'next/image';
 import React, {
-  SetStateAction,
-  useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
-import Image1 from '../../public/assets/images/goalKeepers.png';
-import Image2 from '@/public/assets/images/gem.png';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   selectRender,
-  setStateAlarmTarget,
-  setStatePost,
 } from '@/redux/renderSlice';
-import { handleGetMyPostAll, handleGetPostAll } from '@/app/post/actions';
-import { setStateGoal } from '@/redux/renderSlice';
+import { handleGetMyPostAll } from '@/app/post/actions';
 import { PostBox, PostBoxDetail } from './index';
 import { handleGetUserInfo } from '@/app/actions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,11 +17,6 @@ import {
   faChevronCircleRight,
   faChevronCircleLeft,
 } from '@fortawesome/free-solid-svg-icons';
-import {
-  handleCreateShare,
-  handleDeleteShare,
-  handleGetShare,
-} from '@/app/community/share/actions';
 import { selectAlarmData } from '@/redux/alarmDataSlice';
 
 interface postContentTypes {
@@ -70,7 +56,6 @@ const MyPosts: React.FC<{}> = ({}) => {
 
   const containerRef = useRef<any>(null);
 
-  const dispatch = useDispatch();
   const reduxPostData = useSelector(selectRender);
   const reduxAlarmData = useSelector(selectAlarmData);
 
@@ -131,40 +116,6 @@ const MyPosts: React.FC<{}> = ({}) => {
   };
 
   const onCheerPost = async (index: number) => {
-    // await handleLikePost(postData[index].postId)
-    //   .then((response) => {
-    //     if (response.success) {
-    //       dispatch(setStatePost(!reduxPostData.postBoolean));
-    //     }
-    //   })
-    //   .catch((error) => console.log(error));
-  };
-  const onShareGoal = async (index: number) => {
-    // await handleCreateShare(postData[index].goalId)
-    //   .then((response) => {
-    //     if (response.success) {
-    //       dispatch(setStatePost(!reduxPostData.postBoolean));
-    //     }
-    //   })
-    //   .catch((error) => console.log(error));
-  };
-  const onGetShareData = async (goalId: number) => {
-    // await handleGetShare(goalId)
-    //   .then(async (response) => {
-    //     if (response.success) {
-    //       await onDeleteShareGoal(response.data.goalId);
-    //     }
-    //   })
-    //   .catch((error) => console.log(error));
-  };
-  const onDeleteShareGoal = async (goalId: number) => {
-    await handleDeleteShare(goalId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStatePost(!reduxPostData.postBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
   };
 
   return (
@@ -184,8 +135,6 @@ const MyPosts: React.FC<{}> = ({}) => {
                   setFocusNum={setFocusNum}
                   index={index}
                   onCheerPost={onCheerPost}
-                  onShareGoal={onShareGoal}
-                  onGetShareData={onGetShareData}
                 ></PostBoxDetail>
               );
             } else {
@@ -197,8 +146,6 @@ const MyPosts: React.FC<{}> = ({}) => {
                   focusNum={focusNum}
                   setFocusNum={setFocusNum}
                   onCheerPost={onCheerPost}
-                  onShareGoal={onShareGoal}
-                  onGetShareData={onGetShareData}
                 ></PostBox>
               );
             }

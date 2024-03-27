@@ -8,52 +8,8 @@ import {
 } from '@/components/index.js';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { StaticImageData } from 'next/image';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectRender, setStateAlarmTarget } from '@/redux/renderSlice';
-import Link from 'next/link';
-
-interface postContentTypes {
-  content: {
-    content: string;
-    createdAt: string;
-    goalDescription: null | string;
-    goalId: null | number;
-    goalImageUrl: null | string;
-    goalTitle: null | string;
-    like: boolean;
-    likeCnt: number;
-    nickname: string;
-  };
-  goalDescription: string;
-  goalId: number;
-  goalImageUrl: null | string;
-  goalTitle: string;
-  goalshareCnt: number;
-  postId: number;
-  share: boolean;
-}
-
-interface myPostListTypes {
-  content: postContentTypes[];
-  empty: boolean;
-  first: boolean;
-  last: boolean;
-  number: number;
-  numberOfElements: number;
-  pageable: {
-    offset: number;
-    pageNumber: number;
-    pageSize: number;
-    paged: boolean;
-    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-    unpaged: boolean;
-  };
-  size: number;
-  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
-  totalElements: number;
-  totalPages: number;
-}
+import { useSelector } from 'react-redux';
+import { selectRender } from '@/redux/renderSlice';
 
 export default function Home() {
   const [isMyGoals, setIsMyGoals] = useState(true);
@@ -75,18 +31,14 @@ export default function Home() {
     nickname: string;
   } | null>(null);
   const [myGoalList, setMyGoalList] = useState<any[]>([]);
-  const [myPostList, setMyPostList] = useState<myPostListTypes[]>([]);
   const containerEl = useRef<any>();
   const [goalDoing, setGoalDoing] = useState<string>('doing');
-  const [token, setToken] = useState<string | undefined>(undefined);
 
-  const dispatch = useDispatch();
   const reduxAlarmData = useSelector(selectRender);
 
   useEffect(() => {
     if (reduxAlarmData.alarmBoolean) {
       setIsMyGoals(false);
-      
     }
   }, [reduxAlarmData.alarmBoolean]);
 
@@ -105,16 +57,6 @@ export default function Home() {
     setPortalElement(document.getElementById('portal'));
   }, [isOpen]);
 
-  // useEffect(() => {
-  //   // date 키값을 string에서 Date로 변환
-  //   const updatedList = myGoalList.map((item) => ({
-  //     ...item,
-  //     completeDate: new Date(item.completeDate),
-  //   }));
-
-  //   // 상태 업데이트
-  //   setMyGoalList(updatedList);
-  // }, []);
   const handleTab = (boolean: boolean) => {
     setIsMyGoals(boolean);
   };

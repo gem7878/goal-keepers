@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 import { handleLogin } from './actions';
 import Image from 'next/image';
 import kakaoButton from '../../../../public/kakao_login_buttons/kakao_login_medium_wide.png';
@@ -19,6 +18,7 @@ const Login = () => {
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
+
     const postData = {
       email: form.email?.value,
       password: form.password?.value,

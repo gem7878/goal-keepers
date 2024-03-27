@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { handleGetUserInfo } from '../actions';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -52,7 +52,7 @@ const MyPage = () => {
     });
   };
   return (
-    <div className="w-full py-14 px-5 h-full flex flex-col justify-between">
+    <div className="w-full py-14 px-5 h-full flex flex-col justify-center gap-4">
       <section className="border w-full rounded-md h-[17%] flex justify-between py-4 px-8 items-center">
         <div className="flex items-end">
           <h2 className="text-2xl">&quot;{nickname}&quot;</h2>
@@ -67,12 +67,6 @@ const MyPage = () => {
             <button>계정 관리</button>
           </Link>
         </div>
-      </section>
-      <section
-        className="border w-full rounded-md h-[11%] py-4 px-8 flex items-center"
-        onClick={() => router.push('/my-page/notice')}
-      >
-        <h2 className="text-xl">공지사항</h2>
       </section>
       <section
         className="border w-full rounded-md h-[11%] py-4 px-8 flex items-center"

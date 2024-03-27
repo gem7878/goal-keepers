@@ -17,16 +17,10 @@ import {
   setStatePrivate,
   setStatePost,
 } from '@/redux/renderSlice';
-import { CommentBox } from './index';
+import { CommentBox, ShareButton } from './index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHeart,
-  faShare,
-  faEdit,
-  faTrash,
-  faWindowClose,
-  faCheckSquare,
-  faCheck,
   faTimes,
   faThumbsUp,
   faTrashAlt,
@@ -61,16 +55,12 @@ const PostBoxDetail: React.FC<{
   index: number;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
   onCheerPost: (index: number) => void;
-  onShareGoal: (index: number) => void;
-  onGetShareData: (index: number) => void;
 }> = ({
   data,
   myNickname,
   setFocusNum,
   index,
   onCheerPost,
-  onShareGoal,
-  onGetShareData,
 }) => {
   const [addContent, setAddContent] = useState(false);
   const [contentList, setContentList] = useState<postContentTypes[]>([]);
@@ -90,7 +80,7 @@ const PostBoxDetail: React.FC<{
 
   useEffect(() => {
     onGetAllPostContent(pageable.pageNumber);
-    setIsPrivate(data.privated)
+    setIsPrivate(data.privated);
   }, [reduxPostData.contentBoolean]);
 
   const onGetAllPostContent = async (pageNumber: number) => {
@@ -221,34 +211,24 @@ const PostBoxDetail: React.FC<{
         </p>
         <ul
           ref={likeRef}
-          className="absolute right-0 bottom-0 mb-1 mr-3 flex justify-center	text-white gap-2"
+          className="absolute right-0 bottom-0 mb-1 mr-3 flex justify-center	text-white gap-2 "
         >
           <li className="flex items-center gap-1">
             <FontAwesomeIcon
               icon={faThumbsUp}
               onClick={() => onCheerPost(index)}
-              className={`text-gray-400 ${
-                data.cheer ? 'text-orange-400' : 'text-gray-300'
-              }`}
+              className={`${data.cheer ? 'text-orange-400' : 'text-gray-300'}`}
             />
             <label className={`text-xs 'text-gray-300'`}>
               {data.postCheerCnt}
             </label>
           </li>
-          <li className="flex items-center gap-1">
-            <FontAwesomeIcon
-              icon={faShare}
-              onClick={() => {
-                data.share ? onGetShareData(data.goalId) : onShareGoal(index);
-              }}
-              className={`text-gray-400 ${
-                data.share ? 'text-orange-400' : 'text-gray-300'
-              }`}
-            />
-            <label className={`text-xs 'text-gray-300'	`}>
-              {data.goalshareCnt}
-            </label>
-          </li>
+          <ShareButton
+            isShare={data.share}
+            goalId={data.goalId}
+            isPostPage={true}
+            goalshareCnt={data.goalshareCnt}
+          ></ShareButton>
         </ul>
       </div>
       {data.myPost ? (
