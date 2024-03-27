@@ -1,3 +1,5 @@
+'use client';
+
 import React, {
   useCallback,
   useEffect,
@@ -8,9 +10,7 @@ import React, {
 import Image1 from '../../public/assets/images/goalKeepers.png';
 import Image from 'next/image';
 import { handleGetCommunityContentAll } from '@/app/community/actions';
-import { ContentBox, JoinMembersBox } from './index';
-import { useSelector } from 'react-redux';
-import { selectRender } from '@/redux/renderSlice';
+import { ContentBox, JoinMembersBox, ShareButton } from './index';
 
 interface communityContentList {
   content: string;
@@ -42,9 +42,8 @@ interface communityContentTypes {
 }
 const CommunityBoxDetail: React.FC<{
   data: communityContentTypes;
-  index: number;
   nickNameBg: string[];
-}> = ({ data, index, nickNameBg }) => {
+}> = ({ data, nickNameBg }) => {
   const [contentData, setContentData] = useState<communityContentList[]>([]);
   const [pageable, setPageable] = useState({
     pageNumber: 1,
@@ -53,8 +52,6 @@ const CommunityBoxDetail: React.FC<{
   const [more, setMore] = useState<boolean>(false);
 
   const containerRef = useRef<any>(null);
-
-  const reduxContentData = useSelector(selectRender);
 
   useEffect(() => {
     onGetCommunityContentAll(pageable.pageNumber);
@@ -124,7 +121,7 @@ const CommunityBoxDetail: React.FC<{
 
   return (
     <article
-      className="h-[430px]
+      className="
       flex
       justify-between
       p-3
@@ -139,7 +136,7 @@ const CommunityBoxDetail: React.FC<{
        "
     >
       <div className="w-full">
-        <div className="z-20 w-full h-16 p-3 flex flex-col relative">
+        <div className="z-20 w-full h-16 px-3 py-1 flex flex-col relative">
           <Image
             src={
               data.originalGoalImageUrl === null
@@ -155,18 +152,27 @@ const CommunityBoxDetail: React.FC<{
             className="rounded-tl-md	rounded-tr-md"
           ></Image>
           <div className="bg-black opacity-40 z-10 w-full h-full absolute top-0 left-0 rounded-tl-md	rounded-tr-md"></div>
-          <section className="h-full absolute z-20 top-2 left-4 flex flex-col">
-            <h3 className="text-white text-xl font-bold">
+          <section className="h-full z-20 flex flex-col">
+            <h3 className="text-white text-lg font-bold leading-6">
               {data.originalGoalTitle}
             </h3>
-            <p className="text-sm text-slate-200">
-              {data.originalGoalDescription}
-            </p>
+            <div className="w-full h-8 flex justify-between items-center text-white">
+              <p className=" text-xs text-slate-200 w-[calc(100%-20px)]">
+                {data.originalGoalDescription}
+              </p>
+
+              <ShareButton
+                isShare={data.share}
+                goalId={data.originalGoalId}
+                isPostPage={false}
+                goalshareCnt={data.originalGoalshareCnt}
+              ></ShareButton>
+            </div>
           </section>
         </div>
-        <section className="h-[calc(100%-108px)]">
+        <section className={`${contentData.length > 3 ? 'h-80' : ''}`}>
           <ul
-            className="w-full h-full overflow-y-scroll pr-2 py-3"
+            className={`w-full h-full overflow-y-scroll pr-2 py-3`}
             ref={containerRef}
           >
             {contentData.map((list, listIndex) => {

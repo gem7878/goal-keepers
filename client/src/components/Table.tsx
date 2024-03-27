@@ -1,63 +1,68 @@
 'use client';
 
-import React from 'react';
-import { useTable } from 'react-table';
+import React, { SetStateAction } from 'react';
 
-const Table = ({ columns, data, setSelectData, setOpen }: any) => {
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns, data });
+interface InquiryTypes {
+  inquiryId: number;
+  title: string;
+  content: string;
+  createdAt: string;
+  answered: boolean;
+}
+
+interface TableTypes {
+  data: InquiryTypes[];
+  setSelectData: React.Dispatch<SetStateAction<InquiryTypes | null>>;
+  setOpen: React.Dispatch<SetStateAction<boolean>>;
+}
+
+const Table: React.FC<TableTypes> = ({ data, setSelectData, setOpen }) => {
   return (
-    <table
-      {...getTableProps()}
-      style={{ borderCollapse: 'collapse', width: '100%' }}
-    >
-      <thead>
-        {headerGroups.map((headerGroup, index) => (
-          <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-            {headerGroup.headers.map((column, i) => (
-              <th
-                {...column.getHeaderProps()}
-                style={{
-                  borderBottom: '1px solid #ddd',
-                  background: '#f2f2f2',
-                  padding: '8px',
-                  textAlign: 'center',
-                }}
+    <div className="w-full table-element">
+      <header className="w-full">
+        <ul className="w-full flex border-b border-neutral-300 bg-neutral-100 p-1 text-center text-sm">
+          <li className="w-[58%]">제목</li>
+          <li className="w-[29%]">날짜</li>
+          <li className="w-[13%]">답변</li>
+        </ul>
+      </header>
+      <main className="w-full">
+        <ul className="w-full">
+          {data.map((value, i) => {
+            return (
+              <li
                 key={i}
+                className="w-full border-b border-neutral-300 flex text-[13px] text-center py-5 "
+                onClick={() => {
+                  setSelectData(value);
+                  setOpen(true);
+                }}
               >
-                {column.render('Header')}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row, index) => {
-          prepareRow(row);
-          return (
-            <tr
-              {...row.getRowProps()}
-              style={{ borderBottom: '1px solid #ddd' }}
-              key={index}
-              onClick={() => {
-                setSelectData(row.original);
-                setOpen(true);
-              }}
-            >
-              {row.cells.map((cell, i) => (
-                <td
-                  {...cell.getCellProps()}
-                  style={{ padding: '8px', textAlign: 'center' }}
-                  key={i}
-                >
-                  {cell.render('Cell')}
-                </td>
-              ))}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+                <div className="w-[58%] ">
+                  <span>
+                    {value.title.length > 14
+                      ? value.title.slice(0, 14) + '...'
+                      : value.title}
+                  </span>
+                </div>
+                <div className="w-[29%]">
+                  <span>{value.createdAt.slice(0, 10)}</span>
+                </div>
+                <div className="w-[13%]">
+                  <span
+                    className={`${
+                      value.answered ? 'text-red-600' : 'text-gray-400'
+                    }`}
+                  >
+                    {value.answered ? '완료' : '대기중'}
+                  </span>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </main>
+    </div>
   );
 };
 

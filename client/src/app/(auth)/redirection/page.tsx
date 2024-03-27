@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { handleKakaoLogin } from './actions';
 import { useRouter } from 'next/navigation';
-import { type } from 'os';
 
 const Redirection = () => {
   const router = useRouter();

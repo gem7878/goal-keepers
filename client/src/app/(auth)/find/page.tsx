@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { handleFindPassword } from './actions';
 import Link from 'next/link';
@@ -11,7 +10,6 @@ const Find = () => {
   const [message, setMessage] = useState<String | null>(null);
   const [errorMessage, setErrorMessage] = useState<String | null>(null);
 
-  const router = useRouter();
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setIsError(false);
@@ -22,11 +20,9 @@ const Find = () => {
     };
     const response = await handleFindPassword(postData)
     if (response.statusCode == 200) {
-      console.log(response.message);
       setMessage(response.message);
       setIsPost(true);
     } else {
-      console.log(response);
       setIsError(true);
       setErrorMessage(response.message);
     }

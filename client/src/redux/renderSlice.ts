@@ -11,6 +11,7 @@ const renderSlice = createSlice({
     contentBoolean: false,
     privateBoolean: false,
     alarmBoolean: false,
+    inquiryBoolean: false,
     alarmTargetBoolean: false,
     logOutBoolean: false,
   },
@@ -42,6 +43,9 @@ const renderSlice = createSlice({
     setStateAlarm: (state, action) => {
       state.alarmBoolean = action.payload;
     },
+    setStateInquiry: (state, action) => {
+      state.inquiryBoolean = action.payload;
+    },
     setStateAlarmTarget: (state, action) => {
       state.alarmBoolean = action.payload;
     },
@@ -61,6 +65,7 @@ export const {
   setStateContent,
   setStatePrivate,
   setStateAlarm,
+  setStateInquiry,
   setStateAlarmTarget,
   setStateLogOut,
 } = renderSlice.actions;

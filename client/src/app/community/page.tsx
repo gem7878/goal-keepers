@@ -12,7 +12,7 @@ import React, {
   useState,
 } from 'react';
 import { handleGetCommunityAll } from './actions';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectRender } from '@/redux/renderSlice';
 
 interface communityContentList {
@@ -44,39 +44,6 @@ interface communityContentTypes {
   share: boolean;
 }
 
-interface myCommunityListTypes {
-  timestamp: string;
-  success: boolean;
-  message: null | string;
-  data: {
-    content: communityContentTypes[];
-  };
-  pageable: {
-    pageNumber: number;
-    pageSize: number;
-    sort: {
-      empty: boolean;
-      sorted: boolean;
-      unsorted: boolean;
-    };
-    offset: number;
-    paged: boolean;
-    unpaged: boolean;
-  };
-  last: boolean;
-  totalPages: number;
-  totalElements: number;
-  first: boolean;
-  numberOfElements: number;
-  size: number;
-  number: number;
-  sort: {
-    empty: boolean;
-    sorted: boolean;
-    unsorted: boolean;
-  };
-  empty: boolean;
-}
 const Community = (props: any) => {
   const [focusNum, setFocusNum] = useState<number | null>(null);
   const [communityData, setCommunityData] = useState<communityContentTypes[]>(
@@ -104,6 +71,7 @@ const Community = (props: any) => {
 
   const containerRef = useRef<any>(null);
 
+  const dispatch = useDispatch();
   const reduxCommunityData = useSelector(selectRender);
 
   useEffect(() => {
@@ -181,7 +149,6 @@ const Community = (props: any) => {
       last: false,
     });
   };
-
   return (
     <div className="w-full h-full pt-[40px] flex flex-col">
       <SearchBox
@@ -199,7 +166,6 @@ const Community = (props: any) => {
           return focusNum === index ? (
             <CommunityBoxDetail
               key={index}
-              index={index}
               data={data}
               nickNameBg={nickNameBg}
             ></CommunityBoxDetail>

@@ -10,7 +10,6 @@ import React, {
   useState,
 } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
-import Image2 from '@/public/assets/images/gem.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectRender } from '@/redux/renderSlice';
 import { handleGetGoalListAll } from '@/app/actions';

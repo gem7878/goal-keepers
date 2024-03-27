@@ -10,14 +10,6 @@ export const setAccessTokenCookie = (token: string) => {
   const expiresDate = new Date();
   expiresDate.setTime(expiresDate.getTime() + oneDayInSeconds * 1000);
 
-  // Cookies.set('accessToken', token, {
-  //   expires: expiresDate,
-  //   path: '/',
-  //   httpOnly: true,
-  //   secure: process.env.NEXT_PUBLIC_ENV === 'production',
-  //   sameSite: process.env.NEXT_PUBLIC_ENV === 'production' ? 'none' : 'lax',
-  // });
-
   cookies().set({
     name: 'accessToken',
     // name: '_vercel_jwt',

@@ -8,7 +8,6 @@ import React, {
   useState,
 } from 'react';
 import Image1 from '../../../../../public/assets/images/goalKeepers.png';
-import Image2 from '../../../../../public/assets/images/gem.png';
 import Image from 'next/image';
 import { useDispatch } from 'react-redux';
 import { setCreateButton } from '@/redux/renderSlice';
