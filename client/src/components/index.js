@@ -1,8 +1,8 @@
-export { default as Layout } from './Layout.tsx';
 export { default as Navbar } from './Navbar.tsx';
 export { default as MyGoals } from './MyGoals.tsx';
 export { default as MyPosts } from './MyPosts.tsx';
 export { default as CreateButton } from './CreateButton.tsx';
+export { default as ShareButton } from './ShareButton.tsx';
 export { default as PostBox } from './PostBox.tsx';
 export { default as PostBoxDetail } from './PostBoxDetail.tsx';
 export { default as CommunityBox } from './CommunityBox.tsx';
@@ -15,3 +15,5 @@ export { default as PullToRefresh } from './PullToRefresh.tsx';
 export { default as Table } from './Table.tsx';
 export { default as GoalModal } from './GoalModal.tsx';
 export { default as CsModal } from './CsModal.tsx';
+export { default as InquiryModal } from './InquiryModal.tsx';
+export { default as FAQBox } from './FAQBox.tsx';

@@ -3,15 +3,11 @@
 import React, { useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faShare, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons';
 import { handleLikeContent } from '@/app/community/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  selectRender,
-  setStateContent,
-  setStatePost,
-} from '@/redux/renderSlice';
+import { selectRender, setStateContent } from '@/redux/renderSlice';
 interface communityContentList {
   content: string;
   contentId: number;
@@ -36,19 +32,16 @@ const ContentBox: React.FC<{
 
   const onLikeContent = async () => {
     setIsLike(!isLike);
-    await handleLikeContent(list.contentId)
-      .then((response) => {
-        if (response.success) {
-          dispatch(setStateContent(!reduxContentData.contentBoolean));
-        }
-      })
-      .catch((error) => console.log(error));
+    const response = await handleLikeContent(list.contentId);
+    if (response.success) {
+      dispatch(setStateContent(!reduxContentData.contentBoolean));
+    }
   };
 
   return (
     <li
       key={index}
-      className={`text-gray-600 bg-neutral-100 py-1 rounded-md px-2 drop-shadow-lg h-12 mb-3 content-element`}
+      className={`text-gray-600 bg-neutral-100 py-1 rounded-md px-2 drop-shadow-lg h-12 mb-3 content-element mx-1`}
     >
       <div className="w-full flex items-center justify-between">
         <div className="rounded-full h-4 bg-orange-200 px-2 ">

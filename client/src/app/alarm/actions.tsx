@@ -2,7 +2,6 @@
 
 import { handleGetToken } from '@/utils/getCookie';
 import axios from 'axios';
-import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
 
 export const handleGetAlarm = async (getData: {
   pageNum: number;

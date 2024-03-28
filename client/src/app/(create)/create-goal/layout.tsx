@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-import { notFound, useParams, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import React from 'react';
 
 export default function CreateGoalLayout({
   children,
@@ -11,22 +10,9 @@ export default function CreateGoalLayout({
 }) {
   const params = useSearchParams();
   const item = params.get('item');
-  
-  // const params = useParams<{ createGoalId: any }>();
-
-  // console.log(params);
-
-  // const [createGoalId, setCreateGoalId] = useState(1);
-
-  // useEffect(() => {
-  //   setCreateGoalId(parseInt(params.createGoalId));
-  // }, [params.createGoalId]);
 
   const createGoalList = ['title', 'description', 'date', 'image'];
 
-  // if (createGoalId > createGoalList.length) {
-  //   notFound();
-  // }
   return (
     <section className="gk-primary-create-section">
       <nav className="w-16">

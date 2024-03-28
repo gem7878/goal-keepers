@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 
 interface joinMemberListTypes {
@@ -14,7 +16,7 @@ const JoinMembersBox: React.FC<{
 
   useEffect(() => {
     formatJoinMemberList();
-  }, []);
+  }, [joinMemberList]);
 
   const formatJoinMemberList = () => {
     const newList = joinMemberList.filter((data) => !data.isOwner && data);
@@ -25,7 +27,7 @@ const JoinMembersBox: React.FC<{
     setNewJoinMember(newList);
   };
   return (
-    <section className="h-11 flex flex-col">
+    <section className="h-11 flex flex-col mt-2">
       <h5 className="text-xs font-bold">JOIN MEMBERS</h5>
       <ul className="flex gap-[3px] mt-1">
         {newJoinMember.length > 10 ? (

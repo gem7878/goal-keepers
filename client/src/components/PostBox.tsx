@@ -1,10 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import Image1 from '../../public/assets/images/goalKeepers.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faShare, faPlus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faHeart,
+  faPlus,
+} from '@fortawesome/free-solid-svg-icons';
+import ShareButton from './ShareButton';
 
 interface postContentTypes {
   content: string;
@@ -37,17 +41,7 @@ const PostBox: React.FC<{
   focusNum: number | null;
   setFocusNum: React.Dispatch<React.SetStateAction<number | null>>;
   onCheerPost: (index: number) => void;
-  onShareGoal: (index: number) => void;
-  onGetShareData: (index: number) => void;
-}> = ({
-  data,
-  index,
-  focusNum,
-  setFocusNum,
-  onCheerPost,
-  onShareGoal,
-  onGetShareData,
-}) => {
+}> = ({ data, index, focusNum, setFocusNum, onCheerPost }) => {
   const likeRef = useRef<HTMLUListElement>(null);
 
   const handleFocus = (e: { target: any }) => {
@@ -89,10 +83,6 @@ const PostBox: React.FC<{
           ></Image>
         </div>
 
-        <h3 className="text-center px-1 max-w-fit mx-4	text-white	font-bold absolute top-1/3 -translate-y-1/3 z-10 bg-black text-ellipsis	">
-          {data.goalTitle}
-          {data.goalTitle.length > 22 && '...'}
-        </h3>
         <ul ref={likeRef} className="flex w-full justify-center	gap-2">
           <li className="flex items-center gap-1">
             <FontAwesomeIcon
@@ -108,36 +98,33 @@ const PostBox: React.FC<{
               {data.postCheerCnt}
             </label>
           </li>
-          <li className="flex items-center gap-1">
-            <FontAwesomeIcon
-              icon={faShare}
-              onClick={() => {
-                data.share ? onGetShareData(data.goalId) : onShareGoal(index);
-              }}
-              className="text-gray-600"
-            />
-            <label
-              className={`text-xs	${
-                data.share ? 'text-orange-400' : 'text-gray-500'
-              }`}
-            >
-              {data.goalshareCnt}
-            </label>
-          </li>
+          <ShareButton
+            isShare={data.share}
+            goalId={data.goalId}
+            isPostPage={true}
+            goalshareCnt={data.goalshareCnt}
+          ></ShareButton>
         </ul>
       </div>
-      <div className="w-1/2	flex flex-col justify-center">
-        <li
-          className={`text-gray-600 text-sm bg-orange-100 my-2 py-1 rounded-md px-2 flex justify-between`}
-        >
-          <span>{data.content.content}</span>
-        </li>
-        <FontAwesomeIcon icon={faPlus} className="text-gray-600 mt-3" />
-        {/* <div className="flex flex-col">
-          <span className="text-center h-5">.</span>
-          <span className="text-center h-5">.</span>
-          <span className="text-center h-5">.</span>
-        </div> */}
+      <div className="w-1/2	flex flex-col justify-between py-2">
+        <div>
+          <h3 className="px-1 text-neutral-800	font-bold z-10 h-[50px]">
+            {data.goalTitle.length > 18
+              ? `${data.goalTitle.slice(0, 18)}...`
+              : data.goalTitle}
+          </h3>
+          <li
+            className={`text-gray-600 text-sm bg-orange-100 mx-1 my-2 py-1 rounded-md px-2 flex justify-between drop-shadow`}
+          >
+            <span>
+              {data.content.content.length > 18
+                ? `${data.content.content.slice(0, 18)}...`
+                : data.content.content}
+            </span>
+          </li>
+        </div>
+
+        <FontAwesomeIcon icon={faPlus} className="text-gray-600 mt-3 text-xs" />
       </div>
     </article>
   );

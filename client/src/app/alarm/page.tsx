@@ -2,13 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCaretUp,
-  faCaretDown,
-  faCog,
-  faTrash,
-} from '@fortawesome/free-solid-svg-icons';
 import {
   handleDeleteAlarm,
   handleGetAlarm,

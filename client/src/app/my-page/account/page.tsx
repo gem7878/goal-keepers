@@ -1,15 +1,15 @@
 'use client';
 
 import { handleConfirmNickName } from '@/app/(auth)/register/actions';
-import React, { useEffect, useState } from 'react';
-import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
+import React, { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
   handleChangeNickname,
   handleChangePassword,
   handleLogout,
   handleRemoveMember,
 } from './actions';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setStateLogOut } from '@/redux/renderSlice';
 
@@ -22,9 +22,6 @@ const Account = () => {
   const {
     control,
     getValues,
-    setError,
-    watch,
-    handleSubmit,
     formState: { errors, isValid },
   } = useForm({
     mode: 'onChange',

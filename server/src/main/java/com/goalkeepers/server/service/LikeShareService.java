@@ -159,12 +159,12 @@ public class LikeShareService extends ServiceHelper {
         }
     }
 
-    // 담기 취소 - 참여 제외
-    @Transactional
-    public void disconnecteOriginGoal(Long goalId) {
-        Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
-        deleteShare(goal);
-    }
+    // // 담기 취소 - 골 삭제하기
+    // @Transactional
+    // public void disconnecteOriginGoal(Long goalId) {
+    //     Goal goal = isMyGoal(memberRepository, goalRepository, goalId);
+    //     deleteShare(goal);
+    // }
 
     // 목표 삭제 - 담기 데이터 삭제
     public void deleteShare(Goal goal) {

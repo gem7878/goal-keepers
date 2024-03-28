@@ -24,8 +24,6 @@ import {
   faEdit,
   faTrash,
   faWindowClose,
-  faCheckSquare,
-  faCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { selectAlarmData } from '@/redux/alarmDataSlice';
 
@@ -76,6 +74,7 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
 
   useLayoutEffect(() => {
     if (containerRef.current) {
+
       containerRef.current.addEventListener('scroll', handleScroll);
       return () =>
         containerRef.current.removeEventListener('scroll', handleScroll);
@@ -232,7 +231,9 @@ const CommentBox: React.FC<CommentBoxTypes> = ({ postId, myNickname }) => {
             return (
               <li
                 key={index}
-                className={`flex-col w-full h-9 p-[2px] comment-element text-gray-700 ${focusComment === index && 'bg-orange-100'}`}
+                className={`flex-col w-full h-9 p-[2px] comment-element text-gray-700 ${
+                  focusComment === index && 'bg-orange-100'
+                }`}
               >
                 <div className="flex text-xs w-full justify-between">
                   <h4 className=" font-bold">{list.nickname}</h4>

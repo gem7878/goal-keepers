@@ -15,7 +15,6 @@ import { Provider } from 'react-redux';
 import { store } from '../redux/store';
 import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
 import { tokenValue } from './alarm/actions';
-import { handleGetEventId, handleGetToken } from '@/utils/getCookie';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';

@@ -47,7 +47,7 @@ export const handleGetUserInfo = async () => {
         },
       },
     );
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.log('error', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
